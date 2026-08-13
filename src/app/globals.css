@@ -1,1 +1,7 @@
 @import "tailwindcss";
+
+@theme {
+  --color-rialo-a9ddd3: #a9ddd3;
+  --color-rialo-e8e3d5: #e8e3d5;
+  --color-rialo-010101: #010101;
+}
