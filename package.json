@@ -9,7 +9,8 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
-    "db:check": "drizzle-kit check"
+    "db:check": "drizzle-kit check",
+    "quiz:validate": "tsx scripts/validate-question-bank.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.2",

@@ -1,0 +1,1079 @@
+{
+  "title": "Rialo Community Quiz",
+  "version": 1,
+  "questionCount": 89,
+  "notes": {
+    "categoryVisibility": "Internal metadata only. Do not show categories to players during the quiz.",
+    "source": "Transcribed exactly from the finalized 89-question list supplied in this conversation."
+  },
+  "questions": [
+    {
+      "id": 1,
+      "category": "Rialo: Fundamentals & Ecosystem",
+      "question": "Which company is the original contributor behind Rialo?",
+      "options": {
+        "A": "Mysten Labs",
+        "B": "Subzero Labs",
+        "C": "Pantera Labs",
+        "D": "Rialo Foundation"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 2,
+      "category": "Rialo: Fundamentals & Ecosystem",
+      "question": "How does Rialo currently describe itself on its main website?",
+      "options": {
+        "A": "A decentralized storage network",
+        "B": "A Bitcoin execution layer",
+        "C": "Infrastructure for the next generation of intelligent systems",
+        "D": "An AI-only application chain"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 3,
+      "category": "Rialo: Fundamentals & Ecosystem",
+      "question": "What was Rialo originally introduced as?",
+      "options": {
+        "A": "The Real World Blockchain",
+        "B": "The Universal Rollup",
+        "C": "The Agent Settlement Layer",
+        "D": "The Financial Data Chain"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 4,
+      "category": "Rialo: Fundamentals & Ecosystem",
+      "question": "Who is the co-founder and CEO of Subzero Labs?",
+      "options": {
+        "A": "Bobby Zagotta",
+        "B": "Jan Camenisch",
+        "C": "Lu Zhang",
+        "D": "Ade Adepoju"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 5,
+      "category": "Rialo: Fundamentals & Ecosystem",
+      "question": "How much did Subzero Labs announce in its initial raise to build Rialo?",
+      "options": {
+        "A": "$8 million",
+        "B": "$12 million",
+        "C": "$20 million",
+        "D": "$50 million"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 6,
+      "category": "Rialo Architecture",
+      "question": "Which Rialo component is responsible for bidirectional Web2 interactivity?",
+      "options": {
+        "A": "Rialo Cruise",
+        "B": "Rialo Stream",
+        "C": "Rialo Edge",
+        "D": "Rialo Consensus"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 7,
+      "category": "Rialo Architecture",
+      "question": "What concurrency figure does Rialo advertise for Rialo Edge web calls?",
+      "options": {
+        "A": "More than 1,000",
+        "B": "More than 100,000",
+        "C": "More than 10 million",
+        "D": "Exactly 1,337"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 8,
+      "category": "Rialo Architecture",
+      "question": "Which component provides native automation and autonomous complex workflows?",
+      "options": {
+        "A": "Rialo Workflow",
+        "B": "Rialo Cruise",
+        "C": "Rialo Omni Account",
+        "D": "Rialo Consensus"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 9,
+      "category": "Rialo Architecture",
+      "question": "Which Rialo component is designed to provide data access and state updates directly from validators?",
+      "options": {
+        "A": "Rialo IPC",
+        "B": "Rialo Stream",
+        "C": "Rialo Edge",
+        "D": "Rialo Read Path"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 10,
+      "category": "Rialo Architecture",
+      "question": "Rialo says its Read Path can reduce certain data-access latency to approximately:",
+      "options": {
+        "A": "5 seconds",
+        "B": "1 second",
+        "C": "100 milliseconds",
+        "D": "10 seconds"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 11,
+      "category": "Rialo Architecture",
+      "question": "Which instruction-set architecture is used by Rialo VM?",
+      "options": {
+        "A": "x86",
+        "B": "RISC-V",
+        "C": "ARM64 only",
+        "D": "WASM only"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 12,
+      "category": "Rialo Architecture",
+      "question": "Which VM ecosystem is Rialo VM currently advertised as compatible with?",
+      "options": {
+        "A": "SVM",
+        "B": "Cairo VM",
+        "C": "Bitcoin Script",
+        "D": "FuelVM"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 13,
+      "category": "Rialo Architecture",
+      "question": "Which additional VM environments does Rialo say are intended to follow?",
+      "options": {
+        "A": "Cairo and FuelVM",
+        "B": "CosmWasm and WASM",
+        "C": "Bitcoin VM and TON VM",
+        "D": "EVM and MoveVM"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 14,
+      "category": "Rialo Architecture",
+      "question": "What is REX primarily associated with in Rialo's architecture?",
+      "options": {
+        "A": "Validator staking rewards",
+        "B": "Social identity",
+        "C": "Confidential computing and extended execution",
+        "D": "NFT compression"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 15,
+      "category": "Rialo Architecture",
+      "question": "What block time does Rialo's developer portal advertise for Rialo Consensus?",
+      "options": {
+        "A": "1 second",
+        "B": "50 milliseconds",
+        "C": "400 milliseconds",
+        "D": "12 seconds"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 16,
+      "category": "Rialo Architecture",
+      "question": "Which Rialo component focuses on native gasless transactions and low-to-zero fees?",
+      "options": {
+        "A": "Rialo Cruise",
+        "B": "Rialo Edge",
+        "C": "Rialo Stream",
+        "D": "Rialo Workflow"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 17,
+      "category": "Rialo Architecture",
+      "question": "What is the main idea behind Rialo Omni Account?",
+      "options": {
+        "A": "One validator controlling several nodes",
+        "B": "One stablecoin usable across every fiat currency",
+        "C": "One oracle serving every application",
+        "D": "One account capable of transacting across multiple networks"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 18,
+      "category": "Rialo Architecture",
+      "question": "In Rialo's architecture, IPC stands for:",
+      "options": {
+        "A": "Internet Protocol Consensus",
+        "B": "Identity, Privacy and Compliance",
+        "C": "Inter-Protocol Communication",
+        "D": "Integrated Payment Channels"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 19,
+      "category": "Rialo Architecture",
+      "question": "What is Rialo Stream designed to provide?",
+      "options": {
+        "A": "Validator livestreams",
+        "B": "AI-generated video",
+        "C": "Native data feeds",
+        "D": "Social media indexing"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 20,
+      "category": "Rialo Architecture",
+      "question": "What type of execution is associated with Rialo's Execution Engine?",
+      "options": {
+        "A": "Event-driven execution with Conditional Transactions",
+        "B": "Proof-of-work mining",
+        "C": "Batch-only settlement",
+        "D": "Manual validator execution"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 21,
+      "category": "Reactive Transactions & Automation",
+      "question": "What determines when a Rialo Reactive Transaction should execute?",
+      "options": {
+        "A": "A centralized operator",
+        "B": "A random validator vote",
+        "C": "A user's daily login",
+        "D": "A predefined condition or predicate"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 22,
+      "category": "Reactive Transactions & Automation",
+      "question": "Which types of events can Reactive Transactions respond to?",
+      "options": {
+        "A": "Only block-height changes",
+        "B": "Onchain, offchain and time-based conditions",
+        "C": "Only Web2 API responses",
+        "D": "Only token transfers"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 23,
+      "category": "Reactive Transactions & Automation",
+      "question": "Who evaluates the native Reactive Transaction execution pipeline?",
+      "options": {
+        "A": "A separate keeper network",
+        "B": "A single sequencer",
+        "C": "Rialo validators as part of native execution",
+        "D": "External oracle companies only"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 24,
+      "category": "Reactive Transactions & Automation",
+      "question": "Which external infrastructure does native reactive execution aim to reduce or remove?",
+      "options": {
+        "A": "Bots, keepers and cron-style schedulers",
+        "B": "Wallets and private keys",
+        "C": "Validators and consensus",
+        "D": "Smart contracts"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 25,
+      "category": "Reactive Transactions & Automation",
+      "question": "What does “supermodularity” mean in Rialo's design philosophy?",
+      "options": {
+        "A": "Every application runs on its own blockchain",
+        "B": "Components must remain independent",
+        "C": "Every feature should have a separate token",
+        "D": "Complementary components become more valuable when combined"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 26,
+      "category": "Reactive Transactions & Automation",
+      "question": "How does Rialo define “system welfare” in its Supermodularity research?",
+      "options": {
+        "A": "Total validator rewards only",
+        "B": "Total token market capitalization",
+        "C": "Value created for users and developers after costs, coordination overhead and operational risk",
+        "D": "Number of applications deployed"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 27,
+      "category": "Reactive Transactions & Automation",
+      "question": "What does Rialo mean by “compound marginalization” in crypto?",
+      "options": {
+        "A": "Validators producing multiple blocks",
+        "B": "Multiple middleware layers independently adding costs and markups",
+        "C": "Users splitting transactions between wallets",
+        "D": "Tokens losing value across bridges"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 28,
+      "category": "Reactive Transactions & Automation",
+      "question": "What economic approach does Rialo emphasize as a way to address compound marginalization?",
+      "options": {
+        "A": "Vertical integration",
+        "B": "Higher token inflation",
+        "C": "Separate execution layers",
+        "D": "Proof-of-work mining"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 29,
+      "category": "Reactive Transactions & Automation",
+      "question": "Which group contains services Rialo argues can benefit from being integrated more natively?",
+      "options": {
+        "A": "Social feeds, games and NFTs",
+        "B": "Exchanges, wallets and browsers",
+        "C": "Mining pools, faucets and memecoins",
+        "D": "Data feeds, automation and web calls"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 30,
+      "category": "Stake-for-Service",
+      "question": "What does Stake-for-Service primarily convert into service credits?",
+      "options": {
+        "A": "Transaction tips",
+        "B": "Bridge fees",
+        "C": "Staking yield",
+        "D": "NFT royalties"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 31,
+      "category": "Stake-for-Service",
+      "question": "What is the component that converts routed rewards into service credits called?",
+      "options": {
+        "A": "Execution Treasurer",
+        "B": "ServicePaymaster",
+        "C": "Yield Router",
+        "D": "Validator Gateway"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 32,
+      "category": "Stake-for-Service",
+      "question": "What can Stake-for-Service credits be used to pay for?",
+      "options": {
+        "A": "Gas, storage and scheduled execution",
+        "B": "Only validator hardware",
+        "C": "Only NFT minting",
+        "D": "Fiat bank transfers"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 33,
+      "category": "Stake-for-Service",
+      "question": "In a Stake-for-Service position, what does the “routing fraction” specify?",
+      "options": {
+        "A": "The percentage of validators that must approve a transaction",
+        "B": "The percentage of tokens to burn",
+        "C": "The user's voting power",
+        "D": "The portion of future staking rewards directed toward services"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 34,
+      "category": "Stake-for-Service",
+      "question": "What happens to the staking principal when part of its yield is routed through Stake-for-Service?",
+      "options": {
+        "A": "It is automatically burned",
+        "B": "It remains staked and continues securing the network",
+        "C": "It becomes a service credit",
+        "D": "It is transferred to application developers"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 35,
+      "category": "Stake-for-Service",
+      "question": "How are Stake-for-Service credits described outside their service context?",
+      "options": {
+        "A": "Freely tradable",
+        "B": "Bridgeable to any chain",
+        "C": "Non-transferable",
+        "D": "Convertible into NFTs"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 36,
+      "category": "Stake-for-Service",
+      "question": "Combining Reactive Transactions with Stake-for-Service is intended to make which type of system easier to sustain?",
+      "options": {
+        "A": "Long-running automated workflows funded by staking yield",
+        "B": "Proof-of-work mining pools",
+        "C": "Centralized order books",
+        "D": "Manual multisig operations"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 37,
+      "category": "Project 1337",
+      "question": "What did Project 1337 primarily demonstrate?",
+      "options": {
+        "A": "A decentralized social network",
+        "B": "A new NFT marketplace",
+        "C": "A validator reputation system",
+        "D": "Streaming live financial-market data into an onchain system at high speed"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 38,
+      "category": "Project 1337",
+      "question": "Which data provider was referenced as the source used in Project 1337?",
+      "options": {
+        "A": "Bloomberg",
+        "B": "Massive",
+        "C": "Reuters",
+        "D": "CoinGecko"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 39,
+      "category": "Project 1337",
+      "question": "Instead of simply publishing raw financial data, what did Project 1337 calculate?",
+      "options": {
+        "A": "Validator voting power",
+        "B": "Token emission schedules",
+        "C": "A market-maker-style best estimate of price",
+        "D": "NFT rarity scores"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 40,
+      "category": "Project 1337",
+      "question": "How were Project 1337's processed updates authenticated?",
+      "options": {
+        "A": "They were cryptographically signed",
+        "B": "They were approved through Discord votes",
+        "C": "They were checked manually",
+        "D": "They were stored only in a private database"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 41,
+      "category": "Project 1337",
+      "question": "Which applications were mentioned as potential beneficiaries of Project 1337-style infrastructure?",
+      "options": {
+        "A": "Social profiles and gaming skins",
+        "B": "Proof-of-work pools and mining farms",
+        "C": "Messaging applications only",
+        "D": "Perpetual markets, RWAs and synthetic financial systems"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 42,
+      "category": "Rialo & the Agent Economy",
+      "question": "What does SCALE stand for?",
+      "options": {
+        "A": "Secure Coordination and Agent Liquidity Engine",
+        "B": "Simple Contracts for Agent Labor Execution",
+        "C": "Smart Contract Agent Logic Environment",
+        "D": "Secure Compute and Labor Exchange"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 43,
+      "category": "Rialo & the Agent Economy",
+      "question": "SCALE was described as being inspired by which well-known startup financing instrument?",
+      "options": {
+        "A": "Convertible bond",
+        "B": "IPO prospectus",
+        "C": "YC SAFE Note",
+        "D": "Treasury bill"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 44,
+      "category": "Rialo & the Agent Economy",
+      "question": "Which set correctly describes the core terms included in a SCALE task?",
+      "options": {
+        "A": "Prompt, payment, deadline and judge",
+        "B": "Validator, bridge, wallet and NFT",
+        "C": "Block height, gas price, sequencer and miner",
+        "D": "Username, password, role and profile"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 45,
+      "category": "Rialo & the Agent Economy",
+      "question": "What happens to the payment when a SCALE task is created?",
+      "options": {
+        "A": "It remains entirely offchain",
+        "B": "It is sent directly to the worker before work starts",
+        "C": "It is burned temporarily",
+        "D": "It is escrowed onchain"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 46,
+      "category": "Rialo & the Agent Economy",
+      "question": "Which protocol is mentioned for communication between agents in Rialo's SCALE example?",
+      "options": {
+        "A": "SMTP",
+        "B": "Google's Agent2Agent (A2A)",
+        "C": "BitTorrent",
+        "D": "Lightning Network"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 47,
+      "category": "Rialo & the Agent Economy",
+      "question": "Where can an agent search for another suitable agent in the SCALE example?",
+      "options": {
+        "A": "Rialo Agent Registry",
+        "B": "Ethereum Name Service",
+        "C": "Cboe EDGX",
+        "D": "Rialo Cruise"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 48,
+      "category": "Rialo & the Agent Economy",
+      "question": "What can happen automatically if an agent misses the task deadline in the SCALE example?",
+      "options": {
+        "A": "Rialo's native timers can trigger a refund",
+        "B": "All validators are slashed",
+        "C": "The task becomes an NFT",
+        "D": "The worker automatically receives payment"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 49,
+      "category": "Rialo & the Agent Economy",
+      "question": "What happens when the judge agent gives the submitted work a passing verdict?",
+      "options": {
+        "A": "The task is deleted",
+        "B": "The requester is refunded",
+        "C": "The validator receives the task payment",
+        "D": "The working agent receives the agreed payment"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 50,
+      "category": "Rialo & the Agent Economy",
+      "question": "Which Rialo primitive helps programs communicate with external AI agents and internet services?",
+      "options": {
+        "A": "Proof-of-work",
+        "B": "Validator delegation",
+        "C": "Native webcalls",
+        "D": "NFT compression"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 51,
+      "category": "Rialo & the Agent Economy",
+      "question": "Which combination of native capabilities does Rialo highlight as especially useful for integrated lending infrastructure?",
+      "options": {
+        "A": "Real-world data, automation, and private/verifiable computation",
+        "B": "NFT minting, gaming and social feeds",
+        "C": "Mining, staking and token burning",
+        "D": "Memecoins, DAOs and profile pictures"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 52,
+      "category": "Rialo & the Agent Economy",
+      "question": "Which set consists entirely of tutorials currently listed as available on Rialo Learn?",
+      "options": {
+        "A": "Threshold Cryptography, Privacy, Compliance, REX",
+        "B": "Solidity, Cairo, Move, Bitcoin Script",
+        "C": "Stablecoin Mining, NFT Design, Token Trading, DAOs",
+        "D": "Concurrency Control, Consistency Levels, Async Transactions, Reactive Transactions"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 53,
+      "category": "Latch",
+      "question": "What is Latch?",
+      "options": {
+        "A": "A decentralized exchange",
+        "B": "A governance and access-control layer for AI agents",
+        "C": "A Rialo NFT marketplace",
+        "D": "A validator client"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 54,
+      "category": "Latch",
+      "question": "In Latch terminology, what is the real API credential stored inside Latch called?",
+      "options": {
+        "A": "Mount",
+        "B": "Pipeline",
+        "C": "Secret",
+        "D": "Predicate"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 55,
+      "category": "Latch",
+      "question": "What happens to the plaintext credential after it is stored as a Latch Secret?",
+      "options": {
+        "A": "Latch does not return it to the user, dashboard or caller",
+        "B": "It is published onchain",
+        "C": "It becomes part of every Latch token",
+        "D": "It is sent to every connected agent"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 56,
+      "category": "Latch",
+      "question": "Which prefix is used by scoped Latch access tokens?",
+      "options": {
+        "A": "`rlo_`",
+        "B": "`api_`",
+        "C": "`agt_`",
+        "D": "`lat_`"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 57,
+      "category": "Latch",
+      "question": "What happens before Latch uses the real credential for an agent request?",
+      "options": {
+        "A": "A human must approve every call",
+        "B": "The request passes through the policy pipeline",
+        "C": "The credential is sent to the agent",
+        "D": "The token is converted into USDC"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 58,
+      "category": "Latch",
+      "question": "What happens when the first filter in a Latch pipeline denies a request?",
+      "options": {
+        "A": "The remaining filters override the denial",
+        "B": "The request is sent upstream anyway",
+        "C": "Evaluation short-circuits and the upstream is not called",
+        "D": "The credential is permanently deleted"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 59,
+      "category": "Latch",
+      "question": "What status code is normally returned when a Latch policy filter denies a request?",
+      "options": {
+        "A": "403",
+        "B": "200",
+        "C": "301",
+        "D": "500"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 60,
+      "category": "Latch",
+      "question": "What status code is returned when a Latch rate limit is exceeded?",
+      "options": {
+        "A": "403",
+        "B": "404",
+        "C": "500",
+        "D": "429"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 61,
+      "category": "Latch",
+      "question": "Into which three groups does Latch divide its filters?",
+      "options": {
+        "A": "Local, Global and Remote",
+        "B": "Read, Write and Delete",
+        "C": "Request, Response and Metered",
+        "D": "Public, Private and Hybrid"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 62,
+      "category": "Latch",
+      "question": "Which Latch filter controls which upstream paths a token may reach?",
+      "options": {
+        "A": "`endpoint`",
+        "B": "`identity`",
+        "C": "`response`",
+        "D": "`spend_limit`"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 63,
+      "category": "Latch",
+      "question": "Which filter restricts HTTP verbs such as GET, POST and DELETE?",
+      "options": {
+        "A": "`payload`",
+        "B": "`endpoint`",
+        "C": "`cedar`",
+        "D": "`method`"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 64,
+      "category": "Latch",
+      "question": "Which filter can enforce rules against fields inside a JSON request body?",
+      "options": {
+        "A": "`response`",
+        "B": "`payload`",
+        "C": "`identity`",
+        "D": "`ip_allowlist`"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 65,
+      "category": "Latch",
+      "question": "Which filter can reject a request because its body exceeds a specified number of bytes?",
+      "options": {
+        "A": "`spend_limit`",
+        "B": "`method`",
+        "C": "`body_size`",
+        "D": "`endpoint`"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 66,
+      "category": "Latch",
+      "question": "Which Latch filter can restrict requests to particular hours and days?",
+      "options": {
+        "A": "`time_window`",
+        "B": "`payload`",
+        "C": "`response`",
+        "D": "`body_size`"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 67,
+      "category": "Latch",
+      "question": "Which filter can restrict requests based on the caller's IP address?",
+      "options": {
+        "A": "`method`",
+        "B": "`rate_limit`",
+        "C": "`custom_code`",
+        "D": "`ip_allowlist`"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 68,
+      "category": "Latch",
+      "question": "Which Latch filter is used to gate access to enrolled agent identities?",
+      "options": {
+        "A": "`payload`",
+        "B": "`identity`",
+        "C": "`response`",
+        "D": "`endpoint`"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 69,
+      "category": "Latch",
+      "question": "Which filter can inspect an upstream reply and block or redact it before the agent sees it?",
+      "options": {
+        "A": "`method`",
+        "B": "`time_window`",
+        "C": "`response`",
+        "D": "`rate_limit`"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 70,
+      "category": "Latch",
+      "question": "Which Latch filter is designed to enforce live daily-spending constraints?",
+      "options": {
+        "A": "`spend_limit`",
+        "B": "`endpoint`",
+        "C": "`body_size`",
+        "D": "`header_requirement`"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 71,
+      "category": "Latch",
+      "question": "If a Latch is extended into a child, what can the child do to the parent's authority?",
+      "options": {
+        "A": "Ignore the parent's policies",
+        "B": "Gain unrestricted access",
+        "C": "Replace the real credential",
+        "D": "Narrow the authority further"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 72,
+      "category": "Latch",
+      "question": "How is an extended Latch's parent policy resolved?",
+      "options": {
+        "A": "Only once when the child is created",
+        "B": "Live at request time",
+        "C": "Once every 30 days",
+        "D": "Only after administrator approval"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 73,
+      "category": "Latch",
+      "question": "What is a multi-mount Latch?",
+      "options": {
+        "A": "One credential copied to many agents without policies",
+        "B": "Multiple Latch accounts merged into one wallet",
+        "C": "Several upstream services placed behind one Latch token",
+        "D": "A validator operating several machines"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 74,
+      "category": "Latch",
+      "question": "What can each mount in a multi-mount Latch have independently?",
+      "options": {
+        "A": "Its own upstream URL, Secret and policy pipeline",
+        "B": "Its own blockchain consensus mechanism",
+        "C": "Its own native token",
+        "D": "Its own Rialo validator set"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 75,
+      "category": "Latch",
+      "question": "What do services behind a multi-mount Latch share?",
+      "options": {
+        "A": "The same API credential in every case",
+        "B": "The same upstream URL",
+        "C": "The same policy rules in every case",
+        "D": "One token and one audit trail"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 76,
+      "category": "Latch",
+      "question": "What happens to Latches derived from a Secret when that underlying credential is rotated?",
+      "options": {
+        "A": "Every Latch must be manually recreated",
+        "B": "They automatically use the updated credential",
+        "C": "They permanently stop working",
+        "D": "Their policies are deleted"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 77,
+      "category": "Latch",
+      "question": "Does revoking one Latch require rotating the underlying API credential?",
+      "options": {
+        "A": "Always",
+        "B": "Only for GET requests",
+        "C": "No",
+        "D": "Only for AI model APIs"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 78,
+      "category": "Latch",
+      "question": "What infrastructure-as-code tool has an official Latch provider for managing Secrets, Latches and KV connections?",
+      "options": {
+        "A": "Terraform",
+        "B": "Kubernetes only",
+        "C": "Docker Compose only",
+        "D": "Ansible only"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 79,
+      "category": "Latch",
+      "question": "Latch was built by which team?",
+      "options": {
+        "A": "Cboe",
+        "B": "Pantera Capital",
+        "C": "Mysten Labs",
+        "D": "Subzero Labs"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 80,
+      "category": "Agent Grand Prix — AGP",
+      "question": "What does AGP stand for in the Rialo/Subzero ecosystem?",
+      "options": {
+        "A": "Autonomous Governance Protocol",
+        "B": "Agent Grand Prix",
+        "C": "Agent Gas Program",
+        "D": "Automated Grand Protocol"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 81,
+      "category": "Agent Grand Prix — AGP",
+      "question": "Which phrase best describes AGP's core concept?",
+      "options": {
+        "A": "Chess combined with DeFi",
+        "B": "Poker played by validators",
+        "C": "“21 Questions meets F1” for AI agents",
+        "D": "An NFT racing game"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 82,
+      "category": "Agent Grand Prix — AGP",
+      "question": "What do AGP agents race through?",
+      "options": {
+        "A": "A circuit of hidden points",
+        "B": "A list of public token prices",
+        "C": "Ethereum blocks",
+        "D": "NFT collections"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 83,
+      "category": "Agent Grand Prix — AGP",
+      "question": "What type of questions do racers use to discover each hidden point?",
+      "options": {
+        "A": "Multiple-choice questions",
+        "B": "Open-ended essays",
+        "C": "Coding challenges",
+        "D": "Yes/no questions"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 84,
+      "category": "Agent Grand Prix — AGP",
+      "question": "How many yes/no questions can a racer ask per hidden point according to the AGP track description?",
+      "options": {
+        "A": "Exactly 3",
+        "B": "Unlimited",
+        "C": "Exactly 21",
+        "D": "One"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 85,
+      "category": "Agent Grand Prix — AGP",
+      "question": "What must an agent eventually do to move past a hidden point?",
+      "options": {
+        "A": "Stake RLO",
+        "B": "Win a validator vote",
+        "C": "Make a guess",
+        "D": "Mint an NFT"
+      },
+      "correctOption": "C"
+    },
+    {
+      "id": 86,
+      "category": "Agent Grand Prix — AGP",
+      "question": "When does AGP track registration occur?",
+      "options": {
+        "A": "During a defined registration window",
+        "B": "Only after the race finishes",
+        "C": "At any time forever",
+        "D": "Only once per year"
+      },
+      "correctOption": "A"
+    },
+    {
+      "id": 87,
+      "category": "Agent Grand Prix — AGP",
+      "question": "What product evaluates AGP interactions before answers reach the racing agent?",
+      "options": {
+        "A": "Rialo Cruise",
+        "B": "Cboe EDGX",
+        "C": "Rialo Stream",
+        "D": "Latch"
+      },
+      "correctOption": "D"
+    },
+    {
+      "id": 88,
+      "category": "Agent Grand Prix — AGP",
+      "question": "Which set is shown on AGP's official site as technology it is built on?",
+      "options": {
+        "A": "Chainlink, Arbitrum, Optimism, Uniswap",
+        "B": "MCP, Sigil, OpenRouter, Latch",
+        "C": "Bitcoin, Lightning, Ordinals, Runes",
+        "D": "IPFS, Filecoin, ENS, Lens"
+      },
+      "correctOption": "B"
+    },
+    {
+      "id": 89,
+      "category": "Agent Grand Prix — AGP",
+      "question": "Which line appears as AGP's philosophy/tagline?",
+      "options": {
+        "A": "“The skill is the question. No pay-to-win.”",
+        "B": "“Fastest model always wins.”",
+        "C": "“More tokens, more speed.”",
+        "D": "“Race first, reason later.”"
+      },
+      "correctOption": "A"
+    }
+  ]
+}
