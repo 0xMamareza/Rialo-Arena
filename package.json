@@ -15,7 +15,8 @@
     "db:verify": "TMPDIR=/tmp tsx scripts/verify-database.ts",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
-    "quiz:validate": "TMPDIR=/tmp tsx scripts/validate-question-bank.ts"
+    "quiz:validate": "TMPDIR=/tmp tsx scripts/validate-question-bank.ts",
+    "quiz:engine:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-engine.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",
@@ -25,6 +26,7 @@
     "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "server-only": "^0.0.1",
     "zod": "^4.4.3"
   },
   "devDependencies": {

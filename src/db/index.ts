@@ -21,6 +21,7 @@ function createPool() {
     max: process.env.NODE_ENV === "production" ? 10 : 5,
     connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 30_000,
+    allowExitOnIdle: process.env.NODE_ENV !== "production",
   });
 }
 
