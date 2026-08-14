@@ -11,6 +11,7 @@ import {
 } from "react";
 
 import styles from "./arena-intro.module.css";
+import { Grainient } from "./grainient";
 
 const WORD = "RIALO";
 const RESTING_WIDTH = 28;
@@ -58,6 +59,7 @@ export function ArenaIntro({
 }: ArenaIntroProps) {
   const [phase, setPhase] = useState<IntroPhase>("open");
   const [pressureEnabled, setPressureEnabled] = useState(false);
+  const [motionEnabled, setMotionEnabled] = useState(false);
   const platformRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLElement>(null);
   const wordRef = useRef<HTMLDivElement>(null);
@@ -121,7 +123,9 @@ export function ArenaIntro({
     const coarsePointer = window.matchMedia("(pointer: coarse)");
 
     const updateCapability = () => {
-      setPressureEnabled(!reducedMotion.matches && !coarsePointer.matches);
+      const motionIsEnabled = !reducedMotion.matches;
+      setMotionEnabled(motionIsEnabled);
+      setPressureEnabled(motionIsEnabled && !coarsePointer.matches);
     };
 
     updateCapability();
@@ -413,6 +417,35 @@ export function ArenaIntro({
                 className={`${styles.backgroundImage} ${styles.backgroundBase}`}
               />
             </div>
+            {phase === "open" && motionEnabled ? (
+              <div className={styles.grainientLayer}>
+                <Grainient
+                  className={styles.grainientCanvas}
+                  color1="#e8e3d5"
+                  color2="#010101"
+                  color3="#e8e3d5"
+                  timeSpeed={2.65}
+                  colorBalance={0}
+                  warpStrength={1.35}
+                  warpFrequency={3.3}
+                  warpSpeed={1.6}
+                  warpAmplitude={50}
+                  blendAngle={0}
+                  blendSoftness={0.05}
+                  rotationAmount={500}
+                  noiseScale={2}
+                  grainAmount={0.1}
+                  grainScale={2}
+                  grainAnimated={false}
+                  contrast={1.5}
+                  gamma={1}
+                  saturation={1}
+                  centerX={0}
+                  centerY={0}
+                  zoom={1.35}
+                />
+              </div>
+            ) : null}
             <div
               className={`${styles.backgroundLayer} ${styles.backgroundEchoLayer}`}
             >

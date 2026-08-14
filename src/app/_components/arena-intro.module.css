@@ -67,11 +67,29 @@
 }
 
 .backgroundBaseLayer {
+  z-index: 0;
   transform: translate3d(var(--bg-x), var(--bg-y), 0);
 }
 
+.grainientLayer {
+  position: absolute;
+  z-index: 1;
+  inset: -7%;
+  overflow: hidden;
+  transform: translate3d(var(--bg-x), var(--bg-y), 0) scale(1.045);
+  transform-origin: center;
+  will-change: transform;
+}
+
+.grainientCanvas {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 .backgroundEchoLayer {
-  opacity: 0.34;
+  z-index: 2;
+  opacity: 0.46;
   transform: translate3d(
     var(--bg-counter-x),
     var(--bg-counter-y),
@@ -86,15 +104,15 @@
 
 .backgroundBase {
   filter: brightness(0.62) contrast(1.12);
-  animation: backgroundBreathe 14s cubic-bezier(0.45, 0, 0.55, 1) infinite;
 }
 
 .backgroundEcho {
-  filter: brightness(0.74) contrast(1.2) blur(7px);
-  opacity: 0.52;
+  filter: brightness(0.9) contrast(1.16) blur(1.5px);
+  opacity: 0.58;
   mix-blend-mode: screen;
-  transform: scale(1.085);
-  animation: backgroundEchoDrift 18s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+  transform: scale(1.065);
+  animation: backgroundArtworkDrift 19s cubic-bezier(0.42, 0, 0.58, 1)
+    infinite;
   mask-image: radial-gradient(
     circle at var(--pointer-x) var(--pointer-y),
     #010101 0%,
@@ -105,6 +123,7 @@
 
 .pointerLight {
   position: absolute;
+  z-index: 3;
   inset: 0;
   background: radial-gradient(
     circle at var(--pointer-x) var(--pointer-y),
@@ -291,39 +310,21 @@
   border: 0;
 }
 
-@keyframes backgroundBreathe {
+@keyframes backgroundArtworkDrift {
   0% {
-    transform: scale(1.05) translate3d(-0.55%, 0.42%, 0) rotate(-0.08deg);
-  }
-
-  38% {
-    transform: scale(1.072) translate3d(0.48%, -0.36%, 0) rotate(0.06deg);
-  }
-
-  72% {
-    transform: scale(1.062) translate3d(0.12%, 0.5%, 0) rotate(0.03deg);
-  }
-
-  100% {
-    transform: scale(1.05) translate3d(-0.55%, 0.42%, 0) rotate(-0.08deg);
-  }
-}
-
-@keyframes backgroundEchoDrift {
-  0% {
-    transform: scale(1.085) translate3d(0.68%, -0.52%, 0) rotate(0.1deg);
+    transform: scale(1.055) translate3d(0.55%, -0.42%, 0) rotate(0.06deg);
   }
 
   31% {
-    transform: scale(1.122) translate3d(-0.6%, 0.42%, 0) rotate(-0.08deg);
+    transform: scale(1.075) translate3d(-0.48%, 0.34%, 0) rotate(-0.05deg);
   }
 
   67% {
-    transform: scale(1.102) translate3d(-0.14%, -0.58%, 0) rotate(-0.02deg);
+    transform: scale(1.065) translate3d(-0.12%, -0.46%, 0) rotate(-0.01deg);
   }
 
   100% {
-    transform: scale(1.085) translate3d(0.68%, -0.52%, 0) rotate(0.1deg);
+    transform: scale(1.055) translate3d(0.55%, -0.42%, 0) rotate(0.06deg);
   }
 }
 
@@ -337,7 +338,7 @@
   }
 
   .backgroundEchoLayer {
-    opacity: 0.28;
+    opacity: 0.4;
   }
 
   .composition {
@@ -420,11 +421,11 @@
   }
 
   .backgroundBaseLayer,
+  .grainientLayer,
   .backgroundEchoLayer {
     transform: none;
   }
 
-  .backgroundBase,
   .backgroundEcho {
     animation: none;
   }
@@ -434,7 +435,7 @@
   }
 
   .backgroundEcho {
-    transform: scale(1.1);
+    transform: scale(1.065);
   }
 
   .pointerLight {

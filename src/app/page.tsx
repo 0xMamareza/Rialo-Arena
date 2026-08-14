@@ -19,6 +19,13 @@ const challengeFacts = [
   { value: "3,000", label: "maximum points" },
 ];
 
+const externalLinks = [
+  { label: "DISCORD", href: "https://discord.gg/7vYcMa4DS" },
+  { label: "TWITTER", href: "https://x.com/RialoHQ" },
+  { label: "GITHUB", href: "https://github.com/SubzeroLabs" },
+  { label: "RIALO", href: "https://rialo.io/" },
+];
+
 export default function Home() {
   return (
     <ArenaIntro fontVariableClassName={arenaPressure.variable}>
@@ -32,7 +39,18 @@ export default function Home() {
             className={styles.lockup}
             priority
           />
-          <p className={styles.issue}>Arena / Challenge 001</p>
+          <nav className={styles.externalNav} aria-label="Rialo links">
+            {externalLinks.map((link) => (
+              <a
+                href={link.href}
+                key={link.label}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
         </header>
 
         <section className={styles.hero} aria-labelledby="platform-title">
@@ -79,8 +97,7 @@ export default function Home() {
         </section>
 
         <footer className={styles.footer}>
-          <span>Speed-based scoring</span>
-          <span aria-hidden="true">R / A</span>
+          <span>Built for the Rialo community</span>
         </footer>
       </main>
     </ArenaIntro>
