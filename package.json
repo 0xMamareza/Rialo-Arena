@@ -8,14 +8,21 @@
     "start": "next start",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
+    "db:up": "docker compose --env-file .env.local up -d --wait postgres",
+    "db:down": "docker compose --env-file .env.local down",
+    "db:migrate": "drizzle-kit migrate",
+    "db:seed": "TMPDIR=/tmp tsx scripts/seed-questions.ts",
+    "db:verify": "TMPDIR=/tmp tsx scripts/verify-database.ts",
     "db:generate": "drizzle-kit generate",
     "db:check": "drizzle-kit check",
-    "quiz:validate": "tsx scripts/validate-question-bank.ts"
+    "quiz:validate": "TMPDIR=/tmp tsx scripts/validate-question-bank.ts"
   },
   "dependencies": {
+    "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "next": "16.3.0",
     "ogl": "^1.0.11",
+    "pg": "^8.23.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "zod": "^4.4.3"
@@ -23,12 +30,14 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/pg": "^8.21.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.3.0",
     "tailwindcss": "^4",
+    "tsx": "^4.23.12",
     "typescript": "^5"
   }
 }
