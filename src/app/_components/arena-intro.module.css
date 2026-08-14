@@ -1,0 +1,443 @@
+.stage {
+  position: relative;
+  min-height: 100svh;
+  overflow: clip;
+  background: #010101;
+}
+
+.platformLayer {
+  min-height: 100svh;
+  opacity: 0.42;
+  filter: blur(14px);
+  transform: scale(0.985);
+  transform-origin: 50% 45%;
+  transition:
+    opacity 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    filter 900ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.platformReady {
+  opacity: 1;
+  filter: none;
+  transform: none;
+}
+
+.intro {
+  --bg-x: 0px;
+  --bg-y: 0px;
+  --bg-counter-x: 0px;
+  --bg-counter-y: 0px;
+  --pointer-x: 50%;
+  --pointer-y: 50%;
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  min-width: 320px;
+  min-height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: #010101;
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transition:
+    clip-path 860ms cubic-bezier(0.76, 0, 0.24, 1),
+    opacity 600ms ease;
+}
+
+.intro[data-phase="closing"] {
+  clip-path: inset(0 0 100% 0);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.backgroundScene {
+  position: absolute;
+  z-index: -3;
+  inset: 0;
+  overflow: hidden;
+  background: #010101;
+  pointer-events: none;
+}
+
+.backgroundLayer {
+  position: absolute;
+  inset: -3%;
+  will-change: transform;
+}
+
+.backgroundBaseLayer {
+  transform: translate3d(var(--bg-x), var(--bg-y), 0);
+}
+
+.backgroundEchoLayer {
+  opacity: 0.34;
+  transform: translate3d(
+    var(--bg-counter-x),
+    var(--bg-counter-y),
+    0
+  );
+}
+
+.backgroundImage {
+  object-fit: cover;
+  object-position: 51% center;
+}
+
+.backgroundBase {
+  filter: brightness(0.62) contrast(1.12);
+  animation: backgroundBreathe 14s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+}
+
+.backgroundEcho {
+  filter: brightness(0.74) contrast(1.2) blur(7px);
+  opacity: 0.52;
+  mix-blend-mode: screen;
+  transform: scale(1.085);
+  animation: backgroundEchoDrift 18s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+  mask-image: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    #010101 0%,
+    rgb(1 1 1 / 72%) 22%,
+    transparent 57%
+  );
+}
+
+.pointerLight {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--pointer-x) var(--pointer-y),
+    rgb(232 227 213 / 14%) 0%,
+    rgb(169 221 211 / 7%) 20%,
+    transparent 47%
+  );
+  mix-blend-mode: screen;
+  opacity: 0.78;
+}
+
+.scrim {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(1 1 1 / 58%) 0%, transparent 30%),
+    radial-gradient(circle at 50% 48%, transparent 0%, rgb(1 1 1 / 26%) 60%),
+    linear-gradient(0deg, rgb(1 1 1 / 76%) 0%, transparent 34%);
+}
+
+.composition {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-height: 100svh;
+  padding: clamp(1.5rem, 3vw, 3.25rem) clamp(1rem, 3.5vw, 4.5rem)
+    clamp(6.5rem, 13vh, 8rem);
+  pointer-events: none;
+}
+
+.identity {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.introSymbol {
+  width: clamp(1.4rem, 1.8vw, 1.9rem);
+  height: auto;
+}
+
+.arenaSubtitle,
+.supportingLine,
+.entryCue {
+  margin: 0;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.58rem, 0.65vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.19em;
+  line-height: 1.35;
+  text-transform: uppercase;
+}
+
+.wordCluster {
+  align-self: center;
+  display: grid;
+  justify-items: center;
+  width: 100%;
+  gap: clamp(0.7rem, 1.7vh, 1.15rem);
+  transform: translateY(-1vh);
+}
+
+.pressureWord {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: min(100%, 4.25em);
+  color: #e8e3d5;
+  font-family: var(--font-arena-pressure), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(4.6rem, 20.5vw, 22rem);
+  font-variation-settings: "wght" 120, "wdth" 28, "opsz" 144;
+  line-height: 0.66;
+  text-align: center;
+  text-transform: uppercase;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.letterCell {
+  display: grid;
+  flex: 1 1 20%;
+  min-width: 0;
+  place-items: center;
+}
+
+.letter {
+  display: block;
+  font-variation-settings: "wght" 120, "wdth" 28, "opsz" 144;
+  line-height: inherit;
+  will-change: font-variation-settings;
+}
+
+.arenaSubtitle {
+  color: #e8e3d5;
+  font-size: clamp(0.72rem, 1.1vw, 1rem);
+  font-weight: 700;
+  letter-spacing: clamp(0.58em, 1.1vw, 0.95em);
+  line-height: 1;
+  text-indent: clamp(0.58em, 1.1vw, 0.95em);
+}
+
+.supportingLine {
+  margin-top: clamp(0.6rem, 1.6vh, 1.25rem);
+  justify-self: center;
+  max-width: min(100%, 42rem);
+  color: rgb(232 227 213 / 78%);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.supportingLine span {
+  padding-inline: 0.55em;
+  color: #a9ddd3;
+}
+
+.enterButton {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.enterButton::after {
+  position: absolute;
+  inset: 0.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.2rem;
+  content: "";
+  pointer-events: none;
+  transition: border-color 180ms ease;
+}
+
+.enterButton:focus-visible {
+  outline: none;
+}
+
+.enterButton:focus-visible::after {
+  border-color: #a9ddd3;
+  box-shadow: inset 0 0 0 1px rgb(1 1 1 / 72%);
+}
+
+.entryCue {
+  position: absolute;
+  bottom: max(1.75rem, env(safe-area-inset-bottom));
+  left: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: #e8e3d5;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.entryDot {
+  width: 0.58rem;
+  height: 0.58rem;
+  border: 1px solid #a9ddd3;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px rgb(1 1 1 / 60%);
+  background: #a9ddd3;
+  transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.enterButton:hover .entryDot {
+  transform: scale(1.55);
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes backgroundBreathe {
+  0% {
+    transform: scale(1.05) translate3d(-0.55%, 0.42%, 0) rotate(-0.08deg);
+  }
+
+  38% {
+    transform: scale(1.072) translate3d(0.48%, -0.36%, 0) rotate(0.06deg);
+  }
+
+  72% {
+    transform: scale(1.062) translate3d(0.12%, 0.5%, 0) rotate(0.03deg);
+  }
+
+  100% {
+    transform: scale(1.05) translate3d(-0.55%, 0.42%, 0) rotate(-0.08deg);
+  }
+}
+
+@keyframes backgroundEchoDrift {
+  0% {
+    transform: scale(1.085) translate3d(0.68%, -0.52%, 0) rotate(0.1deg);
+  }
+
+  31% {
+    transform: scale(1.122) translate3d(-0.6%, 0.42%, 0) rotate(-0.08deg);
+  }
+
+  67% {
+    transform: scale(1.102) translate3d(-0.14%, -0.58%, 0) rotate(-0.02deg);
+  }
+
+  100% {
+    transform: scale(1.085) translate3d(0.68%, -0.52%, 0) rotate(0.1deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .backgroundImage {
+    object-position: 53% center;
+  }
+
+  .backgroundBase {
+    filter: brightness(0.56) contrast(1.15);
+  }
+
+  .backgroundEchoLayer {
+    opacity: 0.28;
+  }
+
+  .composition {
+    padding-inline: 0.9rem;
+    padding-bottom: clamp(5.5rem, 13vh, 7rem);
+  }
+
+  .wordCluster {
+    gap: 0.8rem;
+    transform: translateY(-2vh);
+  }
+
+  .pressureWord {
+    width: min(100%, 4.15em);
+    font-size: clamp(4.2rem, 22vw, 8rem);
+  }
+
+  .arenaSubtitle {
+    font-size: 0.68rem;
+    letter-spacing: 0.62em;
+    text-indent: 0.62em;
+  }
+
+  .supportingLine {
+    margin-top: 0.7rem;
+    max-width: 18rem;
+    font-size: 0.58rem;
+    line-height: 1.75;
+  }
+
+  .supportingLine span {
+    padding-inline: 0.25em;
+  }
+}
+
+@media (max-height: 620px) and (orientation: landscape) {
+  .composition {
+    padding-top: 1rem;
+    padding-bottom: 4.5rem;
+  }
+
+  .introSymbol {
+    width: 1.25rem;
+  }
+
+  .wordCluster {
+    gap: 1rem;
+  }
+
+  .pressureWord {
+    font-size: min(18vw, 10rem);
+  }
+
+  .entryCue {
+    bottom: 1.2rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .letter {
+    font-variation-settings: "wght" 260, "wdth" 48, "opsz" 144 !important;
+    will-change: auto;
+  }
+
+  .entryCue {
+    min-height: 2.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .platformLayer,
+  .intro,
+  .entryDot {
+    transition-duration: 1ms;
+  }
+
+  .letter {
+    font-variation-settings: "wght" 260, "wdth" 48, "opsz" 144 !important;
+    will-change: auto;
+  }
+
+  .backgroundBaseLayer,
+  .backgroundEchoLayer {
+    transform: none;
+  }
+
+  .backgroundBase,
+  .backgroundEcho {
+    animation: none;
+  }
+
+  .backgroundBase {
+    transform: scale(1.065);
+  }
+
+  .backgroundEcho {
+    transform: scale(1.1);
+  }
+
+  .pointerLight {
+    display: none;
+  }
+}

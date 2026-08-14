@@ -5,3 +5,45 @@
   --color-rialo-e8e3d5: #e8e3d5;
   --color-rialo-010101: #010101;
 }
+
+:root {
+  color-scheme: dark;
+  --arena-ink: #010101;
+  --arena-paper: #e8e3d5;
+  --arena-mint: #a9ddd3;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  background: var(--arena-ink);
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--arena-ink);
+  color: var(--arena-paper);
+  font-family: Arial, Helvetica, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+::selection {
+  background: var(--arena-mint);
+  color: var(--arena-ink);
+}
