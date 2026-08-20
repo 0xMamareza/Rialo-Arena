@@ -38,19 +38,52 @@ const maxQuestionPointsSql = sql.raw(String(MAX_QUESTION_POINTS));
 const maxQuizScoreSql = sql.raw(String(MAX_QUIZ_SCORE));
 
 // defaultNow() initializes timestamps only; update paths must maintain updatedAt.
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  xAccountId: text("x_account_id").notNull().unique(),
-  xUsername: text("x_username").notNull(),
-  displayName: text("display_name").notNull(),
-  profileImageUrl: text("profile_image_url"),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true })
-    .defaultNow()
-    .notNull(),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    xUsername: text("x_username").notNull().unique(),
+    profileImageUrl: text("profile_image_url").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "users_x_username_normalized_check",
+      sql`char_length(${table.xUsername}) between 1 and 15 and ${table.xUsername} = lower(${table.xUsername}) and ${table.xUsername} ~ '^[a-z0-9_]+$'`,
+    ),
+  ],
+);
+
+export const sessions = pgTable(
+  "sessions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    check(
+      "sessions_token_hash_check",
+      sql`${table.tokenHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "sessions_expiry_check",
+      sql`${table.expiresAt} > ${table.createdAt}`,
+    ),
+    index("sessions_user_id_idx").on(table.userId),
+  ],
+);
 
 // Referenced question content, options, and correct answers are append-only.
 // Corrections deactivate the old row and insert a replacement.

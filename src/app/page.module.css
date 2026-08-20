@@ -42,7 +42,6 @@
 .externalNav,
 .eyebrow,
 .fact dt,
-.action p,
 .footer {
   margin: 0;
   font-family: "Arial Narrow", Arial, sans-serif;
@@ -54,8 +53,7 @@
 }
 
 .externalNav,
-.footer,
-.action p {
+.footer {
   color: rgb(232 227 213 / 54%);
 }
 
@@ -181,39 +179,6 @@
   font-size: 0.35em;
   letter-spacing: 0;
   text-transform: uppercase;
-}
-
-.action {
-  display: grid;
-  gap: 0.9rem;
-  padding-top: clamp(1.5rem, 3vh, 2.25rem);
-}
-
-.connectButton {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  min-height: 3.75rem;
-  padding: 0 1.3rem;
-  border: 1px solid rgb(169 221 211 / 40%);
-  border-radius: 0;
-  background: rgb(169 221 211 / 9%);
-  color: #a9ddd3;
-  font-family: "Arial Narrow", Arial, sans-serif;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-}
-
-.connectButton:disabled {
-  cursor: not-allowed;
-  opacity: 0.64;
-}
-
-.connectButton span {
-  font-size: 1rem;
 }
 
 .footer {

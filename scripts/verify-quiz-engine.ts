@@ -19,7 +19,6 @@ type Engine = typeof import("../src/server/quiz/engine");
 
 type TemporaryUser = {
   id: string;
-  xAccountId: string;
 };
 
 type InternalAttemptQuestion = {
@@ -97,17 +96,17 @@ async function createTemporaryUser(
   pool: Pool,
   marker: string,
 ): Promise<TemporaryUser> {
-  const xAccountId = `quiz-engine-verifier-${marker}-${randomUUID()}`;
+  const xUsername = `qv_${marker}_${randomUUID().replaceAll("-", "").slice(0, 6)}`;
   const result = await pool.query<{ id: string }>(
-    `INSERT INTO users (x_account_id, x_username, display_name)
-     VALUES ($1, $2, $3)
+    `INSERT INTO users (x_username, profile_image_url)
+     VALUES ($1, $2)
      RETURNING id`,
-    [xAccountId, `verifier_${marker}`, `Quiz verifier ${marker}`],
+    [xUsername, `https://unavatar.io/x/${xUsername}?fallback=false`],
   );
   const id = result.rows[0]?.id;
 
   assert.ok(id, "Temporary verifier user was not created");
-  return { id, xAccountId };
+  return { id };
 }
 
 async function expectEngineError(

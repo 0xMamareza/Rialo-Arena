@@ -30,6 +30,7 @@ async function verifyDatabase() {
   try {
     const relationsResult = await pool.query<{
       users: string | null;
+      sessions: string | null;
       questions: string | null;
       quizAttempts: string | null;
       attemptQuestions: string | null;
@@ -37,6 +38,7 @@ async function verifyDatabase() {
     }>(
       `SELECT
         to_regclass('public.users')::text AS "users",
+        to_regclass('public.sessions')::text AS "sessions",
         to_regclass('public.questions')::text AS "questions",
         to_regclass('public.quiz_attempts')::text AS "quizAttempts",
         to_regclass('public.attempt_questions')::text AS "attemptQuestions",
@@ -52,8 +54,8 @@ async function verifyDatabase() {
       'SELECT count(*)::integer AS "migrationCount" FROM drizzle.__drizzle_migrations',
     );
 
-    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 1) {
-      throw new Error("Expected exactly one applied Drizzle migration.");
+    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 2) {
+      throw new Error("Expected exactly two applied Drizzle migrations.");
     }
 
     const storedResult = await database.execute<StoredQuestionRow>(
@@ -95,27 +97,6 @@ async function verifyDatabase() {
       }
     });
 
-    const emptyTableResult = await pool.query<{
-      userCount: number;
-      attemptCount: number;
-      attemptQuestionCount: number;
-    }>(
-      `SELECT
-        (SELECT count(*)::integer FROM users) AS "userCount",
-        (SELECT count(*)::integer FROM quiz_attempts) AS "attemptCount",
-        (SELECT count(*)::integer FROM attempt_questions) AS "attemptQuestionCount"`,
-    );
-    const emptyTables = emptyTableResult.rows[0];
-
-    if (
-      !emptyTables ||
-      emptyTables.userCount !== 0 ||
-      emptyTables.attemptCount !== 0 ||
-      emptyTables.attemptQuestionCount !== 0
-    ) {
-      throw new Error("Users or attempt tables are not empty.");
-    }
-
     const sequenceResult = await pool.query<{
       lastValue: string;
       isCalled: boolean;
@@ -144,9 +125,8 @@ async function verifyDatabase() {
     console.log(
       `Verified ${APPROVED_QUESTION_COUNT} exact canonical question matches with IDs 1–${APPROVED_QUESTION_COUNT}.`,
     );
-    console.log("Verified one applied Drizzle migration and all expected tables.");
+    console.log("Verified two applied Drizzle migrations and all expected tables.");
     console.log("Verified the next generated question ID is beyond the seeded range.");
-    console.log("Verified users and quiz-attempt tables are empty.");
   } finally {
     await pool.end();
   }

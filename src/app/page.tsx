@@ -2,6 +2,8 @@ import Image from "next/image";
 import localFont from "next/font/local";
 
 import { ArenaIntro } from "./_components/arena-intro";
+import { ProfilePanel } from "./_components/profile-panel";
+import { getCurrentUser } from "@/server/identity/current-user";
 import styles from "./page.module.css";
 
 const arenaPressure = localFont({
@@ -26,7 +28,15 @@ const externalLinks = [
   { label: "RIALO", href: "https://rialo.io/" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const currentUser = await getCurrentUser();
+  const initialProfile = currentUser
+    ? {
+        username: currentUser.xUsername,
+        profileImageUrl: currentUser.profileImageUrl,
+      }
+    : null;
+
   return (
     <ArenaIntro fontVariableClassName={arenaPressure.variable}>
       <main className={styles.platform} id="arena-platform" tabIndex={-1}>
@@ -79,20 +89,7 @@ export default function Home() {
               ))}
             </dl>
 
-            <div className={styles.action}>
-              <button
-                className={styles.connectButton}
-                type="button"
-                disabled
-                aria-describedby="connect-note"
-              >
-                Connect X
-                <span aria-hidden="true">↗</span>
-              </button>
-              <p id="connect-note">
-                X connection is required to compete. Coming soon.
-              </p>
-            </div>
+            <ProfilePanel initialProfile={initialProfile} />
           </div>
         </section>
 

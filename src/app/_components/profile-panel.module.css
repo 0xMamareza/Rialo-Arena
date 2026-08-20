@@ -1,0 +1,574 @@
+.identityPanel {
+  display: grid;
+  gap: 0.9rem;
+  padding-top: clamp(1.5rem, 3vh, 2.25rem);
+}
+
+.entryCta {
+  display: grid;
+  gap: 0.9rem;
+}
+
+.entryCta p,
+.status,
+.attribution,
+.stepMarker,
+.inputLabel {
+  margin: 0;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.6rem, 0.66vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.entryCta p {
+  max-width: 29rem;
+  color: rgb(232 227 213 / 54%);
+}
+
+.primaryButton,
+.secondaryButton,
+.changeButton,
+.closeButton {
+  font: inherit;
+  cursor: pointer;
+}
+
+.primaryButton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 3.75rem;
+  padding: 0 1.3rem;
+  border: 1px solid rgb(169 221 211 / 48%);
+  border-radius: 0;
+  background: rgb(169 221 211 / 9%);
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.primaryButton:hover:not(:disabled) {
+  border-color: #a9ddd3;
+  background: #a9ddd3;
+  color: #010101;
+}
+
+.primaryButton:disabled,
+.secondaryButton:disabled {
+  cursor: wait;
+  opacity: 0.58;
+}
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.changeButton:focus-visible,
+.closeButton:focus-visible,
+.attribution:focus-visible,
+.inputShell:focus-within {
+  outline: 1px solid #a9ddd3;
+  outline-offset: 0.25rem;
+}
+
+.readyState {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.8rem 1rem;
+  min-height: 5rem;
+  padding: 0.75rem 0;
+  border-top: 1px solid rgb(169 221 211 / 38%);
+  border-bottom: 1px solid rgb(232 227 213 / 14%);
+}
+
+.readyProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+.readyProfile div {
+  display: grid;
+  gap: 0.2rem;
+  min-width: 0;
+}
+
+.readyProfile strong {
+  overflow: hidden;
+  color: #e8e3d5;
+  font-size: clamp(0.95rem, 1.3vw, 1.15rem);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status {
+  color: #a9ddd3;
+}
+
+.readyAvatar,
+.avatarFallback {
+  width: 3.75rem;
+  height: 3.75rem;
+  flex: 0 0 auto;
+  border: 1px solid rgb(169 221 211 / 48%);
+  border-radius: 50%;
+  background: #010101;
+  object-fit: cover;
+}
+
+.avatarFallback {
+  display: grid;
+  place-items: center;
+  color: #a9ddd3;
+  font-size: 1.35rem;
+}
+
+.changeButton,
+.secondaryButton {
+  min-height: 2.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 0;
+  background: transparent;
+  color: rgb(232 227 213 / 66%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.changeButton:hover,
+.secondaryButton:hover:not(:disabled) {
+  color: #a9ddd3;
+}
+
+.attribution {
+  grid-column: 1 / -1;
+  width: fit-content;
+  color: rgb(232 227 213 / 36%);
+  font-size: 0.52rem;
+  text-decoration: none;
+}
+
+.attribution:hover {
+  color: rgb(232 227 213 / 66%);
+}
+
+.dialog {
+  position: fixed;
+  inset: 0;
+  width: min(51.25rem, calc(100vw - 3rem));
+  max-width: none;
+  height: min(50rem, calc(100svh - 3rem));
+  max-height: none;
+  padding: 0;
+  margin: auto;
+  overflow: hidden;
+  border: 1px solid rgb(232 227 213 / 24%);
+  border-radius: 0;
+  background: rgb(1 1 1 / 96%);
+  color: #e8e3d5;
+  box-shadow:
+    0 2.5rem 9rem rgb(1 1 1 / 82%),
+    inset 0 1px rgb(169 221 211 / 10%);
+  scrollbar-color: rgb(169 221 211 / 34%) transparent;
+}
+
+.dialog[open] {
+  display: block;
+  animation: dialogEnter 200ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.dialog::backdrop {
+  background: rgb(1 1 1 / 82%);
+  backdrop-filter: blur(14px) saturate(0.68);
+  animation: backdropEnter 180ms ease-out both;
+}
+
+.dialogSurface {
+  position: relative;
+  min-height: 100%;
+  height: 100%;
+  padding: clamp(1.5rem, 4svh, 3rem) clamp(2rem, 4.5vw, 3.75rem);
+  overflow-y: auto;
+  background:
+    linear-gradient(90deg, rgb(169 221 211 / 8%), transparent 1px) 0 0 / 25% 100%,
+    radial-gradient(circle at 100% 0%, rgb(169 221 211 / 11%), transparent 38%),
+    radial-gradient(circle at 0% 100%, rgb(232 227 213 / 5%), transparent 34%),
+    rgb(1 1 1 / 94%);
+}
+
+.dialogSurface::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #a9ddd3 50%, transparent);
+  content: "";
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.closeButton {
+  position: absolute;
+  z-index: 1;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgb(232 227 213 / 56%);
+  font-size: 1.5rem;
+  line-height: 1;
+  place-items: center;
+}
+
+.closeButton:hover {
+  color: #e8e3d5;
+}
+
+.form,
+.confirmation {
+  display: grid;
+  align-content: center;
+  width: min(100%, 38.75rem);
+  min-height: 100%;
+  margin-inline: auto;
+  padding-block: clamp(2rem, 4svh, 3rem) clamp(0.75rem, 2svh, 1.5rem);
+  animation: sceneEnter 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.form {
+  gap: clamp(1.15rem, 2.4vh, 1.75rem);
+}
+
+.confirmation {
+  gap: clamp(0.45rem, 1svh, 0.75rem);
+  text-align: center;
+}
+
+.headline {
+  display: grid;
+  max-width: 36rem;
+  margin: clamp(1.25rem, 3vh, 2rem) 0 0;
+  color: #e8e3d5;
+  font-size: clamp(3.25rem, 6vw, 5rem);
+  font-weight: 500;
+  letter-spacing: -0.065em;
+  line-height: 0.83;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.confirmation .headline {
+  justify-self: center;
+  font-size: clamp(3rem, min(5.2vw, 8svh), 4.25rem);
+  margin-top: clamp(0.4rem, 1svh, 0.75rem);
+}
+
+.form > p:not(.error),
+.confirmation > p:not(.error, .avatarError) {
+  max-width: 33rem;
+  margin: 0;
+  color: rgb(232 227 213 / 58%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.66rem, 0.82vw, 0.78rem);
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  line-height: 1.6;
+  text-transform: uppercase;
+}
+
+.confirmation > p:not(.error, .avatarError) {
+  justify-self: center;
+}
+
+.stepMarker,
+.inputLabel {
+  color: #a9ddd3;
+}
+
+.inputLabel {
+  margin-top: clamp(1rem, 2.5vh, 1.75rem);
+}
+
+.inputShell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  min-height: 5.25rem;
+  padding-inline: 1.25rem;
+  border: 1px solid rgb(232 227 213 / 28%);
+  background: rgb(232 227 213 / 3%);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.inputShell:focus-within {
+  border-color: #a9ddd3;
+  outline: none;
+  background: rgb(169 221 211 / 5%);
+  box-shadow: inset 3px 0 0 #a9ddd3;
+}
+
+.inputShell span {
+  color: #a9ddd3;
+  font-size: 1.45rem;
+}
+
+.inputShell input {
+  min-width: 0;
+  height: 5.15rem;
+  padding: 0 0.65rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #e8e3d5;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: -0.02em;
+}
+
+.error,
+.avatarError {
+  margin: 0;
+  color: #e8e3d5;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.55;
+  text-transform: uppercase;
+}
+
+.avatarFrame {
+  position: relative;
+  display: grid;
+  width: clamp(10.625rem, min(15vw, 24svh), 12.5rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  border: 1px solid rgb(169 221 211 / 58%);
+  border-radius: 50%;
+  background: rgb(169 221 211 / 6%);
+  overflow: hidden;
+  place-items: center;
+  box-shadow:
+    0 0 0 0.35rem rgb(1 1 1 / 90%),
+    0 0 0 0.4rem rgb(232 227 213 / 13%);
+  animation: avatarEnter 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.previewAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}
+
+.loadingLabel {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  background: #010101;
+  color: rgb(232 227 213 / 56%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  place-items: center;
+}
+
+.avatarError {
+  display: grid;
+  width: min(100%, 32rem);
+  min-height: clamp(10rem, 23vh, 13.25rem);
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-top: 1px solid rgb(169 221 211 / 34%);
+  border-bottom: 1px solid rgb(232 227 213 / 18%);
+  justify-self: center;
+  background:
+    linear-gradient(90deg, transparent, rgb(232 227 213 / 4%), transparent),
+    rgb(232 227 213 / 2%);
+  text-align: center;
+  place-items: center;
+  animation: sceneEnter 200ms ease-out both;
+}
+
+.previewUsername {
+  display: block;
+  overflow: hidden;
+  color: #e8e3d5;
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-weight: 500;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.confirmActions {
+  display: grid;
+  width: min(100%, 29rem);
+  gap: 0.35rem;
+  margin-top: clamp(0.15rem, 0.7svh, 0.5rem);
+  justify-self: center;
+}
+
+.dialog .primaryButton {
+  min-height: 4.35rem;
+  padding-inline: 1.5rem;
+}
+
+.confirmation .attribution {
+  justify-self: center;
+  margin-top: 0.15rem;
+}
+
+@keyframes dialogEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes backdropEnter {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sceneEnter {
+  from {
+    opacity: 0;
+    transform: translateY(0.45rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes avatarEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .readyState {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .dialog {
+    width: calc(100vw - 1rem);
+    height: calc(100svh - 1rem);
+  }
+
+  .dialogSurface {
+    padding: 1.1rem;
+  }
+
+  .form,
+  .confirmation {
+    padding-block: 3.1rem 1rem;
+  }
+
+  .form {
+    gap: 1.05rem;
+  }
+
+  .confirmation {
+    gap: 0.68rem;
+  }
+
+  .headline {
+    margin-top: 0.75rem;
+    font-size: clamp(2.55rem, 14vw, 3.4rem);
+    line-height: 0.86;
+  }
+
+  .form > p:not(.error),
+  .confirmation > p:not(.error, .avatarError) {
+    font-size: 0.62rem;
+  }
+
+  .inputLabel {
+    margin-top: 0.5rem;
+  }
+
+  .inputShell {
+    min-height: 4.5rem;
+    padding-inline: 0.9rem;
+  }
+
+  .inputShell input {
+    height: 4.4rem;
+    font-size: 1.35rem;
+  }
+
+  .avatarFrame {
+    width: clamp(8.25rem, 42vw, 9.75rem);
+  }
+
+  .avatarError {
+    min-height: clamp(8.25rem, 24vh, 10rem);
+    padding: 1.5rem 1rem;
+  }
+
+  .dialog .primaryButton {
+    min-height: 3.8rem;
+  }
+
+  .secondaryButton {
+    min-height: 2.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton,
+  .inputShell {
+    transition: none;
+  }
+
+  .dialog[open],
+  .dialog::backdrop,
+  .form,
+  .confirmation,
+  .avatarFrame,
+  .avatarError {
+    animation: none;
+  }
+}
