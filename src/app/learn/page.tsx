@@ -3,6 +3,7 @@ import Image from "next/image";
 import localFont from "next/font/local";
 
 import { AgpCinematic } from "./_components/agp-cinematic";
+import { LatchCinematic } from "./_components/latch-cinematic";
 import {
   ChapterFacts,
   StudyNotes,
@@ -63,7 +64,7 @@ const chapters: LearnChapterNavItem[] = [
     number: "06",
     available: false,
   },
-  { id: "chapter-latch", label: "Latch", number: "07", available: false },
+  { id: "chapter-latch", label: "Latch", number: "07", available: true },
   { id: "chapter-agp", label: "AGP", number: "08", available: true },
 ];
 
@@ -168,6 +169,116 @@ const architectureNotes: StudyNote[] = [
         The architecture matters most where composition creates something no
         isolated component could provide: recurring operations, hybrid
         chain-to-world workflows, and verifiable computation over external data.
+      </p>
+    ),
+  },
+];
+
+const latchFacts: ChapterFact[] = [
+  {
+    label: "Credential boundary",
+    value: "The agent receives a scoped lat_ token, never the real API credential stored as a Secret.",
+  },
+  {
+    label: "Ordered control",
+    value: "Request filters evaluate in pipeline order and the first denial short-circuits the run.",
+  },
+  {
+    label: "Safe forwarding",
+    value: "Secret injection happens only after request policy passes, immediately before the upstream call.",
+  },
+  {
+    label: "Controlled return",
+    value: "The response filter runs after upstream and can block or redact before data reaches the caller.",
+  },
+  {
+    label: "Multi-mount",
+    value: "One token can route to multiple services with a separate Secret and policy pipeline per mount.",
+  },
+  {
+    label: "Full trace",
+    value: "Allowed and denied calls share an audit trail with the deciding filter and its reason.",
+  },
+];
+
+const latchNotes: StudyNote[] = [
+  {
+    title: "Secret",
+    body: (
+      <p>
+        A Secret is the real credential. Latch stores it encrypted and treats the
+        value as write-only. It is injected in the configured header, query, or
+        body position only when an allowed request is forwarded.
+      </p>
+    ),
+  },
+  {
+    title: "Latch token",
+    body: (
+      <p>
+        A lat_ token identifies a scoped Latch with its own upstream, policy,
+        and lifetime. The caller holds this token instead of the credential, so
+        the token cannot be turned back into the upstream key.
+      </p>
+    ),
+  },
+  {
+    title: "Ordered pipeline",
+    body: (
+      <p>
+        Filters run in order. The first denial stops evaluation, skips every
+        later filter, avoids credential injection, and prevents an upstream
+        call. Ordinary policy denials return 403 with the deciding filter.
+      </p>
+    ),
+  },
+  {
+    title: "Request and response filters",
+    body: (
+      <p>
+        Request filters govern what a caller can do before upstream runs. The
+        response filter governs what the caller can learn after upstream runs,
+        including blocking statuses or redacting selected JSON paths.
+      </p>
+    ),
+  },
+  {
+    title: "Extension and inheritance",
+    body: (
+      <p>
+        A child Latch inherits the parent chain and can narrow authority by
+        adding restrictions. Live inheritance resolves policy on each request,
+        so tightening or disabling a parent can affect descendants immediately.
+      </p>
+    ),
+  },
+  {
+    title: "Multi-mount",
+    body: (
+      <p>
+        A mount table maps unique path prefixes to separate upstream services.
+        Each mount owns its upstream URL, bound Secret, and pipeline while the
+        Latch keeps one token and one activity trail.
+      </p>
+    ),
+  },
+  {
+    title: "Credential rotation and revocation",
+    body: (
+      <p>
+        Rotate a Secret once and every Latch derived from it uses the new
+        credential without issuing new lat_ tokens. Revoke or disable one Latch
+        to cut off that caller without rotating the shared credential.
+      </p>
+    ),
+  },
+  {
+    title: "Terraform provider",
+    body: (
+      <p>
+        The official provider manages Secrets, Latches, policies, mounts, and
+        KV connections as reviewed configuration. Terraform 1.11 or newer keeps
+        credential arguments write-only so they do not appear in plan or state.
       </p>
     ),
   },
@@ -398,7 +509,34 @@ export default function LearnPage() {
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>02</span>
             <i />
-            <strong>Prototype field test</strong>
+            <strong>Authority enters policy</strong>
+            <i />
+            <span>07</span>
+          </div>
+        </section>
+
+        <section
+          className={`${styles.chapter} ${styles.latchChapter}`}
+          id="chapter-latch"
+          data-learn-chapter
+          aria-labelledby="latch-title"
+        >
+          <LatchCinematic />
+
+          <div className={styles.chapterKnowledge}>
+            <ChapterFacts facts={latchFacts} headingId="latch-facts-title" />
+            <StudyNotes
+              notes={latchNotes}
+              headingId="latch-notes-title"
+              sourceHref="https://onlatch.com/docs/"
+              sourceLabel="Latch documentation"
+            />
+          </div>
+
+          <div className={styles.chapterTransition} aria-hidden="true">
+            <span>07</span>
+            <i />
+            <strong>Policy enters the circuit</strong>
             <i />
             <span>08</span>
           </div>

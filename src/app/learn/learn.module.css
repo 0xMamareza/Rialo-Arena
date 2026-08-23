@@ -840,6 +840,995 @@
   line-height: 1.6;
 }
 
+.latchChapter {
+  position: relative;
+}
+
+.latchChapter::after {
+  position: absolute;
+  z-index: -1;
+  inset: 18rem 8% auto;
+  height: 54rem;
+  background: radial-gradient(ellipse, rgb(169 221 211 / 6%), transparent 70%);
+  content: "";
+  pointer-events: none;
+}
+
+.latchCinematic,
+.latchPinSequence {
+  position: relative;
+}
+
+.latchCinematic {
+  background: linear-gradient(180deg, transparent, rgb(1 1 1 / 32%) 12% 88%, transparent);
+}
+
+.latchPinnedScene {
+  position: relative;
+  height: 100svh;
+  min-height: 44rem;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(circle at 68% 48%, rgb(169 221 211 / 8%), transparent 38%);
+}
+
+.latchPinnedScene::before,
+.latchPinnedScene::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.latchPinnedScene::before {
+  z-index: 1;
+  background-image:
+    linear-gradient(rgb(232 227 213 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(232 227 213 / 4%) 1px, transparent 1px);
+  background-size: 3.5rem 3.5rem;
+  mask-image: linear-gradient(90deg, transparent 10%, #010101 36% 92%, transparent);
+}
+
+.latchPinnedScene::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgb(1 1 1 / 74%) 0 9%, transparent 34% 90%, rgb(1 1 1 / 55%)),
+    linear-gradient(180deg, rgb(1 1 1 / 34%), transparent 18% 77%, rgb(1 1 1 / 76%));
+}
+
+.latchWorld {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0.84;
+  transform: translate3d(2.5%, 2%, 0) scale(0.94);
+  transform-origin: 68% 48%;
+  will-change: transform, opacity;
+}
+
+.latchPipelineSvg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.latchPipelineRail,
+.latchPipelineTrace,
+.latchEntryTrace,
+.latchResponseRail,
+.latchInjectTrace {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.latchPipelineRail {
+  stroke: rgb(232 227 213 / 14%);
+  stroke-width: 2;
+}
+
+.latchPipelineTrace {
+  stroke: url(#latch-trace-gradient);
+  stroke-dasharray: 1220;
+  stroke-width: 2.5;
+  filter: url(#latch-glow);
+}
+
+.latchEntryTrace {
+  stroke: #a9ddd3;
+  stroke-dasharray: 280;
+  stroke-width: 3;
+  filter: url(#latch-glow);
+}
+
+.latchResponseRail {
+  stroke: rgb(169 221 211 / 34%);
+  stroke-dasharray: 3 12;
+  stroke-width: 1.5;
+}
+
+.latchTerminal rect,
+.latchTokenNode rect,
+.latchUpstreamNode rect {
+  fill: rgb(1 1 1 / 84%);
+  stroke: rgb(232 227 213 / 22%);
+}
+
+.latchTerminal circle,
+.latchTerminal path {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.5;
+}
+
+.latchTerminal text,
+.latchTokenNode text,
+.latchFilter text,
+.latchSecretNode text,
+.latchUpstreamNode text,
+.latchOutcome text,
+.latchRedaction text,
+.latchPolicyBoundary text,
+.latchAuditTrace text,
+.latchMountSvg text {
+  fill: #a9ddd3;
+  font-family: Arial, sans-serif;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.latchTokenNode rect {
+  fill: rgb(169 221 211 / 8%);
+  stroke: rgb(169 221 211 / 52%);
+}
+
+.latchPinnedScene[data-latch-active-filter="token"] .latchTerminal,
+.latchPinnedScene[data-latch-active-filter="token"] .latchTokenNode {
+  opacity: 1;
+  filter: drop-shadow(0 0 10px rgb(169 221 211 / 34%));
+}
+
+.latchPinnedScene[data-latch-active-filter="token"] .latchTokenNode rect {
+  fill: rgb(169 221 211 / 15%);
+  stroke: #a9ddd3;
+  stroke-width: 1.8;
+}
+
+.latchPinnedScene[data-latch-run="scope"] .latchTokenNode circle {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: latchTokenPulse 1.45s ease-out infinite;
+}
+
+.latchTokenNode circle {
+  fill: #a9ddd3;
+}
+
+.latchTokenNode .latchTokenValue {
+  fill: #e8e3d5;
+  font-size: 11px;
+  letter-spacing: 1px;
+}
+
+.latchPolicyBoundary path {
+  fill: none;
+  stroke: rgb(169 221 211 / 25%);
+  stroke-dasharray: 3 7;
+}
+
+.latchPolicyBoundary text {
+  fill: rgb(232 227 213 / 32%);
+}
+
+.latchFilter {
+  opacity: 0.28;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.latchPinnedScene .latchFilter {
+  opacity: 0.28 !important;
+}
+
+.latchFilter rect {
+  fill: rgb(1 1 1 / 86%);
+  stroke: rgb(169 221 211 / 42%);
+}
+
+.latchFilter > path:first-of-type {
+  fill: none;
+  stroke: rgb(232 227 213 / 22%);
+}
+
+.latchFilter circle {
+  fill: rgb(169 221 211 / 9%);
+  stroke: rgb(169 221 211 / 48%);
+}
+
+.latchFilter > path:last-of-type {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.5;
+}
+
+.latchFilter text {
+  font-size: 7.5px;
+  letter-spacing: 1px;
+}
+
+.latchPinnedScene[data-latch-active-filter="method"] [data-latch-filter="method"],
+.latchPinnedScene[data-latch-active-filter="endpoint"] [data-latch-filter="endpoint"],
+.latchPinnedScene[data-latch-active-filter="identity"] [data-latch-filter="identity"],
+.latchPinnedScene[data-latch-active-filter="rate-limit"] [data-latch-filter="rate-limit"],
+.latchPinnedScene[data-latch-active-filter="spend-limit"] [data-latch-filter="spend-limit"] {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 11px rgb(169 221 211 / 36%));
+}
+
+.latchPinnedScene[data-latch-active-filter="method"] [data-latch-filter="method"] rect,
+.latchPinnedScene[data-latch-active-filter="endpoint"] [data-latch-filter="endpoint"] rect,
+.latchPinnedScene[data-latch-active-filter="identity"] [data-latch-filter="identity"] rect,
+.latchPinnedScene[data-latch-active-filter="rate-limit"] [data-latch-filter="rate-limit"] rect,
+.latchPinnedScene[data-latch-active-filter="spend-limit"] [data-latch-filter="spend-limit"] rect {
+  fill: rgb(169 221 211 / 13%);
+  stroke: #a9ddd3;
+  stroke-width: 2;
+}
+
+.latchPinnedScene[data-latch-active-filter="method"] [data-latch-filter="method"] text,
+.latchPinnedScene[data-latch-active-filter="endpoint"] [data-latch-filter="endpoint"] text,
+.latchPinnedScene[data-latch-active-filter="identity"] [data-latch-filter="identity"] text,
+.latchPinnedScene[data-latch-active-filter="rate-limit"] [data-latch-filter="rate-limit"] text,
+.latchPinnedScene[data-latch-active-filter="spend-limit"] [data-latch-filter="spend-limit"] text {
+  fill: #e8e3d5;
+}
+
+.latchSecretNode rect {
+  fill: rgb(1 1 1 / 92%);
+  stroke: rgb(232 227 213 / 28%);
+}
+
+.latchPinnedScene[data-latch-active-filter="secret"] .latchSecretNode,
+.latchPinnedScene[data-latch-active-filter="response"] .latchSecretNode,
+.latchPinnedScene[data-latch-active-filter="response"] .latchUpstreamNode {
+  opacity: 1 !important;
+  filter: drop-shadow(0 0 12px rgb(169 221 211 / 32%));
+}
+
+.latchPinnedScene[data-latch-active-filter="secret"] .latchSecretNode > rect:first-child,
+.latchPinnedScene[data-latch-active-filter="response"] .latchSecretNode > rect:first-child,
+.latchPinnedScene[data-latch-active-filter="response"] .latchUpstreamNode rect {
+  stroke: #a9ddd3;
+  stroke-width: 1.8;
+}
+
+.latchSecretNode .latchVaultDoor {
+  fill: rgb(169 221 211 / 7%);
+  stroke: rgb(169 221 211 / 48%);
+  transform-box: fill-box;
+}
+
+.latchSecretNode circle,
+.latchSecretNode > path:last-of-type {
+  fill: none;
+  stroke: #a9ddd3;
+}
+
+.latchSecretNode text:last-of-type {
+  fill: rgb(232 227 213 / 34%);
+  font-size: 6px;
+}
+
+.latchInjectTrace {
+  stroke: #a9ddd3;
+  stroke-dasharray: 28;
+  stroke-width: 3;
+}
+
+.latchUpstreamNode path {
+  fill: none;
+  stroke: rgb(169 221 211 / 42%);
+}
+
+.latchPacket {
+  opacity: 0;
+}
+
+.latchPacket > :first-child {
+  fill: #a9ddd3;
+  stroke: #010101;
+  stroke-width: 2;
+}
+
+.latchPacketGlow {
+  fill: #a9ddd3;
+  opacity: 0.18;
+  filter: url(#latch-glow);
+}
+
+.latchEntryPacket .latchPacketGlow {
+  opacity: 0.34;
+}
+
+.latchStopHalo,
+.latchRateRing {
+  fill: none !important;
+  stroke: #a9ddd3 !important;
+  stroke-width: 1.5 !important;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.latchStopHalo {
+  stroke-dasharray: 3 5;
+  animation: latchStopPulse 900ms ease-out infinite;
+}
+
+.latchStopMark {
+  fill: none;
+  stroke: #e8e3d5;
+  stroke-width: 1.8;
+}
+
+.latchRateRing {
+  stroke-dasharray: 10 7;
+  animation: latchRateGate 2.2s linear infinite;
+}
+
+.latchResponsePacket > :first-child {
+  fill: #e8e3d5;
+}
+
+.latchOutcome {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.latchOutcome rect,
+.latchOutcome path {
+  fill: rgb(1 1 1 / 92%);
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.latchOutcome text {
+  font-size: 7px;
+  letter-spacing: 1px;
+}
+
+.latchPinnedScene[data-latch-run="403"] [data-latch-outcome="allowed"],
+.latchPinnedScene[data-latch-run="403"] [data-latch-outcome="429"],
+.latchPinnedScene[data-latch-run="429"] [data-latch-outcome="allowed"],
+.latchPinnedScene[data-latch-run="429"] [data-latch-outcome="403"],
+.latchPinnedScene[data-latch-run="response"] [data-latch-outcome] {
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
+.latchPinnedScene[data-latch-run="403"] [data-latch-secret],
+.latchPinnedScene[data-latch-run="403"] [data-latch-upstream],
+.latchPinnedScene[data-latch-run="429"] [data-latch-secret],
+.latchPinnedScene[data-latch-run="429"] [data-latch-upstream] {
+  opacity: 0.2 !important;
+}
+
+.latchPinnedScene[data-latch-run="403"] [data-latch-vault-door],
+.latchPinnedScene[data-latch-run="429"] [data-latch-vault-door] {
+  transform: scaleX(1) !important;
+}
+
+.latchPinnedScene[data-latch-run="403"] [data-latch-inject],
+.latchPinnedScene[data-latch-run="429"] [data-latch-inject] {
+  stroke-dashoffset: 28 !important;
+}
+
+.latchPinnedScene[data-latch-run="403"] .latchPipelineTrace {
+  stroke-dasharray: 512 1220 !important;
+  stroke-dashoffset: 0 !important;
+  stroke-width: 3.5;
+}
+
+.latchPinnedScene[data-latch-run="429"] .latchPipelineTrace {
+  stroke-dasharray: 780 1220 !important;
+  stroke-dashoffset: 0 !important;
+  stroke-width: 3.5;
+}
+
+.latchPinnedScene[data-latch-run="allow"] .latchPipelineTrace,
+.latchPinnedScene[data-latch-run="response"] .latchResponseRail {
+  stroke-width: 3.5;
+  filter: url(#latch-glow);
+}
+
+.latchRedaction {
+  opacity: 0;
+}
+
+.latchRedaction > rect:first-child {
+  fill: rgb(1 1 1 / 94%);
+  stroke: rgb(169 221 211 / 45%);
+}
+
+.latchPinnedScene[data-latch-active-filter="response"] .latchRedaction > rect:first-child {
+  stroke: #a9ddd3;
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 10px rgb(169 221 211 / 28%));
+}
+
+.latchRedaction rect:not(:first-child) {
+  fill: #a9ddd3;
+  opacity: 0.44;
+}
+
+.latchRedaction text:not(:first-of-type) {
+  fill: rgb(232 227 213 / 45%);
+  font-size: 7px;
+}
+
+.latchAuditTrace path {
+  stroke: rgb(232 227 213 / 16%);
+}
+
+.latchAuditTrace circle {
+  fill: #a9ddd3;
+}
+
+.latchAuditTrace text {
+  fill: rgb(232 227 213 / 30%);
+  font-size: 7px;
+}
+
+.latchResponseLabel {
+  fill: rgb(169 221 211 / 42%);
+  font-family: Arial, sans-serif;
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.4px;
+}
+
+.latchContentLayer {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.latchIntro,
+.latchRelease {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  width: min(44rem, 53vw);
+  padding-left: clamp(1.5rem, 5vw, 6rem);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.latchIntro::before,
+.latchRelease::before {
+  position: absolute;
+  z-index: -1;
+  inset: -8rem -11rem;
+  background: radial-gradient(ellipse at 34% 50%, rgb(1 1 1 / 98%) 0 43%, rgb(1 1 1 / 78%) 59%, transparent 77%);
+  content: "";
+}
+
+.latchIntro h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3.8rem, 6vw, 7rem);
+  font-variation-settings: "wght" 410, "wdth" 78, "opsz" 120;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.latchIntro > p:last-child {
+  max-width: 35rem;
+  margin: 1.75rem 0 0;
+  color: rgb(232 227 213 / 62%);
+  font-size: clamp(0.98rem, 1.15vw, 1.12rem);
+  line-height: 1.6;
+}
+
+.latchSceneContent {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.latchSceneHeader {
+  position: absolute;
+  top: clamp(6.5rem, 11vh, 8rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.latchSceneHeader span,
+.latchRelease span,
+.latchMountCopy > span {
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.56rem, 0.64vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.latchSceneHeader strong {
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.3rem, 3.5vw, 4rem);
+  font-variation-settings: "wght" 420, "wdth" 80, "opsz" 100;
+  font-weight: 420;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.latchPhaseDeck {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(6rem, 11vh, 8.5rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  width: min(33rem, 36vw);
+  min-height: clamp(14.5rem, 27vh, 15.5rem);
+  isolation: isolate;
+}
+
+.latchPhaseDeck::before {
+  position: absolute;
+  z-index: 0;
+  inset: -3rem -6rem -3rem -3rem;
+  background: radial-gradient(ellipse at 23% 50%, rgb(1 1 1 / 98%) 0 43%, rgb(1 1 1 / 80%) 58%, transparent 80%);
+  content: "";
+}
+
+.latchPhase {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  padding-top: 1.3rem;
+  border-top: 1px solid rgb(169 221 211 / 55%);
+}
+
+.latchPhase > span {
+  display: block;
+  margin-bottom: 1rem;
+  color: #a9ddd3;
+}
+
+.latchPhase h3 {
+  max-width: 14ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(1.75rem, 2.2vw, 2.75rem);
+  font-variation-settings: "wght" 450, "wdth" 82, "opsz" 90;
+  font-weight: 450;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.latchPhase p {
+  max-width: 29rem;
+  margin: 1rem 0 0;
+  color: rgb(232 227 213 / 72%);
+  font-size: clamp(0.86rem, 0.95vw, 0.98rem);
+  line-height: 1.5;
+}
+
+.latchPhase small {
+  position: absolute;
+  top: 1.3rem;
+  right: 0;
+  color: rgb(232 227 213 / 27%);
+}
+
+.latchPhaseRail {
+  position: absolute;
+  right: clamp(1.5rem, 3vw, 3rem);
+  bottom: clamp(2rem, 4vh, 3rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0;
+  margin: 0;
+  color: rgb(232 227 213 / 42%);
+  list-style: none;
+}
+
+.latchPhaseRail li {
+  position: relative;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(232 227 213 / 16%);
+}
+
+.latchPhaseRail li::before {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a9ddd3;
+  content: "";
+}
+
+.latchPinnedScene[data-latch-run="scope"] [data-latch-step="scope"],
+.latchPinnedScene[data-latch-run="allow"] [data-latch-step="allow"],
+.latchPinnedScene[data-latch-run="403"] [data-latch-step="403"],
+.latchPinnedScene[data-latch-run="429"] [data-latch-step="429"],
+.latchPinnedScene[data-latch-run="response"] [data-latch-step="return"] {
+  color: #e8e3d5;
+}
+
+.latchRelease {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.latchRelease p {
+  max-width: 10ch;
+  margin: 1.4rem 0 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3rem, 5vw, 5.8rem);
+  font-variation-settings: "wght" 410, "wdth" 80, "opsz" 110;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.latchMountScene {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(19rem, 0.42fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 7rem);
+  min-height: clamp(48rem, 112svh, 68rem);
+  padding: clamp(6rem, 11vh, 9rem) clamp(1.5rem, 5vw, 6rem);
+  overflow: hidden;
+  isolation: isolate;
+  border-top: 1px solid rgb(232 227 213 / 10%);
+  background: linear-gradient(180deg, rgb(1 1 1 / 58%), rgb(1 1 1 / 24%) 38% 78%, transparent);
+}
+
+.latchMountScene::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(1 1 1 / 94%) 0 17%, transparent 45% 100%);
+  content: "";
+  pointer-events: none;
+}
+
+.latchMountCopy,
+.latchMountSvg {
+  position: relative;
+  z-index: 3;
+}
+
+.latchMountCopy h3 {
+  max-width: 9ch;
+  margin: 1.4rem 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3.2rem, 5vw, 5.9rem);
+  font-variation-settings: "wght" 410, "wdth" 80, "opsz" 110;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.latchMountCopy p {
+  max-width: 34rem;
+  margin: 0;
+  color: rgb(232 227 213 / 64%);
+  font-size: clamp(0.95rem, 1.12vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.latchMountCopy small {
+  display: block;
+  max-width: 28rem;
+  padding-top: 1.5rem;
+  margin-top: 1.75rem;
+  border-top: 1px solid rgb(169 221 211 / 32%);
+  color: #a9ddd3;
+  line-height: 1.5;
+}
+
+.latchMountSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.latchMountToken circle {
+  fill: rgb(1 1 1 / 74%);
+  stroke: rgb(169 221 211 / 48%);
+}
+
+.latchMountToken circle:first-child {
+  stroke-dasharray: 3 8;
+}
+
+.latchMountToken text:last-child {
+  fill: #e8e3d5;
+  font-size: 13px;
+}
+
+.latchMountBranch {
+  fill: none;
+  stroke: url(#latch-branch-gradient);
+  stroke-dasharray: 430;
+  stroke-width: 1.5;
+}
+
+.latchMountPipeline,
+.latchMountSecret rect,
+.latchMountUpstream rect {
+  fill: rgb(1 1 1 / 78%);
+  stroke: rgb(232 227 213 / 20%);
+}
+
+.latchMountService path:not(.latchMountBranch) {
+  fill: none;
+  stroke: rgb(169 221 211 / 44%);
+}
+
+.latchMountService circle {
+  fill: #a9ddd3;
+}
+
+.latchMountService .latchMountServiceName {
+  fill: #e8e3d5;
+  font-size: 13px;
+}
+
+.latchMountSecret text,
+.latchMountUpstream text {
+  font-size: 7px;
+}
+
+.latchSharedAudit path {
+  stroke: rgb(169 221 211 / 32%);
+}
+
+.latchSharedAudit text {
+  fill: rgb(232 227 213 / 38%);
+  font-size: 7px;
+}
+
+.latchStaticRuns {
+  display: none;
+}
+
+@keyframes latchTokenPulse {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  55% {
+    opacity: 0.42;
+    transform: scale(1.9);
+  }
+}
+
+@keyframes latchStopPulse {
+  from {
+    opacity: 0.85;
+    transform: scale(0.72);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.45);
+  }
+}
+
+@keyframes latchRateGate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1100px), (prefers-reduced-motion: reduce) {
+  .latchPinnedScene {
+    display: grid;
+    height: auto;
+    min-height: 0;
+    padding: 8rem clamp(1.5rem, 5vw, 4rem) 5rem;
+    gap: 2.5rem;
+  }
+
+  .latchPinnedScene::after {
+    z-index: 3;
+    background: linear-gradient(180deg, rgb(1 1 1 / 88%), transparent 24% 80%, rgb(1 1 1 / 82%));
+  }
+
+  .latchContentLayer,
+  .latchSceneContent {
+    display: contents;
+  }
+
+  .latchIntro,
+  .latchSceneHeader,
+  .latchPhaseDeck,
+  .latchPhaseRail,
+  .latchRelease,
+  .latchWorld {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+
+  .latchIntro {
+    z-index: 10;
+    order: 1;
+    min-height: 30rem;
+    padding: 2rem 0;
+  }
+
+  .latchIntro::before,
+  .latchRelease::before {
+    display: none;
+  }
+
+  .latchIntro h2 {
+    font-size: clamp(3.5rem, 8.5vw, 6rem);
+  }
+
+  .latchWorld {
+    z-index: 2;
+    order: 2;
+    aspect-ratio: 16 / 9;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .latchSceneHeader {
+    z-index: 10;
+    order: 3;
+  }
+
+  .latchPhaseDeck {
+    z-index: 10;
+    order: 4;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(16rem, 1fr));
+    min-height: 16rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgb(169 221 211 / 40%) transparent;
+  }
+
+  .latchPhaseDeck::before {
+    display: none;
+  }
+
+  .latchPhase {
+    position: relative;
+    min-height: 14rem;
+    padding-right: 1.5rem;
+    background: rgb(1 1 1 / 88%);
+    visibility: visible !important;
+    opacity: 1 !important;
+    scroll-snap-align: start;
+  }
+
+  .latchPhase h3 {
+    font-size: clamp(1.9rem, 3.5vw, 2.8rem);
+  }
+
+  .latchPhase p {
+    color: rgb(232 227 213 / 76%);
+  }
+
+  .latchPhaseRail {
+    display: none;
+  }
+
+  .latchRelease {
+    z-index: 10;
+    order: 5;
+    min-height: 22rem;
+    padding: 3rem 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .latchPacket,
+  .latchOutcome,
+  .latchRedaction {
+    display: none;
+  }
+
+  .latchFilter,
+  .latchSecretNode,
+  .latchUpstreamNode,
+  .latchMountService,
+  .latchSharedAudit {
+    opacity: 1 !important;
+  }
+
+  .latchPinnedScene .latchFilter {
+    opacity: 1 !important;
+    filter: none;
+  }
+
+  .latchMountBranch,
+  .latchPipelineTrace,
+  .latchInjectTrace {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .latchMountScene {
+    grid-template-columns: 1fr;
+    min-height: auto;
+    gap: 3rem;
+  }
+
+  .latchMountCopy h3 {
+    max-width: 11ch;
+  }
+
+  .latchMountSvg {
+    width: min(100%, 58rem);
+    justify-self: center;
+  }
+
+  .latchStaticRuns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    padding: 0 clamp(1.5rem, 5vw, 4rem) 6rem;
+    border-top: 1px solid rgb(232 227 213 / 12%);
+  }
+
+  .latchStaticRuns > div {
+    min-height: 10rem;
+    padding: 1.5rem;
+    border-right: 1px solid rgb(232 227 213 / 12%);
+    border-bottom: 1px solid rgb(232 227 213 / 12%);
+  }
+
+  .latchStaticRuns > div:nth-child(even) {
+    border-right: 0;
+  }
+
+  .latchStaticRuns span {
+    color: #a9ddd3;
+    font-weight: 700;
+  }
+
+  .latchStaticRuns p {
+    max-width: 28rem;
+    margin: 2rem 0 0;
+    color: rgb(232 227 213 / 62%);
+    line-height: 1.5;
+  }
+}
+
 .agpCinematic {
   position: relative;
   min-height: 100svh;
@@ -923,8 +1912,7 @@
   min-height: 42rem;
   overflow: hidden;
   background:
-    radial-gradient(circle at 72% 48%, rgb(169 221 211 / 8%), transparent 38%),
-    rgb(1 1 1 / 46%);
+    radial-gradient(circle at 72% 48%, rgb(169 221 211 / 8%), transparent 38%);
 }
 
 .agpPinnedScene::before,
@@ -982,6 +1970,19 @@
 }
 
 @media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  .agpPinSequence {
+    height: 600svh;
+  }
+
+  .latchPinSequence {
+    height: 620svh;
+  }
+
+  :is(.agpPinnedScene, .latchPinnedScene) {
+    position: sticky;
+    top: 0;
+  }
+
   .agpRaceContent,
   .agpSceneRelease {
     visibility: hidden;
@@ -1698,6 +2699,78 @@
     font-size: clamp(2.7rem, 13vw, 4.5rem);
   }
 
+  .latchPinnedScene {
+    padding: 7.5rem 1rem 4rem;
+    gap: 2rem;
+  }
+
+  .latchIntro {
+    min-height: 27rem;
+  }
+
+  .latchIntro h2 {
+    font-size: clamp(3.15rem, 13vw, 4.8rem);
+    letter-spacing: -0.04em;
+    line-height: 0.93;
+  }
+
+  .latchWorld {
+    min-height: 18rem;
+    margin-inline: -12%;
+    aspect-ratio: 5 / 4;
+  }
+
+  .latchPipelineSvg {
+    transform: scale(1.2);
+  }
+
+  .latchSceneHeader strong {
+    font-size: clamp(2.3rem, 10vw, 3.5rem);
+  }
+
+  .latchPhaseDeck {
+    grid-template-columns: repeat(5, minmax(82vw, 1fr));
+    min-height: 18rem;
+  }
+
+  .latchPhase {
+    min-height: 18rem;
+  }
+
+  .latchRelease {
+    min-height: 20rem;
+  }
+
+  .latchRelease p {
+    font-size: clamp(2.8rem, 12vw, 4.25rem);
+  }
+
+  .latchMountScene {
+    gap: 2rem;
+    padding: 6rem 1rem 4rem;
+  }
+
+  .latchMountCopy h3 {
+    font-size: clamp(3rem, 13vw, 4.6rem);
+  }
+
+  .latchMountSvg {
+    margin-inline: -8%;
+    width: 116%;
+  }
+
+  .latchStaticRuns {
+    grid-template-columns: 1fr;
+    padding: 0 1rem 5rem;
+  }
+
+  .latchStaticRuns > div,
+  .latchStaticRuns > div:nth-child(even) {
+    min-height: 9rem;
+    padding-inline: 0;
+    border-right: 0;
+  }
+
   .agpPinnedScene {
     padding: 7.5rem 1rem 4rem;
     gap: 2rem;
@@ -1773,6 +2846,9 @@
   .orbit,
   .architectureFlow,
   .fieldBackground *,
+  .latchTokenNode circle,
+  .latchStopHalo,
+  .latchRateRing,
   .chapterLead > :not(.fieldBackground),
   .architectureStatement > * {
     animation: none !important;

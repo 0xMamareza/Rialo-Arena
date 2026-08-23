@@ -100,12 +100,9 @@ export function AgpCinematic() {
             defaults: { ease: "none" },
             scrollTrigger: {
               trigger: "[data-agp-trigger]",
-              pin: "[data-agp-pin]",
               start: "top top",
-              end: "+=500%",
+              end: "bottom bottom",
               scrub: 0.75,
-              anticipatePin: 1,
-              pinSpacing: true,
               invalidateOnRefresh: true,
             },
           });
@@ -200,8 +197,8 @@ export function AgpCinematic() {
 
   return (
     <section ref={rootRef} className={styles.agpCinematic} aria-labelledby="agp-title">
-      <div className={styles.agpPinSequence} data-agp-trigger>
-        <div className={styles.agpPinnedScene} data-agp-pin>
+      <div className={styles.agpPinSequence} data-agp-trigger data-cinematic-sequence="agp">
+        <div className={styles.agpPinnedScene} data-agp-pin data-cinematic-stage>
           <RialoFieldBackground intensity="stage" />
           <div className={styles.agpWorldViewport}>
             <div className={styles.agpWorld} data-agp-world>
