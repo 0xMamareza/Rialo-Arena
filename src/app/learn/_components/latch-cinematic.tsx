@@ -507,9 +507,9 @@ export function LatchCinematic() {
 
   return (
     <section ref={rootRef} className={styles.latchCinematic} aria-labelledby="latch-title">
-      <div className={styles.latchPinSequence} data-latch-trigger data-cinematic-sequence="latch">
+      <div className={`${styles.cinematicSequence} ${styles.latchPinSequence}`} data-latch-trigger data-cinematic-sequence="latch">
         <div
-          className={styles.latchPinnedScene}
+          className={`${styles.cinematicStage} ${styles.latchPinnedScene}`}
           data-cinematic-stage
           data-latch-active-filter="token"
           data-latch-pin

@@ -4,6 +4,8 @@ import localFont from "next/font/local";
 
 import { AgpCinematic } from "./_components/agp-cinematic";
 import { LatchCinematic } from "./_components/latch-cinematic";
+import { ReactiveCinematic } from "./_components/reactive-cinematic";
+import { StakeServiceCinematic } from "./_components/stake-service-cinematic";
 import {
   ChapterFacts,
   StudyNotes,
@@ -44,13 +46,13 @@ const chapters: LearnChapterNavItem[] = [
     id: "chapter-reactive",
     label: "Reactive",
     number: "03",
-    available: false,
+    available: true,
   },
   {
     id: "chapter-stake-for-service",
     label: "Stake-for-Service",
     number: "04",
-    available: false,
+    available: true,
   },
   {
     id: "chapter-project-1337",
@@ -169,6 +171,171 @@ const architectureNotes: StudyNote[] = [
         The architecture matters most where composition creates something no
         isolated component could provide: recurring operations, hybrid
         chain-to-world workflows, and verifiable computation over external data.
+      </p>
+    ),
+  },
+];
+
+const reactiveFacts: ChapterFact[] = [
+  {
+    label: "Protocol-native automation",
+    value: "Conditions are evaluated and triggered by Rialo's execution path without bots, keepers, cron jobs, or separate schedulers.",
+  },
+  {
+    label: "Signal range",
+    value: "Predicates can reference onchain state and events, validator-attested external data, and time conditions.",
+  },
+  {
+    label: "Stored condition",
+    value: "A predicate defines when its associated executable transaction becomes eligible to run.",
+  },
+  {
+    label: "Deterministic agreement",
+    value: "Validators evaluate affected predicates against shared state and arrive at the same result.",
+  },
+  {
+    label: "Automatic execution",
+    value: "A true predicate enqueues its transaction for execution in dependency order.",
+  },
+];
+
+const reactiveNotes: StudyNote[] = [
+  {
+    title: "Predicate and action",
+    body: (
+      <p>
+        A reactive transaction registers a logical predicate with the program
+        that should run when that predicate becomes true. The condition waits
+        in chain state instead of depending on an external watcher.
+      </p>
+    ),
+  },
+  {
+    title: "Signals that can wake execution",
+    body: (
+      <p>
+        Inputs can include balances, state transitions, emitted events,
+        validator-attested oracle or API data, block height, timestamps, and
+        results produced by earlier workflow steps.
+      </p>
+    ),
+  },
+  {
+    title: "Validator evaluation",
+    body: (
+      <p>
+        During block execution, validators evaluate predicates whose
+        dependencies may have changed. Evaluation is deterministic, so the
+        network reaches one conclusion from the same state.
+      </p>
+    ),
+  },
+  {
+    title: "Trigger and execution order",
+    body: (
+      <p>
+        When a predicate becomes true, Rialo marks the transaction as triggered
+        and enqueues it. The action can run in the same block or a following
+        block according to dependency ordering.
+      </p>
+    ),
+  },
+  {
+    title: "Long-running workflows",
+    body: (
+      <p>
+        A reactive transaction can create later conditional steps, allowing a
+        workflow to wait, resume, and span many blocks while remaining inside
+        the protocol&apos;s execution model.
+      </p>
+    ),
+  },
+];
+
+const stakeServiceFacts: ChapterFact[] = [
+  {
+    label: "Principal preserved",
+    value: "The RLO principal remains staked and continues securing the network while producing rewards.",
+  },
+  {
+    label: "Future yield routing",
+    value: "A chosen routing fraction directs only part of future staking rewards toward services.",
+  },
+  {
+    label: "ServicePaymaster",
+    value: "Routed rewards go directly to the ServicePaymaster, which mints an equivalent quantity of service credits.",
+  },
+  {
+    label: "Bound utility",
+    value: "Credits are non-transferable outside service use and cannot become a speculative asset.",
+  },
+  {
+    label: "Network services",
+    value: "Credits can fund gas, storage, and scheduled execution across Rialo.",
+  },
+  {
+    label: "Recurring operations",
+    value: "Yield-funded credits can sustain Reactive Transactions without repeated balance monitoring or manual top-ups.",
+  },
+];
+
+const stakeServiceNotes: StudyNote[] = [
+  {
+    title: "The SfS position",
+    body: (
+      <p>
+        A Stake-for-Service position records the staked principal, its validator
+        or pool, and the fraction of future rewards allocated to service use.
+        The principal itself stays in the staking position.
+      </p>
+    ),
+  },
+  {
+    title: "Routing future rewards",
+    body: (
+      <p>
+        At each reward interval, the selected share bypasses user custody and
+        flows to the ServicePaymaster. The remaining reward follows the normal
+        path back to the staker.
+      </p>
+    ),
+  },
+  {
+    title: "ServicePaymaster accounting",
+    body: (
+      <p>
+        The ServicePaymaster mints credits with equivalent backing and tracks
+        balances and consumption. When services consume credits, validators and
+        providers receive the corresponding RLO payout.
+      </p>
+    ),
+  },
+  {
+    title: "Why credits stay service-bound",
+    body: (
+      <p>
+        Credits behave as programmable vouchers for network work. They cannot
+        be transferred outside the service context, which keeps routed rewards
+        directed toward productive network activity.
+      </p>
+    ),
+  },
+  {
+    title: "Services the flow can fund",
+    body: (
+      <p>
+        The same credit system can pay for gas, storage, scheduled tasks, and
+        future service categories integrated into Rialo&apos;s network accounting.
+      </p>
+    ),
+  },
+  {
+    title: "Composition with Reactive Transactions",
+    body: (
+      <p>
+        Reactive Transactions provide native scheduling and condition-based
+        execution. Stake-for-Service supplies a renewable funding stream, so a
+        recurring workflow can continue without a manually maintained gas balance.
       </p>
     ),
   },
@@ -509,7 +676,61 @@ export default function LearnPage() {
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>02</span>
             <i />
-            <strong>Authority enters policy</strong>
+            <strong>Conditions enter execution</strong>
+            <i />
+            <span>03</span>
+          </div>
+        </section>
+
+        <section
+          className={styles.chapter}
+          id="chapter-reactive"
+          data-learn-chapter
+          aria-labelledby="reactive-title"
+        >
+          <ReactiveCinematic />
+
+          <div className={styles.chapterKnowledge}>
+            <ChapterFacts facts={reactiveFacts} headingId="reactive-facts-title" />
+            <StudyNotes
+              notes={reactiveNotes}
+              headingId="reactive-notes-title"
+              sourceHref="https://www.rialo.io/posts/reactive-transactions-a-model-for-native-automation-on-rialo/"
+              sourceLabel="Reactive Transactions"
+            />
+          </div>
+
+          <div className={styles.chapterTransition} aria-hidden="true">
+            <span>03</span>
+            <i />
+            <strong>Execution gains a funding loop</strong>
+            <i />
+            <span>04</span>
+          </div>
+        </section>
+
+        <section
+          className={styles.chapter}
+          id="chapter-stake-for-service"
+          data-learn-chapter
+          aria-labelledby="sfs-title"
+        >
+          <StakeServiceCinematic />
+
+          <div className={styles.chapterKnowledge}>
+            <ChapterFacts facts={stakeServiceFacts} headingId="sfs-facts-title" />
+            <StudyNotes
+              notes={stakeServiceNotes}
+              headingId="sfs-notes-title"
+              sourceHref="https://www.rialo.io/posts/stake-for-service/"
+              sourceLabel="Stake for Service"
+            />
+          </div>
+
+          <div className={styles.chapterTransition} aria-hidden="true">
+            <span>04</span>
+            <i />
+            <strong>Funding enters bounded authority</strong>
             <i />
             <span>07</span>
           </div>

@@ -840,6 +840,772 @@
   line-height: 1.6;
 }
 
+.cinematicSequence,
+.cinematicStage,
+.reactiveCinematic,
+.sfsCinematic {
+  position: relative;
+}
+
+.reactiveCinematic,
+.sfsCinematic {
+  background: linear-gradient(180deg, transparent, rgb(1 1 1 / 30%) 12% 88%, transparent);
+}
+
+.reactiveStage,
+.sfsStage {
+  height: 100svh;
+  min-height: 44rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.reactiveStage {
+  background: radial-gradient(circle at 67% 48%, rgb(169 221 211 / 7%), transparent 40%);
+}
+
+.sfsStage {
+  background:
+    radial-gradient(ellipse at 69% 49%, rgb(169 221 211 / 7%), transparent 42%),
+    linear-gradient(115deg, transparent 36%, rgb(232 227 213 / 2%) 52%, transparent 68%);
+}
+
+.reactiveStage::before,
+.reactiveStage::after,
+.sfsStage::before,
+.sfsStage::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.reactiveStage::before {
+  z-index: 1;
+  background-image:
+    linear-gradient(rgb(232 227 213 / 4%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(232 227 213 / 4%) 1px, transparent 1px);
+  background-size: 3.6rem 3.6rem;
+  mask-image: radial-gradient(circle at 67% 48%, #010101, transparent 74%);
+}
+
+.reactiveStage::after,
+.sfsStage::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgb(1 1 1 / 76%) 0 10%, transparent 34% 92%, rgb(1 1 1 / 48%)),
+    linear-gradient(180deg, rgb(1 1 1 / 26%), transparent 19% 77%, rgb(1 1 1 / 72%));
+}
+
+.sfsStage::before {
+  z-index: 1;
+  background:
+    repeating-radial-gradient(ellipse at 70% 48%, transparent 0 3.5rem, rgb(169 221 211 / 3%) 3.55rem 3.6rem),
+    linear-gradient(90deg, transparent, rgb(232 227 213 / 3%) 50%, transparent);
+  mask-image: linear-gradient(90deg, transparent 8%, #010101 33% 95%, transparent);
+}
+
+.reactiveWorld,
+.sfsWorld {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  transform-origin: 68% 48%;
+  will-change: transform, opacity;
+}
+
+.reactiveDiagram,
+.sfsDiagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.reactiveContentLayer,
+.sfsContentLayer {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.reactiveIntro,
+.reactiveRelease,
+.sfsIntro,
+.sfsRelease {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  width: min(46rem, 55vw);
+  padding-left: clamp(1.5rem, 5vw, 6rem);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.reactiveIntro::before,
+.reactiveRelease::before,
+.sfsIntro::before,
+.sfsRelease::before {
+  position: absolute;
+  z-index: -1;
+  inset: -8rem -12rem;
+  background: radial-gradient(ellipse at 33% 50%, rgb(1 1 1 / 97%) 0 42%, rgb(1 1 1 / 76%) 59%, transparent 78%);
+  content: "";
+}
+
+.reactiveIntro h2,
+.sfsIntro h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3.6rem, 5.7vw, 6.7rem);
+  font-variation-settings: "wght" 410, "wdth" 79, "opsz" 116;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.reactiveIntro > p:last-child,
+.sfsIntro > p:last-child {
+  max-width: 34rem;
+  margin: 1.65rem 0 0;
+  color: rgb(232 227 213 / 64%);
+  font-size: clamp(0.96rem, 1.1vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.reactiveSceneContent,
+.sfsSceneContent {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+}
+
+.reactiveSceneHeader,
+.sfsSceneHeader {
+  position: absolute;
+  top: clamp(6.5rem, 11vh, 8rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.reactiveSceneHeader span,
+.sfsSceneHeader span,
+.reactiveRelease span,
+.sfsRelease span {
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.56rem, 0.64vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.reactiveSceneHeader strong,
+.sfsSceneHeader strong {
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.25rem, 3.35vw, 3.85rem);
+  font-variation-settings: "wght" 420, "wdth" 80, "opsz" 100;
+  font-weight: 420;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.reactivePhaseDeck,
+.sfsPhaseDeck {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(6rem, 11vh, 8.5rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  width: min(33rem, 36vw);
+  min-height: clamp(14.5rem, 27vh, 15.5rem);
+  isolation: isolate;
+}
+
+.reactivePhaseDeck::before,
+.sfsPhaseDeck::before {
+  position: absolute;
+  z-index: 0;
+  inset: -3rem -6rem -3rem -3rem;
+  background: radial-gradient(ellipse at 23% 50%, rgb(1 1 1 / 98%) 0 43%, rgb(1 1 1 / 79%) 58%, transparent 80%);
+  content: "";
+}
+
+.reactivePhase,
+.sfsPhase {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  padding-top: 1.3rem;
+  border-top: 1px solid rgb(169 221 211 / 55%);
+}
+
+.reactivePhase > span,
+.sfsPhase > span {
+  display: block;
+  margin-bottom: 1rem;
+  color: #a9ddd3;
+}
+
+.reactivePhase h3,
+.sfsPhase h3 {
+  max-width: 14ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(1.7rem, 2.15vw, 2.65rem);
+  font-variation-settings: "wght" 450, "wdth" 82, "opsz" 90;
+  font-weight: 450;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.reactivePhase p,
+.sfsPhase p {
+  max-width: 29rem;
+  margin: 0.95rem 0 0;
+  color: rgb(232 227 213 / 70%);
+  font-size: clamp(0.84rem, 0.92vw, 0.96rem);
+  line-height: 1.48;
+}
+
+.reactivePhase small,
+.sfsPhase small {
+  position: absolute;
+  top: 1.3rem;
+  right: 0;
+  color: rgb(232 227 213 / 27%);
+}
+
+.reactivePhaseRail,
+.sfsPhaseRail {
+  position: absolute;
+  right: clamp(1.5rem, 3vw, 3rem);
+  bottom: clamp(2rem, 4vh, 3rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0;
+  margin: 0;
+  color: rgb(232 227 213 / 38%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.52rem, 0.6vw, 0.66rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.reactivePhaseRail li,
+.sfsPhaseRail li {
+  position: relative;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(232 227 213 / 16%);
+}
+
+.reactivePhaseRail li::before,
+.sfsPhaseRail li::before {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a9ddd3;
+  content: "";
+}
+
+.reactiveRelease,
+.sfsRelease {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.reactiveRelease p,
+.sfsRelease p {
+  max-width: 10ch;
+  margin: 1.35rem 0 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.9rem, 4.8vw, 5.5rem);
+  font-variation-settings: "wght" 410, "wdth" 80, "opsz" 110;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.reactiveTriggerFlash {
+  position: absolute;
+  z-index: 7;
+  inset: 0;
+  background: radial-gradient(circle at 73% 50%, rgb(232 227 213 / 38%), rgb(169 221 211 / 12%) 19%, transparent 47%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.reactiveDiagram text,
+.sfsDiagram text {
+  fill: #a9ddd3;
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.3px;
+}
+
+.reactiveSignal circle,
+.reactivePredicate rect,
+.reactiveValidators > rect,
+.reactiveExecution rect {
+  fill: rgb(1 1 1 / 84%);
+  stroke: rgb(169 221 211 / 42%);
+}
+
+.reactiveSignal path,
+.reactiveSignal circle:not(:first-child),
+.reactivePredicate path,
+.reactiveValidators path,
+.reactiveExecution path {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.reactiveSignal text:last-child {
+  fill: rgb(232 227 213 / 34%);
+  font-size: 6px;
+}
+
+.reactiveSignalRoute,
+.reactiveConsensusRoute,
+.reactiveExecutionRoute {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.reactiveSignalRoute {
+  stroke: rgb(169 221 211 / 32%);
+  stroke-dasharray: 3 9;
+  stroke-width: 1.4;
+}
+
+.reactivePacket > circle:first-child {
+  fill: #a9ddd3;
+}
+
+.reactivePacketGlow {
+  fill: #a9ddd3;
+  opacity: 0.22;
+  filter: url(#reactive-glow);
+}
+
+.reactivePredicate {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.reactivePredicate > rect {
+  stroke-width: 1.5;
+}
+
+.reactivePredicate circle {
+  fill: #a9ddd3;
+}
+
+.reactivePredicateValue {
+  fill: #e8e3d5 !important;
+  font-size: 17px !important;
+  letter-spacing: 2px !important;
+}
+
+.reactiveConsensusRoute,
+.reactiveExecutionRoute {
+  stroke: url(#reactive-flow);
+  stroke-dasharray: 230;
+  stroke-width: 3;
+  filter: url(#reactive-glow);
+}
+
+.reactiveValidators > rect {
+  stroke-dasharray: 3 7;
+}
+
+.reactiveValidator circle {
+  fill: rgb(169 221 211 / 9%);
+  stroke: #a9ddd3;
+}
+
+.reactiveValidator text {
+  fill: rgb(232 227 213 / 58%);
+}
+
+.reactiveAgreement {
+  fill: #e8e3d5 !important;
+}
+
+.reactiveTriggerRing {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.reactiveTriggerRing:first-child {
+  stroke-dasharray: 4 8;
+}
+
+.reactiveTriggerCore {
+  fill: #a9ddd3;
+  filter: url(#reactive-glow);
+}
+
+.reactiveTrigger path {
+  fill: #010101;
+  stroke: #e8e3d5;
+  stroke-width: 1.2;
+}
+
+.reactiveExecution {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.reactiveExecution rect {
+  stroke-width: 1.6;
+}
+
+.reactiveExecution circle {
+  fill: #a9ddd3;
+  filter: url(#reactive-glow);
+}
+
+.reactiveBlockRail path {
+  stroke: rgb(232 227 213 / 15%);
+}
+
+.reactiveBlockRail circle {
+  fill: #a9ddd3;
+}
+
+.reactiveBlockRail text {
+  fill: rgb(232 227 213 / 30%);
+  font-size: 6px;
+}
+
+.sfsPrincipal path,
+.sfsRouter path:not(.sfsRouterArc),
+.sfsPaymaster path {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.sfsReservoirOuter,
+.sfsReservoirInner {
+  fill: rgb(1 1 1 / 66%);
+  stroke: rgb(169 221 211 / 44%);
+}
+
+.sfsReservoirOuter {
+  stroke-dasharray: 3 9;
+}
+
+.sfsNodeTitle {
+  fill: #e8e3d5 !important;
+  font-size: 12px !important;
+}
+
+.sfsYieldRoute,
+.sfsReturnRoute,
+.sfsPaymasterRoute,
+.sfsCreditRoute,
+.sfsServiceBranch,
+.sfsReactiveBridge {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.sfsYieldRoute,
+.sfsPaymasterRoute,
+.sfsCreditRoute,
+.sfsServiceBranch,
+.sfsReactiveBridge {
+  stroke: url(#sfs-stream);
+  stroke-width: 2.5;
+  filter: url(#sfs-glow);
+}
+
+.sfsReturnRoute {
+  stroke: rgb(232 227 213 / 14%);
+  stroke-dasharray: 3 9;
+}
+
+.sfsRouteLabel {
+  fill: rgb(232 227 213 / 30%) !important;
+  font-size: 6px !important;
+}
+
+.sfsYieldPacket > circle:first-child,
+.sfsFlowParticle circle {
+  fill: #a9ddd3;
+}
+
+.sfsYieldGlow {
+  fill: #a9ddd3;
+  opacity: 0.24;
+  filter: url(#sfs-glow);
+}
+
+.sfsRouter rect,
+.sfsPaymaster rect,
+.sfsService rect,
+.sfsReactiveNode rect {
+  fill: rgb(1 1 1 / 84%);
+  stroke: rgb(169 221 211 / 42%);
+}
+
+.sfsRouter circle {
+  fill: rgb(169 221 211 / 5%);
+  stroke: rgb(232 227 213 / 22%);
+}
+
+.sfsRouterArc {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-dasharray: 118;
+  stroke-dashoffset: 118;
+  stroke-linecap: round;
+  stroke-width: 4;
+  filter: url(#sfs-glow);
+}
+
+.sfsRouterValue {
+  fill: #e8e3d5 !important;
+  font-size: 18px !important;
+}
+
+.sfsPaymaster circle {
+  fill: rgb(169 221 211 / 14%);
+  stroke: #a9ddd3;
+}
+
+.sfsPaymasterRoute {
+  stroke-dasharray: 150;
+}
+
+.sfsCreditRoute {
+  stroke-dasharray: 40;
+}
+
+.sfsCreditBurst {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.sfsCreditBurst circle {
+  fill: rgb(1 1 1 / 86%);
+  stroke: #a9ddd3;
+}
+
+.sfsCreditBurst circle:first-child {
+  stroke-dasharray: 3 7;
+}
+
+.sfsCreditBurst text:first-of-type {
+  fill: #e8e3d5;
+  font-size: 7px;
+}
+
+.sfsServiceBranch {
+  stroke-dasharray: 240;
+}
+
+.sfsService circle {
+  fill: #a9ddd3;
+}
+
+.sfsService text {
+  fill: #e8e3d5;
+  font-size: 7px;
+}
+
+.sfsReactiveBridge {
+  stroke-dasharray: 760;
+  stroke-width: 3;
+}
+
+.sfsReactiveNode text:first-of-type {
+  fill: #e8e3d5;
+}
+
+.sfsReactiveNode text:last-of-type {
+  fill: rgb(169 221 211 / 65%);
+  font-size: 6px;
+}
+
+.sfsFlowParticle {
+  filter: url(#sfs-glow);
+}
+
+@media (max-width: 1100px), (prefers-reduced-motion: reduce) {
+  .reactiveStage,
+  .sfsStage {
+    display: grid;
+    height: auto;
+    min-height: 0;
+    padding: 8rem clamp(1.5rem, 5vw, 4rem) 5rem;
+    gap: 2.5rem;
+  }
+
+  .reactiveStage::after,
+  .sfsStage::after {
+    z-index: 3;
+    background: linear-gradient(180deg, rgb(1 1 1 / 86%), transparent 24% 80%, rgb(1 1 1 / 80%));
+  }
+
+  .reactiveContentLayer,
+  .reactiveSceneContent,
+  .sfsContentLayer,
+  .sfsSceneContent {
+    display: contents;
+  }
+
+  .reactiveIntro,
+  .reactiveSceneHeader,
+  .reactiveWorld,
+  .reactivePhaseDeck,
+  .reactiveRelease,
+  .sfsIntro,
+  .sfsSceneHeader,
+  .sfsWorld,
+  .sfsPhaseDeck,
+  .sfsRelease {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+
+  .reactiveIntro,
+  .sfsIntro {
+    z-index: 10;
+    order: 1;
+    min-height: 29rem;
+    padding: 2rem 0;
+  }
+
+  .reactiveIntro::before,
+  .reactiveRelease::before,
+  .sfsIntro::before,
+  .sfsRelease::before {
+    display: none;
+  }
+
+  .reactiveIntro h2,
+  .sfsIntro h2 {
+    font-size: clamp(3.4rem, 8.2vw, 5.9rem);
+  }
+
+  .reactiveWorld,
+  .sfsWorld {
+    z-index: 2;
+    order: 2;
+    aspect-ratio: 16 / 9;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .reactiveSceneHeader,
+  .sfsSceneHeader {
+    z-index: 10;
+    order: 3;
+  }
+
+  .reactivePhaseDeck,
+  .sfsPhaseDeck {
+    z-index: 10;
+    order: 4;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(16rem, 1fr));
+    min-height: 16rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgb(169 221 211 / 40%) transparent;
+  }
+
+  .reactivePhaseDeck::before,
+  .sfsPhaseDeck::before {
+    display: none;
+  }
+
+  .reactivePhase,
+  .sfsPhase {
+    position: relative;
+    min-height: 14rem;
+    padding-right: 1.5rem;
+    background: rgb(1 1 1 / 88%);
+    visibility: visible !important;
+    opacity: 1 !important;
+    scroll-snap-align: start;
+  }
+
+  .reactivePhaseRail,
+  .sfsPhaseRail {
+    display: none;
+  }
+
+  .reactiveRelease,
+  .sfsRelease {
+    z-index: 10;
+    order: 5;
+    min-height: 22rem;
+    padding: 3rem 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .reactivePacket,
+  .sfsYieldPacket,
+  .sfsFlowParticle,
+  .reactiveTriggerFlash {
+    display: none;
+  }
+
+  .reactiveSignal,
+  .reactivePredicate,
+  .reactiveValidator,
+  .reactiveTrigger,
+  .reactiveExecution,
+  .sfsRouter,
+  .sfsPaymaster,
+  .sfsCreditBurst,
+  .sfsService,
+  .sfsReactiveNode {
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .reactiveConsensusRoute,
+  .reactiveExecutionRoute,
+  .sfsPaymasterRoute,
+  .sfsCreditRoute,
+  .sfsServiceBranch,
+  .sfsReactiveBridge,
+  .sfsRouterArc {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
 .latchChapter {
   position: relative;
 }
@@ -1970,6 +2736,14 @@
 }
 
 @media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  .reactivePinSequence {
+    height: 580svh;
+  }
+
+  .sfsPinSequence {
+    height: 600svh;
+  }
+
   .agpPinSequence {
     height: 600svh;
   }
@@ -1978,11 +2752,15 @@
     height: 620svh;
   }
 
-  :is(.agpPinnedScene, .latchPinnedScene) {
+  .cinematicStage {
     position: sticky;
     top: 0;
   }
 
+  .reactiveSceneContent,
+  .reactiveRelease,
+  .sfsSceneContent,
+  .sfsRelease,
   .agpRaceContent,
   .agpSceneRelease {
     visibility: hidden;
@@ -2697,6 +3475,62 @@
 
   .architectureStatement p {
     font-size: clamp(2.7rem, 13vw, 4.5rem);
+  }
+
+  .reactiveStage,
+  .sfsStage {
+    padding: 7.5rem 1rem 4rem;
+    gap: 2rem;
+  }
+
+  .reactiveIntro,
+  .sfsIntro {
+    min-height: 27rem;
+  }
+
+  .reactiveIntro h2,
+  .sfsIntro h2 {
+    font-size: clamp(3rem, 12.5vw, 4.6rem);
+    letter-spacing: -0.04em;
+    line-height: 0.93;
+  }
+
+  .reactiveWorld,
+  .sfsWorld {
+    min-height: 19rem;
+    margin-inline: -14%;
+    aspect-ratio: 5 / 4;
+  }
+
+  .reactiveDiagram,
+  .sfsDiagram {
+    transform: scale(1.18);
+  }
+
+  .reactiveSceneHeader strong,
+  .sfsSceneHeader strong {
+    font-size: clamp(2.15rem, 9.5vw, 3.35rem);
+  }
+
+  .reactivePhaseDeck,
+  .sfsPhaseDeck {
+    grid-template-columns: repeat(5, minmax(82vw, 1fr));
+    min-height: 18rem;
+  }
+
+  .reactivePhase,
+  .sfsPhase {
+    min-height: 18rem;
+  }
+
+  .reactiveRelease,
+  .sfsRelease {
+    min-height: 20rem;
+  }
+
+  .reactiveRelease p,
+  .sfsRelease p {
+    font-size: clamp(2.7rem, 11.5vw, 4.1rem);
   }
 
   .latchPinnedScene {

@@ -197,8 +197,8 @@ export function AgpCinematic() {
 
   return (
     <section ref={rootRef} className={styles.agpCinematic} aria-labelledby="agp-title">
-      <div className={styles.agpPinSequence} data-agp-trigger data-cinematic-sequence="agp">
-        <div className={styles.agpPinnedScene} data-agp-pin data-cinematic-stage>
+      <div className={`${styles.cinematicSequence} ${styles.agpPinSequence}`} data-agp-trigger data-cinematic-sequence="agp">
+        <div className={`${styles.cinematicStage} ${styles.agpPinnedScene}`} data-agp-pin data-cinematic-stage>
           <RialoFieldBackground intensity="stage" />
           <div className={styles.agpWorldViewport}>
             <div className={styles.agpWorld} data-agp-world>
