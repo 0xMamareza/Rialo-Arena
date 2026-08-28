@@ -4,7 +4,9 @@ import localFont from "next/font/local";
 
 import { AgpCinematic } from "./_components/agp-cinematic";
 import { LatchCinematic } from "./_components/latch-cinematic";
+import { Project1337Cinematic } from "./_components/project-1337-cinematic";
 import { ReactiveCinematic } from "./_components/reactive-cinematic";
+import { ScaleCinematic } from "./_components/scale-cinematic";
 import { StakeServiceCinematic } from "./_components/stake-service-cinematic";
 import {
   ChapterFacts,
@@ -58,13 +60,13 @@ const chapters: LearnChapterNavItem[] = [
     id: "chapter-project-1337",
     label: "Project 1337",
     number: "05",
-    available: false,
+    available: true,
   },
   {
     id: "chapter-agent-economy",
     label: "Agent Economy",
     number: "06",
-    available: false,
+    available: true,
   },
   { id: "chapter-latch", label: "Latch", number: "07", available: true },
   { id: "chapter-agp", label: "AGP", number: "08", available: true },
@@ -336,6 +338,172 @@ const stakeServiceNotes: StudyNote[] = [
         Reactive Transactions provide native scheduling and condition-based
         execution. Stake-for-Service supplies a renewable funding stream, so a
         recurring workflow can continue without a manually maintained gas balance.
+      </p>
+    ),
+  },
+];
+
+const project1337Facts: ChapterFact[] = [
+  {
+    label: "Live source",
+    value: "Project 1337 ingested real-time financial-market updates from Massive's WebSocket feed.",
+  },
+  {
+    label: "Derived signal",
+    value: "Rialo processed the feed into a market-maker-style best-estimate price instead of publishing raw ticks unchanged.",
+  },
+  {
+    label: "Compact output",
+    value: "Preprocessing condensed fast-moving market activity into meaningful values suitable for onchain use.",
+  },
+  {
+    label: "Cryptographic origin",
+    value: "Each update was signed to bind the published result to Massive data and the applied preprocessing.",
+  },
+  {
+    label: "Financial rails",
+    value: "The experiment targeted high-speed infrastructure for perpetuals, real-world assets, and synthetic markets.",
+  },
+];
+
+const project1337Notes: StudyNote[] = [
+  {
+    title: "The Massive feed",
+    body: (
+      <p>
+        Massive supplied a live WebSocket stream containing symbols, prices,
+        and timestamps for thousands of stocks and indices. The pipeline ran
+        continuously under live market conditions.
+      </p>
+    ),
+  },
+  {
+    title: "Why raw publishing was not enough",
+    body: (
+      <p>
+        Fast feeds contain both signal and noise. Project 1337 applied
+        preprocessing so the onchain report represented a useful best estimate
+        rather than a blind relay of every incoming message.
+      </p>
+    ),
+  },
+  {
+    title: "Best-estimate pricing",
+    body: (
+      <p>
+        The experiment used market-maker-style processing that considered
+        factors such as momentum. This produced compact derived values while
+        preserving the financial information applications needed.
+      </p>
+    ),
+  },
+  {
+    title: "Signing the result",
+    body: (
+      <p>
+        Cryptographic signing confirmed that the reported output came from
+        Massive data after the declared preprocessing. Consumers could verify
+        authenticity without relying on an operator&apos;s reputation.
+      </p>
+    ),
+  },
+  {
+    title: "High-speed onchain markets",
+    body: (
+      <p>
+        Dense, precise, frequently updated prices are foundational for
+        perpetual markets, RWA instruments, and synthetic assets that must
+        track real-world markets without stale-data risk.
+      </p>
+    ),
+  },
+];
+
+const scaleFacts: ChapterFact[] = [
+  {
+    label: "Simple labor contract",
+    value: "SCALE means Simple Contracts for Agent Labor Execution.",
+  },
+  {
+    label: "Explicit terms",
+    value: "Each task names the prompt, offered payment, delivery deadline, and third-party judge.",
+  },
+  {
+    label: "Onchain escrow",
+    value: "The offered RLO is escrowed automatically when the SCALE task is minted.",
+  },
+  {
+    label: "Agent discovery",
+    value: "A requester can find a capable worker through the Rialo Agent Registry and communicate over A2A.",
+  },
+  {
+    label: "Timer enforcement",
+    value: "Rialo's native timers can refund the requester automatically when delivery misses the deadline.",
+  },
+  {
+    label: "Verdict settlement",
+    value: "A passing judge verdict releases payment, while a failed verdict refunds the requester.",
+  },
+];
+
+const scaleNotes: StudyNote[] = [
+  {
+    title: "SCALE task terms",
+    body: (
+      <p>
+        A SCALE task packages the requested work, payment amount, deadline, and
+        judge into one onchain agreement. The worker can inspect these terms
+        before accepting the task.
+      </p>
+    ),
+  },
+  {
+    title: "Discovering a worker",
+    body: (
+      <p>
+        The requester can query Rialo&apos;s Agent Registry for an agent with the
+        required capability. The task address is then delivered to that worker
+        using Agent2Agent communication.
+      </p>
+    ),
+  },
+  {
+    title: "Escrow before execution",
+    body: (
+      <p>
+        Minting the task places the offered RLO into program-controlled escrow.
+        The funds are therefore committed before work begins but remain locked
+        until the contract reaches a valid settlement path.
+      </p>
+    ),
+  },
+  {
+    title: "Submission and judging",
+    body: (
+      <p>
+        The worker submits its result to the task address. Rialo can use native
+        webcalls and A2A to ask the named judge whether that work meets the
+        prompt and quality requirements.
+      </p>
+    ),
+  },
+  {
+    title: "Deadline enforcement",
+    body: (
+      <p>
+        If no work arrives before the recorded deadline, a Rialo timer can
+        trigger the refund path automatically. No external scheduler must wake
+        the agreement.
+      </p>
+    ),
+  },
+  {
+    title: "Payment or refund",
+    body: (
+      <p>
+        A passing verdict releases escrow to the worker. A failed verdict
+        returns it to the requester, creating a compact quality-assurance loop
+        for agent-to-agent commerce.
       </p>
     ),
   },
@@ -730,7 +898,61 @@ export default function LearnPage() {
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>04</span>
             <i />
-            <strong>Funding enters bounded authority</strong>
+            <strong>Live markets enter verified state</strong>
+            <i />
+            <span>05</span>
+          </div>
+        </section>
+
+        <section
+          className={styles.chapter}
+          id="chapter-project-1337"
+          data-learn-chapter
+          aria-labelledby="p1337-title"
+        >
+          <Project1337Cinematic />
+
+          <div className={styles.chapterKnowledge}>
+            <ChapterFacts facts={project1337Facts} headingId="p1337-facts-title" />
+            <StudyNotes
+              notes={project1337Notes}
+              headingId="p1337-notes-title"
+              sourceHref="https://www.rialo.io/posts/project-1337/"
+              sourceLabel="Project 1337: The Recap"
+            />
+          </div>
+
+          <div className={styles.chapterTransition} aria-hidden="true">
+            <span>05</span>
+            <i />
+            <strong>Markets give way to agent labor</strong>
+            <i />
+            <span>06</span>
+          </div>
+        </section>
+
+        <section
+          className={styles.chapter}
+          id="chapter-agent-economy"
+          data-learn-chapter
+          aria-labelledby="scale-title"
+        >
+          <ScaleCinematic />
+
+          <div className={styles.chapterKnowledge}>
+            <ChapterFacts facts={scaleFacts} headingId="scale-facts-title" />
+            <StudyNotes
+              notes={scaleNotes}
+              headingId="scale-notes-title"
+              sourceHref="https://www.rialo.io/posts/making-the-agent-economy-simple-and-safe-with-rialo/"
+              sourceLabel="Making the Agent Economy Simple and Safe"
+            />
+          </div>
+
+          <div className={styles.chapterTransition} aria-hidden="true">
+            <span>06</span>
+            <i />
+            <strong>Agent authority enters policy</strong>
             <i />
             <span>07</span>
           </div>

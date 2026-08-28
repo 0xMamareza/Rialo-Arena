@@ -3808,3 +3808,652 @@
     order: 5;
   }
 }
+
+/* Project 1337 and SCALE use the same continuous sticky-stage contract. */
+.p1337Cinematic,
+.scaleCinematic,
+.p1337World,
+.scaleWorld,
+.p1337ContentLayer,
+.scaleContentLayer {
+  position: relative;
+}
+
+.p1337Cinematic,
+.scaleCinematic {
+  background: linear-gradient(180deg, transparent, rgb(1 1 1 / 30%) 12% 88%, transparent);
+}
+
+.p1337Stage,
+.scaleStage {
+  height: 100svh;
+  min-height: 44rem;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.p1337Stage {
+  background:
+    radial-gradient(ellipse at 70% 48%, rgb(169 221 211 / 8%), transparent 43%),
+    linear-gradient(104deg, transparent 33%, rgb(232 227 213 / 2%) 55%, transparent 75%);
+}
+
+.scaleStage {
+  background:
+    radial-gradient(circle at 70% 48%, rgb(169 221 211 / 7%), transparent 42%),
+    linear-gradient(150deg, transparent 42%, rgb(169 221 211 / 2%) 58%, transparent 74%);
+}
+
+.p1337Stage::before,
+.p1337Stage::after,
+.scaleStage::before,
+.scaleStage::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.p1337Stage::before {
+  z-index: 1;
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2.45rem, rgb(169 221 211 / 2.5%) 2.5rem 2.55rem),
+    linear-gradient(90deg, transparent 16%, rgb(169 221 211 / 4%) 58%, transparent 94%);
+  mask-image: radial-gradient(ellipse at 70% 50%, #010101, transparent 76%);
+}
+
+.scaleStage::before {
+  z-index: 1;
+  background-image:
+    linear-gradient(30deg, rgb(169 221 211 / 3%) 1px, transparent 1px),
+    linear-gradient(150deg, rgb(169 221 211 / 3%) 1px, transparent 1px);
+  background-size: 5.5rem 5.5rem;
+  mask-image: radial-gradient(ellipse at 68% 49%, #010101, transparent 73%);
+}
+
+.p1337Stage::after,
+.scaleStage::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgb(1 1 1 / 78%) 0 10%, transparent 35% 92%, rgb(1 1 1 / 50%)),
+    linear-gradient(180deg, rgb(1 1 1 / 24%), transparent 20% 76%, rgb(1 1 1 / 72%));
+}
+
+.p1337World,
+.scaleWorld {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  transform-origin: 69% 49%;
+  will-change: transform, opacity;
+}
+
+.p1337Diagram,
+.scaleDiagram {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.p1337ContentLayer,
+.scaleContentLayer {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.p1337Intro,
+.p1337Release,
+.scaleIntro,
+.scaleRelease {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  width: min(46rem, 55vw);
+  padding-left: clamp(1.5rem, 5vw, 6rem);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.p1337Intro::before,
+.p1337Release::before,
+.scaleIntro::before,
+.scaleRelease::before {
+  position: absolute;
+  z-index: -1;
+  inset: -8rem -12rem;
+  background: radial-gradient(ellipse at 33% 50%, rgb(1 1 1 / 97%) 0 42%, rgb(1 1 1 / 76%) 59%, transparent 78%);
+  content: "";
+}
+
+.p1337Intro h2,
+.scaleIntro h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3.6rem, 5.7vw, 6.7rem);
+  font-variation-settings: "wght" 410, "wdth" 79, "opsz" 116;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.p1337Intro > p:last-child,
+.scaleIntro > p:last-child {
+  max-width: 34rem;
+  margin: 1.65rem 0 0;
+  color: rgb(232 227 213 / 64%);
+  font-size: clamp(0.96rem, 1.1vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.p1337SceneContent,
+.scaleSceneContent {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+}
+
+.p1337SceneHeader,
+.scaleSceneHeader {
+  position: absolute;
+  top: clamp(6.5rem, 11vh, 8rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.p1337SceneHeader span,
+.scaleSceneHeader span,
+.p1337Release span,
+.scaleRelease span {
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.56rem, 0.64vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.p1337SceneHeader strong,
+.scaleSceneHeader strong {
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.25rem, 3.35vw, 3.85rem);
+  font-variation-settings: "wght" 420, "wdth" 80, "opsz" 100;
+  font-weight: 420;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.p1337PhaseDeck,
+.scalePhaseDeck {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(6rem, 11vh, 8.5rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  width: min(33rem, 36vw);
+  min-height: clamp(14.5rem, 27vh, 15.5rem);
+  isolation: isolate;
+}
+
+.p1337PhaseDeck::before,
+.scalePhaseDeck::before {
+  position: absolute;
+  z-index: 0;
+  inset: -3rem -6rem -3rem -3rem;
+  background: radial-gradient(ellipse at 23% 50%, rgb(1 1 1 / 98%) 0 43%, rgb(1 1 1 / 79%) 58%, transparent 80%);
+  content: "";
+}
+
+.p1337Phase,
+.scalePhase {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  padding-top: 1.3rem;
+  border-top: 1px solid rgb(169 221 211 / 55%);
+}
+
+.p1337Phase > span,
+.scalePhase > span {
+  display: block;
+  margin-bottom: 1rem;
+  color: #a9ddd3;
+}
+
+.p1337Phase h3,
+.scalePhase h3 {
+  max-width: 14ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(1.7rem, 2.15vw, 2.65rem);
+  font-variation-settings: "wght" 450, "wdth" 82, "opsz" 90;
+  font-weight: 450;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.p1337Phase p,
+.scalePhase p {
+  max-width: 29rem;
+  margin: 0.95rem 0 0;
+  color: rgb(232 227 213 / 70%);
+  font-size: clamp(0.84rem, 0.92vw, 0.96rem);
+  line-height: 1.48;
+}
+
+.p1337Phase small,
+.scalePhase small {
+  position: absolute;
+  top: 1.3rem;
+  right: 0;
+  color: rgb(232 227 213 / 27%);
+}
+
+.p1337PhaseRail,
+.scalePhaseRail {
+  position: absolute;
+  right: clamp(1.5rem, 3vw, 3rem);
+  bottom: clamp(2rem, 4vh, 3rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 0;
+  margin: 0;
+  color: rgb(232 227 213 / 38%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.52rem, 0.6vw, 0.66rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.p1337PhaseRail li,
+.scalePhaseRail li {
+  position: relative;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgb(232 227 213 / 16%);
+}
+
+.p1337PhaseRail li::before,
+.scalePhaseRail li::before {
+  position: absolute;
+  top: -3px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a9ddd3;
+  content: "";
+}
+
+.p1337Release,
+.scaleRelease {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.p1337Release p,
+.scaleRelease p {
+  max-width: 10ch;
+  margin: 1.35rem 0 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.9rem, 4.8vw, 5.5rem);
+  font-variation-settings: "wght" 410, "wdth" 80, "opsz" 110;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.p1337Diagram text,
+.scaleDiagram text {
+  fill: #a9ddd3;
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+}
+
+.p1337Tick path {
+  stroke: rgb(232 227 213 / 13%);
+}
+
+.p1337Tick text:nth-of-type(2) {
+  fill: #e8e3d5;
+  font-size: 11px;
+}
+
+.p1337Tick text:nth-of-type(3),
+.p1337SectionLabel {
+  fill: rgb(169 221 211 / 58%);
+}
+
+.p1337Tick circle,
+.p1337Pulse {
+  fill: #a9ddd3;
+  filter: url(#p1337-glow);
+}
+
+.p1337MainRoute,
+.p1337OutputRoute,
+.p1337SignRoute,
+.p1337Destinations > path {
+  fill: none;
+  stroke: url(#p1337-stream);
+  stroke-dasharray: 420;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  filter: url(#p1337-glow);
+}
+
+.p1337MainRoute {
+  stroke-dasharray: 3 8;
+  filter: none;
+}
+
+.p1337Packet rect,
+.p1337ProcessorShell,
+.p1337Estimate rect,
+.p1337Signature rect,
+.p1337Destinations rect {
+  fill: rgb(1 1 1 / 86%);
+  stroke: rgb(169 221 211 / 44%);
+}
+
+.p1337Packet text {
+  fill: #e8e3d5;
+  font-size: 6px;
+}
+
+.p1337Processor > path:not(.p1337ProcessorShell) {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-dasharray: 260;
+  stroke-width: 1.4;
+}
+
+.p1337Price {
+  fill: #e8e3d5 !important;
+  font-size: 21px !important;
+  letter-spacing: 1px !important;
+}
+
+.p1337Signature path {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.p1337Destinations circle {
+  fill: #a9ddd3;
+}
+
+.p1337Destinations text {
+  fill: #e8e3d5;
+  font-size: 7px;
+}
+
+.scaleWorkflowRoute,
+.scaleDeadlineRoute,
+.scalePaymentRoute,
+.scaleRefundRoute {
+  fill: none;
+  stroke: url(#scale-route);
+  stroke-dasharray: 900;
+  stroke-linecap: round;
+  stroke-width: 2.4;
+  filter: url(#scale-glow);
+}
+
+.scaleDeadlineRoute {
+  stroke-dasharray: 4 9;
+}
+
+.scalePaymentRoute {
+  stroke: #a9ddd3;
+}
+
+.scaleRefundRoute {
+  stroke: rgb(232 227 213 / 62%);
+}
+
+.scaleNode > circle:first-child,
+.scaleTerms rect,
+.scaleA2A rect,
+.scaleVerdict path,
+.scaleOutcome rect {
+  fill: rgb(1 1 1 / 86%);
+  stroke: rgb(169 221 211 / 44%);
+}
+
+.scaleNodePulse {
+  fill: none;
+  stroke: rgb(169 221 211 / 24%);
+  stroke-dasharray: 3 8;
+}
+
+.scaleNode text,
+.scaleOutcome text {
+  fill: #e8e3d5;
+  font-size: 7px;
+}
+
+.scaleTerms text,
+.scaleA2A text,
+.scaleVerdict text {
+  font-size: 6px;
+}
+
+.scaleOutcome circle,
+.scalePacket > circle:first-child {
+  fill: #a9ddd3;
+}
+
+.scalePacketGlow {
+  fill: #a9ddd3;
+  opacity: 0.25;
+  filter: url(#scale-glow);
+}
+
+.scaleTimer path {
+  fill: none;
+  stroke: #e8e3d5;
+  stroke-width: 1.5;
+}
+
+@media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  .p1337PinSequence {
+    height: 590svh;
+  }
+
+  .scalePinSequence {
+    height: 600svh;
+  }
+
+  .p1337SceneContent,
+  .p1337Release,
+  .scaleSceneContent,
+  .scaleRelease {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1100px), (prefers-reduced-motion: reduce) {
+  .p1337Stage,
+  .scaleStage {
+    display: grid;
+    height: auto;
+    min-height: 0;
+    padding: 8rem clamp(1.5rem, 5vw, 4rem) 5rem;
+    gap: 2.5rem;
+  }
+
+  .p1337ContentLayer,
+  .p1337SceneContent,
+  .scaleContentLayer,
+  .scaleSceneContent {
+    display: contents;
+  }
+
+  .p1337Intro,
+  .p1337SceneHeader,
+  .p1337World,
+  .p1337PhaseDeck,
+  .p1337PhaseRail,
+  .p1337Release,
+  .scaleIntro,
+  .scaleSceneHeader,
+  .scaleWorld,
+  .scalePhaseDeck,
+  .scalePhaseRail,
+  .scaleRelease {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+
+  .p1337Intro,
+  .scaleIntro {
+    order: 1;
+    min-height: 28rem;
+    padding: 2rem 0;
+  }
+
+  .p1337Intro::before,
+  .p1337Release::before,
+  .scaleIntro::before,
+  .scaleRelease::before {
+    display: none;
+  }
+
+  .p1337World,
+  .scaleWorld {
+    order: 2;
+    aspect-ratio: 16 / 9;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .p1337SceneHeader,
+  .scaleSceneHeader {
+    z-index: 10;
+    order: 3;
+  }
+
+  .p1337PhaseDeck,
+  .scalePhaseDeck {
+    z-index: 10;
+    order: 4;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(16rem, 1fr));
+    min-height: 16rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgb(169 221 211 / 40%) transparent;
+  }
+
+  .p1337PhaseDeck::before,
+  .scalePhaseDeck::before {
+    display: none;
+  }
+
+  .p1337Phase,
+  .scalePhase {
+    position: relative;
+    min-height: 14rem;
+    padding-right: 1.5rem;
+    background: rgb(1 1 1 / 88%);
+    visibility: visible !important;
+    opacity: 1 !important;
+    scroll-snap-align: start;
+  }
+
+  .p1337PhaseRail,
+  .scalePhaseRail {
+    display: none;
+  }
+
+  .p1337Release,
+  .scaleRelease {
+    order: 5;
+    min-height: 22rem;
+    padding: 3rem 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .p1337Processor,
+  .p1337Estimate,
+  .p1337Signature,
+  .p1337Destinations,
+  .scaleNode,
+  .scaleTerms,
+  .scaleA2A,
+  .scaleVerdict,
+  .scaleOutcome {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .p1337OutputRoute,
+  .p1337SignRoute,
+  .p1337Destinations > path,
+  .scaleWorkflowRoute,
+  .scaleDeadlineRoute,
+  .scalePaymentRoute,
+  .scaleRefundRoute {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .p1337Packet,
+  .p1337Pulse,
+  .scalePacket {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .p1337Stage,
+  .scaleStage {
+    padding: 7.5rem 1rem 4rem;
+  }
+
+  .p1337Intro h2,
+  .scaleIntro h2 {
+    font-size: clamp(3.15rem, 13vw, 4.8rem);
+  }
+
+  .p1337World,
+  .scaleWorld {
+    min-height: 22rem;
+    margin-inline: -22%;
+  }
+
+  .p1337PhaseDeck,
+  .scalePhaseDeck {
+    grid-template-columns: repeat(5, minmax(81vw, 1fr));
+  }
+
+  .p1337Phase h3,
+  .scalePhase h3 {
+    max-width: 12ch;
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
+  }
+}
