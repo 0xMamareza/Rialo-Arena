@@ -174,112 +174,79 @@ const architectureFacts: ChapterFact[] = [
 
 const architectureNotes: StudyNote[] = [
   {
-    title: "External world and Rialo Edge",
+    title: "Three different data paths",
     body: (
       <p>
-        Rialo Edge is the chain&apos;s bidirectional Web2 boundary. Programs can
-        reach APIs and external systems, then use returned data inside onchain
-        logic without assembling a separate middleware network.
+        Edge is the bidirectional boundary for external services, Stream brings
+        continuous external inputs into applications, and Read Path gives apps
+        fast validator-to-app state access. They connect different kinds of
+        information flow to the same machine.
       </p>
     ),
   },
   {
-    title: "Workflow, Read Path, and Stream",
+    title: "Workflow and Reactive are related, not identical",
     body: (
       <p>
-        Workflow provides native automation for multi-step processes. Stream
-        supplies continuous data feeds for use cases such as DeFi and RWAs.
-        Read Path lets applications access data and state updates directly from
-        validators, reducing latency and operational infrastructure.
+        Workflow composes autonomous multi-step processes. Reactive and
+        Conditional Transactions let work wait for future state, data, or time
+        conditions before it continues.
       </p>
     ),
   },
   {
-    title: "Execution Engine",
+    title: "Execution Engine is not the VM",
     body: (
       <p>
-        The Execution Engine coordinates event-driven work, Conditional
-        Transactions, and hybrid concurrency for dynamic workloads. It decides
-        how work advances; it is distinct from the runtime that executes program
-        instructions.
+        The Execution Engine coordinates events, conditions, and hybrid
+        concurrency. Rialo VM executes program instructions through its RISC-V
+        runtime and SVM compatibility. EVM and MoveVM remain stated as future
+        compatibility direction.
       </p>
     ),
   },
   {
-    title: "Rialo VM",
+    title: "REX extends execution guarantees",
     body: (
       <p>
-        Rialo VM is the RISC-V runtime and supports SVM compatibility. Rialo&apos;s
-        current architecture overview lists EVM and MoveVM compatibility as
-        future direction.
+        REX adds a protected environment for confidential computation. It keeps
+        sensitive inputs from ordinary visibility while preserving verifiable
+        results for the surrounding system.
       </p>
     ),
   },
   {
-    title: "REX protected execution",
+    title: "Cruise and Stake-for-Service solve different friction",
     body: (
       <p>
-        REX is the extended execution environment for confidential work.
-        Sensitive inputs can be encrypted, processed inside the protected
-        environment, and cleared while the resulting computation remains
-        verifiable without exposing the underlying private data.
+        Cruise addresses the user transaction path with native gasless support.
+        Stake-for-Service addresses recurring service funding by routing future
+        staking rewards. Both improve usability at different layers.
       </p>
     ),
   },
   {
-    title: "Cruise and user execution",
+    title: "Account continuity is not interoperability",
     body: (
       <p>
-        Rialo Cruise provides a native gasless transaction path with low to
-        zero fees. It removes a user-facing source of friction while remaining
-        connected to the same execution and settlement machine.
+        Omni Account describes who acts across network contexts. Interop
+        describes how value and messages move across network boundaries. The
+        capabilities reinforce each other without being the same mechanism.
       </p>
     ),
   },
   {
-    title: "Omni Account",
+    title: "IPC and Consensus close different trust loops",
     body: (
       <p>
-        Rialo Omni Account gives a user one account that can transact across
-        multiple networks. The architecture treats cross-network reach as part
-        of the account experience rather than a separate identity for every
-        destination.
-      </p>
-    ),
-  },
-  {
-    title: "Interop is not the account",
-    body: (
-      <p>
-        Omni Account preserves one account experience across network contexts.
-        Rialo Interop is the separate movement and communication layer between
-        networks. Account continuity describes who acts; interoperability
-        describes how value and messages cross boundaries.
-      </p>
-    ),
-  },
-  {
-    title: "Identity, Privacy, and Compliance",
-    body: (
-      <p>
-        IPC names three first-class capabilities in Rialo: Identity, Privacy,
-        and Compliance. Their placement inside the system allows applications
-        to compose trust controls with execution instead of rebuilding them as
-        disconnected application services.
-      </p>
-    ),
-  },
-  {
-    title: "Consensus closes the loop",
-    body: (
-      <p>
-        Rialo describes a high-throughput, parallel multi-proposer consensus
-        design. Consensus orders the work that enters execution and gives the
-        connected architecture a shared view of committed state.
+        Identity, Privacy, and Compliance provide application-facing trust
+        controls. Consensus gives validators a shared order and committed state
+        for the work moving through the architecture.
       </p>
     ),
   },
 ];
+
 const reactiveFacts: ChapterFact[] = [
   {
     label: "Protocol-native automation",
@@ -305,42 +272,22 @@ const reactiveFacts: ChapterFact[] = [
 
 const reactiveNotes: StudyNote[] = [
   {
-    title: "Predicate and action",
+    title: "Dependency-aware evaluation",
     body: (
       <p>
-        A reactive transaction registers a logical predicate with the program
-        that should run when that predicate becomes true. The condition waits
-        in chain state instead of depending on an external watcher.
+        Predicates can depend on state, events, validator-attested external data,
+        block height, timestamps, or earlier workflow results. Validators only
+        reevaluate affected conditions and reach the same result from shared state.
       </p>
     ),
   },
   {
-    title: "Signals that can wake execution",
+    title: "Triggering respects execution order",
     body: (
       <p>
-        Inputs can include balances, state transitions, emitted events,
-        validator-attested oracle or API data, block height, timestamps, and
-        results produced by earlier workflow steps.
-      </p>
-    ),
-  },
-  {
-    title: "Validator evaluation",
-    body: (
-      <p>
-        During block execution, validators evaluate predicates whose
-        dependencies may have changed. Evaluation is deterministic, so the
-        network reaches one conclusion from the same state.
-      </p>
-    ),
-  },
-  {
-    title: "Trigger and execution order",
-    body: (
-      <p>
-        When a predicate becomes true, Rialo marks the transaction as triggered
-        and enqueues it. The action can run in the same block or a following
-        block according to dependency ordering.
+        A true predicate enqueues its associated transaction. The action can run
+        in the same block or a following block according to dependency ordering,
+        so automatic does not mean outside protocol sequencing.
       </p>
     ),
   },
@@ -348,9 +295,9 @@ const reactiveNotes: StudyNote[] = [
     title: "Long-running workflows",
     body: (
       <p>
-        A reactive transaction can create later conditional steps, allowing a
-        workflow to wait, resume, and span many blocks while remaining inside
-        the protocol&apos;s execution model.
+        A triggered transaction can create later conditional steps. This lets a
+        workflow wait, resume, and span many blocks without an external watcher
+        keeping it alive.
       </p>
     ),
   },
@@ -385,22 +332,12 @@ const stakeServiceFacts: ChapterFact[] = [
 
 const stakeServiceNotes: StudyNote[] = [
   {
-    title: "The SfS position",
+    title: "Position and routing boundary",
     body: (
       <p>
-        A Stake-for-Service position records the staked principal, its validator
-        or pool, and the fraction of future rewards allocated to service use.
-        The principal itself stays in the staking position.
-      </p>
-    ),
-  },
-  {
-    title: "Routing future rewards",
-    body: (
-      <p>
-        At each reward interval, the selected share bypasses user custody and
-        flows to the ServicePaymaster. The remaining reward follows the normal
-        path back to the staker.
+        An SfS position records the principal, validator or pool, and routing
+        fraction. Only the selected share of future rewards enters the service
+        path; principal remains in the staking position.
       </p>
     ),
   },
@@ -408,9 +345,9 @@ const stakeServiceNotes: StudyNote[] = [
     title: "ServicePaymaster accounting",
     body: (
       <p>
-        The ServicePaymaster mints credits with equivalent backing and tracks
-        balances and consumption. When services consume credits, validators and
-        providers receive the corresponding RLO payout.
+        Routed rewards back an equivalent quantity of credits. As services
+        consume credits, validators and providers receive the corresponding RLO
+        payout through the network&apos;s accounting path.
       </p>
     ),
   },
@@ -418,18 +355,9 @@ const stakeServiceNotes: StudyNote[] = [
     title: "Why credits stay service-bound",
     body: (
       <p>
-        Credits behave as programmable vouchers for network work. They cannot
-        be transferred outside the service context, which keeps routed rewards
-        directed toward productive network activity.
-      </p>
-    ),
-  },
-  {
-    title: "Services the flow can fund",
-    body: (
-      <p>
-        The same credit system can pay for gas, storage, scheduled tasks, and
-        future service categories integrated into Rialo&apos;s network accounting.
+        Credits are programmable vouchers for network work, not transferable
+        assets. That boundary keeps routed yield directed toward gas, storage,
+        scheduled execution, and other supported services.
       </p>
     ),
   },
@@ -437,9 +365,9 @@ const stakeServiceNotes: StudyNote[] = [
     title: "Composition with Reactive Transactions",
     body: (
       <p>
-        Reactive Transactions provide native scheduling and condition-based
-        execution. Stake-for-Service supplies a renewable funding stream, so a
-        recurring workflow can continue without a manually maintained gas balance.
+        Reactive Transactions supply condition-aware execution. Stake-for-Service
+        supplies renewable service funding, allowing recurring workflows to run
+        without a manually maintained gas balance.
       </p>
     ),
   },
@@ -470,52 +398,32 @@ const project1337Facts: ChapterFact[] = [
 
 const project1337Notes: StudyNote[] = [
   {
-    title: "The Massive feed",
+    title: "Raw feed versus derived market signal",
     body: (
       <p>
-        Massive supplied a live WebSocket stream containing symbols, prices,
-        and timestamps for thousands of stocks and indices. The pipeline ran
-        continuously under live market conditions.
+        Massive supplied a live WebSocket stream across thousands of stocks and
+        indices. Project 1337 processed those fast, noisy updates into compact
+        best-estimate prices rather than relaying every tick unchanged.
       </p>
     ),
   },
   {
-    title: "Why raw publishing was not enough",
+    title: "Signing establishes provenance",
     body: (
       <p>
-        Fast feeds contain both signal and noise. Project 1337 applied
-        preprocessing so the onchain report represented a useful best estimate
-        rather than a blind relay of every incoming message.
+        Cryptographic signing bound each output to Massive data and the declared
+        preprocessing path. Consumers could verify where a derived result came
+        from without treating an operator&apos;s reputation as the proof.
       </p>
     ),
   },
   {
-    title: "Best-estimate pricing",
+    title: "Why the experiment mattered",
     body: (
       <p>
-        The experiment used market-maker-style processing that considered
-        factors such as momentum. This produced compact derived values while
-        preserving the financial information applications needed.
-      </p>
-    ),
-  },
-  {
-    title: "Signing the result",
-    body: (
-      <p>
-        Cryptographic signing confirmed that the reported output came from
-        Massive data after the declared preprocessing. Consumers could verify
-        authenticity without relying on an operator&apos;s reputation.
-      </p>
-    ),
-  },
-  {
-    title: "High-speed onchain markets",
-    body: (
-      <p>
-        Dense, precise, frequently updated prices are foundational for
-        perpetual markets, RWA instruments, and synthetic assets that must
-        track real-world markets without stale-data risk.
+        The goal was not a chart dashboard. It tested whether dense, precise,
+        frequently updated financial signals could support perpetuals, RWAs, and
+        synthetic markets on high-speed onchain rails.
       </p>
     ),
   },
@@ -550,62 +458,42 @@ const scaleFacts: ChapterFact[] = [
 
 const scaleNotes: StudyNote[] = [
   {
-    title: "SCALE task terms",
+    title: "Terms and escrow",
     body: (
       <p>
-        A SCALE task packages the requested work, payment amount, deadline, and
-        judge into one onchain agreement. The worker can inspect these terms
-        before accepting the task.
+        A SCALE task packages the prompt, payment, deadline, and judge into one
+        agreement. Minting commits the offered RLO to program-controlled escrow
+        before a worker begins.
       </p>
     ),
   },
   {
-    title: "Discovering a worker",
+    title: "Discovery and delivery",
     body: (
       <p>
-        The requester can query Rialo&apos;s Agent Registry for an agent with the
-        required capability. The task address is then delivered to that worker
-        using Agent2Agent communication.
+        A requester can find a capable worker through Rialo&apos;s Agent Registry
+        and send the task address over Agent2Agent communication. The worker can
+        inspect the terms before accepting and submit back to the task address.
       </p>
     ),
   },
   {
-    title: "Escrow before execution",
+    title: "Judgment and time are separate settlement paths",
     body: (
       <p>
-        Minting the task places the offered RLO into program-controlled escrow.
-        The funds are therefore committed before work begins but remain locked
-        until the contract reaches a valid settlement path.
+        The named judge evaluates submitted work and a passing verdict releases
+        payment. If delivery never arrives before the deadline, a native Rialo
+        timer can trigger refund without an external scheduler.
       </p>
     ),
   },
   {
-    title: "Submission and judging",
+    title: "The demonstration boundary",
     body: (
       <p>
-        The worker submits its result to the task address. Rialo can use native
-        webcalls and A2A to ask the named judge whether that work meets the
-        prompt and quality requirements.
-      </p>
-    ),
-  },
-  {
-    title: "Deadline enforcement",
-    body: (
-      <p>
-        If no work arrives before the recorded deadline, a Rialo timer can
-        trigger the refund path automatically. No external scheduler must wake
-        the agreement.
-      </p>
-    ),
-  },
-  {
-    title: "Payment or refund",
-    body: (
-      <p>
-        A passing verdict releases escrow to the worker. A failed verdict
-        returns it to the requester, creating a compact quality-assurance loop
-        for agent-to-agent commerce.
+        SCALE demonstrates a compact pattern for agent labor coordination. Its
+        registry, communication, escrow, judging, and timer pieces remain
+        explicit so applications can reason about authority and settlement.
       </p>
     ),
   },
@@ -617,20 +505,16 @@ const latchFacts: ChapterFact[] = [
     value: "The agent receives a scoped lat_ token, never the real API credential stored as a Secret.",
   },
   {
-    label: "Ordered control",
-    value: "Request filters evaluate in pipeline order and the first denial short-circuits the run.",
+    label: "First deny wins",
+    value: "Request filters evaluate in order and the first denial stops evaluation before credential injection or upstream access.",
   },
   {
-    label: "Safe forwarding",
-    value: "Secret injection happens only after request policy passes, immediately before the upstream call.",
+    label: "Two-sided policy",
+    value: "Request filters govern action before upstream; response filters can block or redact what returns.",
   },
   {
-    label: "Controlled return",
-    value: "The response filter runs after upstream and can block or redact before data reaches the caller.",
-  },
-  {
-    label: "Multi-mount",
-    value: "One token can route to multiple services with a separate Secret and policy pipeline per mount.",
+    label: "Composable delegation",
+    value: "Multi-mount and child Latches scope access across services while inherited policy can narrow authority further.",
   },
   {
     label: "Hardware-bound identity",
@@ -641,100 +525,68 @@ const latchFacts: ChapterFact[] = [
     value: "For stronger isolation, policy can evaluate encrypted payloads inside an attested execution environment.",
   },
   {
-    label: "Full trace",
-    value: "Allowed and denied calls share an audit trail with the deciding filter and its reason.",
+    label: "Audit trail",
+    value: "Allowed and denied calls record the deciding filter and reason in one activity trace.",
   },
 ];
-
 const latchNotes: StudyNote[] = [
   {
-    title: "Secret",
+    title: "Secret and Latch have different lifecycles",
     body: (
       <p>
-        A Secret is the real credential. Latch stores it encrypted and treats the
-        value as write-only. It is injected in the configured header, query, or
-        body position only when an allowed request is forwarded.
+        A Secret is the encrypted, write-only upstream credential. Rotate it once
+        and dependent Latches use the replacement. Disable one Latch to revoke a
+        caller without rotating the shared credential.
       </p>
     ),
   },
   {
-    title: "Latch token",
+    title: "Request and response policy have different consequences",
     body: (
       <p>
-        A lat_ token identifies a scoped Latch with its own upstream, policy,
-        and lifetime. The caller holds this token instead of the credential, so
-        the token cannot be turned back into the upstream key.
+        A request denial prevents Secret injection and upstream access. Response
+        policy runs only after upstream and controls what the caller can learn,
+        including status blocking and selected JSON redaction.
       </p>
     ),
   },
   {
-    title: "Ordered pipeline",
+    title: "Inheritance can narrow authority",
     body: (
       <p>
-        Filters run in order. The first denial stops evaluation, skips every
-        later filter, avoids credential injection, and prevents an upstream
-        call. Ordinary policy denials return 403 with the deciding filter.
+        A child Latch inherits its parent chain and can add restrictions. Live
+        inheritance means tightening or disabling a parent can affect descendants
+        without allowing a child to widen the original boundary.
       </p>
     ),
   },
   {
-    title: "Request and response filters",
+    title: "Multi-mount scopes every destination",
     body: (
       <p>
-        Request filters govern what a caller can do before upstream runs. The
-        response filter governs what the caller can learn after upstream runs,
-        including blocking statuses or redacting selected JSON paths.
+        Unique path prefixes can map one token to several upstream services.
+        Each mount retains its own Secret and ordered pipeline while activity
+        remains visible through one audit trail.
       </p>
     ),
   },
   {
-    title: "Extension and inheritance",
+    title: "Identity and enclave protection are additive",
     body: (
       <p>
-        A child Latch inherits the parent chain and can narrow authority by
-        adding restrictions. Live inheritance resolves policy on each request,
-        so tightening or disabling a parent can affect descendants immediately.
+        Hardware-bound keys can make token possession alone insufficient. When
+        stronger isolation is selected, encrypted payloads can be evaluated in
+        an attested environment that records which protected path ran.
       </p>
     ),
   },
   {
-    title: "Multi-mount",
+    title: "Infrastructure as policy",
     body: (
       <p>
-        A mount table maps unique path prefixes to separate upstream services.
-        Each mount owns its upstream URL, bound Secret, and pipeline while the
-        Latch keeps one token and one activity trail.
-      </p>
-    ),
-  },
-  {
-    title: "Credential rotation and revocation",
-    body: (
-      <p>
-        Rotate a Secret once and every Latch derived from it uses the new
-        credential without issuing new lat_ tokens. Revoke or disable one Latch
-        to cut off that caller without rotating the shared credential.
-      </p>
-    ),
-  },
-  {
-    title: "Identity and attested execution",
-    body: (
-      <p>
-        A Latch can require a hardware-bound agent identity, so possession of
-        the token alone is insufficient. When stronger isolation is selected,
-        policy can evaluate encrypted payloads inside a REX enclave and expose
-        an attestation trail showing which protected path ran.
-      </p>
-    ),
-  },
-  {
-    title: "Terraform provider",
-    body: (
-      <p>
-        The official provider manages Secrets, Latches, policies, mounts, and
+        The Terraform provider manages Secrets, Latches, policies, mounts, and
         KV connections as reviewed configuration. Terraform 1.11 or newer keeps
-        credential arguments write-only so they do not appear in plan or state.
+        credential arguments write-only so they stay out of plan and state.
       </p>
     ),
   },
@@ -855,13 +707,14 @@ export default function LearnPage() {
               headingId="rialo-notes-title"
               sourceHref="https://www.rialo.io/posts/introducing-rialo/"
               sourceLabel="Introducing Rialo"
+              sourceType="Official overview"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>01</span>
             <i />
-            <strong>From capability to composition</strong>
+            <strong>Foundations become one connected machine</strong>
             <i />
             <span>02</span>
           </div>
@@ -885,13 +738,14 @@ export default function LearnPage() {
               headingId="architecture-notes-title"
               sourceHref="https://rialo.io/for-devs"
               sourceLabel="Rialo architecture overview"
+              sourceType="Official overview"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>02</span>
             <i />
-            <strong>Conditions enter execution</strong>
+            <strong>Execution becomes condition-aware</strong>
             <i />
             <span>03</span>
           </div>
@@ -912,13 +766,14 @@ export default function LearnPage() {
               headingId="reactive-notes-title"
               sourceHref="https://www.rialo.io/posts/reactive-transactions-a-model-for-native-automation-on-rialo/"
               sourceLabel="Reactive Transactions"
+              sourceType="Technical article"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>03</span>
             <i />
-            <strong>Execution gains a funding loop</strong>
+            <strong>Autonomous execution needs autonomous funding</strong>
             <i />
             <span>04</span>
           </div>
@@ -939,13 +794,14 @@ export default function LearnPage() {
               headingId="sfs-notes-title"
               sourceHref="https://www.rialo.io/posts/stake-for-service/"
               sourceLabel="Stake for Service"
+              sourceType="Technical article"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>04</span>
             <i />
-            <strong>Live markets enter verified state</strong>
+            <strong>Verified data tells funded systems what to act on</strong>
             <i />
             <span>05</span>
           </div>
@@ -966,13 +822,14 @@ export default function LearnPage() {
               headingId="p1337-notes-title"
               sourceHref="https://www.rialo.io/posts/project-1337/"
               sourceLabel="Project 1337: The Recap"
+              sourceType="Experiment recap"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>05</span>
             <i />
-            <strong>Markets give way to agent labor</strong>
+            <strong>Machine-readable data becomes machine-coordinated work</strong>
             <i />
             <span>06</span>
           </div>
@@ -993,13 +850,14 @@ export default function LearnPage() {
               headingId="scale-notes-title"
               sourceHref="https://www.rialo.io/posts/making-the-agent-economy-simple-and-safe-with-rialo/"
               sourceLabel="Making the Agent Economy Simple and Safe"
+              sourceType="Applied demo / overview"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>06</span>
             <i />
-            <strong>Agent authority enters policy</strong>
+            <strong>Delegated work creates delegated authority</strong>
             <i />
             <span>07</span>
           </div>
@@ -1020,13 +878,14 @@ export default function LearnPage() {
               headingId="latch-notes-title"
               sourceHref="https://onlatch.com/docs/"
               sourceLabel="Latch documentation"
+              sourceType="Product documentation"
             />
           </div>
 
           <div className={styles.chapterTransition} aria-hidden="true">
             <span>07</span>
             <i />
-            <strong>Policy enters the circuit</strong>
+            <strong>Constrained, metered agents enter the circuit</strong>
             <i />
             <span>08</span>
           </div>
@@ -1047,8 +906,25 @@ export default function LearnPage() {
               headingId="agp-notes-title"
               sourceHref="https://agp.onlatch.com/"
               sourceLabel="Agent Grand Prix"
+              sourceType="Applied demo / overview"
             />
           </div>
+        </section>
+
+        <section className={styles.routeReadingCta} aria-labelledby="continue-study-title">
+          <span>Continue learning</span>
+          <h2 id="continue-study-title">Take the model into the source.</h2>
+          <p>
+            Learn gives you the model. Explore Rialo&apos;s official material for
+            deeper technical detail before taking the Arena quiz.
+          </p>
+          <a
+            href="https://rialo.io/for-devs"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Study official Rialo material <span aria-hidden="true">↗</span>
+          </a>
         </section>
 
         <footer className={styles.learnFooter}>

@@ -22,6 +22,7 @@ type StudyNotesProps = {
   headingId: string;
   sourceHref: string;
   sourceLabel: string;
+  sourceType: string;
 };
 
 export function ChapterFacts({ facts, headingId }: ChapterFactsProps) {
@@ -49,6 +50,7 @@ export function StudyNotes({
   headingId,
   sourceHref,
   sourceLabel,
+  sourceType,
 }: StudyNotesProps) {
   return (
     <section className={styles.studyNotes} aria-labelledby={headingId}>
@@ -70,14 +72,19 @@ export function StudyNotes({
         ))}
       </div>
 
-      <a
-        className={styles.primaryReading}
-        href={sourceHref}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        Primary reading / {sourceLabel} <span aria-hidden="true">↗</span>
-      </a>
+      <div className={styles.readingCta}>
+        <p>Learn gives you the model. Official sources provide the deeper detail.</p>
+        <a
+          className={styles.primaryReading}
+          href={sourceHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span>{sourceType}</span>
+          <strong>{sourceLabel}</strong>
+          <i aria-hidden="true">↗</i>
+        </a>
+      </div>
     </section>
   );
 }

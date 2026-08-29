@@ -180,6 +180,7 @@
 .arenaReturn:focus-visible,
 .chapterNav a:focus-visible,
 .primaryReading:focus-visible,
+.routeReadingCta a:focus-visible,
 .learnFooter a:focus-visible {
   outline: 1px solid #a9ddd3;
   outline-offset: 0.35rem;
@@ -708,21 +709,118 @@
   margin: 0;
 }
 
-.primaryReading {
+.readingCta {
   grid-column: 2;
-  width: fit-content;
-  margin-top: 0.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 1rem 2rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid rgb(232 227 213 / 12%);
+}
+
+.readingCta > p {
+  max-width: 33rem;
+  margin: 0;
   color: rgb(232 227 213 / 42%);
+  font-size: clamp(0.82rem, 0.92vw, 0.94rem);
+  line-height: 1.55;
+}
+
+.primaryReading {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  width: min(100%, 21rem);
+  color: #e8e3d5;
   text-decoration: none;
   transition: color 160ms ease;
+}
+
+.primaryReading > span {
+  grid-column: 1 / -1;
+  margin-bottom: 0.28rem;
+  color: #a9ddd3;
+  font-size: 0.56rem;
+}
+
+.primaryReading strong {
+  font-size: clamp(0.72rem, 0.78vw, 0.82rem);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.primaryReading i {
+  align-self: center;
+  margin-left: 1rem;
+  color: #a9ddd3;
+  font-style: normal;
 }
 
 .primaryReading:hover {
   color: #a9ddd3;
 }
 
-.primaryReading span {
-  margin-left: 0.5rem;
+.routeReadingCta {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(18rem, 1.3fr);
+  gap: 1rem clamp(2rem, 6vw, 7rem);
+  padding: clamp(5rem, 10vw, 9rem) clamp(1.5rem, 8vw, 9rem);
+  border-block: 1px solid rgb(232 227 213 / 12%);
+  background: radial-gradient(circle at 76% 42%, rgb(169 221 211 / 8%), transparent 32%);
+}
+
+.routeReadingCta > span,
+.routeReadingCta a {
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.58rem, 0.66vw, 0.72rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.routeReadingCta > span {
+  color: #a9ddd3;
+}
+
+.routeReadingCta h2 {
+  max-width: 14ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-size: clamp(2rem, 4.2vw, 4.8rem);
+  font-weight: 520;
+  letter-spacing: -0.055em;
+  line-height: 0.98;
+}
+
+.routeReadingCta p,
+.routeReadingCta a {
+  grid-column: 2;
+}
+
+.routeReadingCta p {
+  max-width: 38rem;
+  margin: 1rem 0 0;
+  color: rgb(232 227 213 / 58%);
+  font-size: clamp(0.95rem, 1.15vw, 1.12rem);
+  line-height: 1.6;
+}
+
+.routeReadingCta a {
+  width: fit-content;
+  margin-top: 1rem;
+  color: #e8e3d5;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.routeReadingCta a:hover {
+  color: #a9ddd3;
+}
+
+.routeReadingCta a span {
+  margin-left: 0.45rem;
+  color: #a9ddd3;
 }
 
 .chapterTransition {
@@ -3234,7 +3332,7 @@
     max-width: 12ch;
   }
 
-  .primaryReading {
+  .readingCta {
     grid-column: 1;
   }
 
@@ -3686,6 +3784,21 @@
 
   .agpPhaseRail li {
     min-width: 4.8rem;
+  }
+
+  .readingCta {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .routeReadingCta {
+    grid-template-columns: 1fr;
+    padding-inline: 1rem;
+  }
+
+  .routeReadingCta p,
+  .routeReadingCta a {
+    grid-column: 1;
   }
 
   .learnFooter {
