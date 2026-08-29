@@ -2858,11 +2858,11 @@
 
 @media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
   .reactivePinSequence {
-    height: 580svh;
+    height: 500svh;
   }
 
   .sfsPinSequence {
-    height: 600svh;
+    height: 520svh;
   }
 
   .agpPinSequence {
@@ -4415,11 +4415,11 @@
 
 @media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
   .p1337PinSequence {
-    height: 590svh;
+    height: 500svh;
   }
 
   .scalePinSequence {
-    height: 600svh;
+    height: 520svh;
   }
 
   .p1337SceneContent,
@@ -5235,4 +5235,31 @@
   color: rgb(169 221 211 / 68%);
   font-size: 0.56rem;
   letter-spacing: 0.14em;
+}
+
+@media (max-width: 760px), (prefers-reduced-motion: reduce) {
+  .reactivePhaseDeck,
+  .sfsPhaseDeck,
+  .latchPhaseDeck,
+  .agpPhaseDeck,
+  .p1337PhaseDeck,
+  .scalePhaseDeck,
+  .architectureMachinePhases {
+    grid-template-columns: 1fr;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+
+  .reactivePhase,
+  .sfsPhase,
+  .latchPhase,
+  .agpPhase,
+  .p1337Phase,
+  .scalePhase,
+  .architectureMachinePhase {
+    min-height: auto;
+    padding: 2.25rem 0;
+    border-bottom: 1px solid rgb(232 227 213 / 12%);
+    scroll-snap-align: none;
+  }
 }

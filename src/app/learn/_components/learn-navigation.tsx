@@ -21,6 +21,8 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
   const firstAvailable = chapters.find((chapter) => chapter.available);
   const [activeId, setActiveId] = useState(firstAvailable?.id ?? "");
   const progressRef = useRef<HTMLSpanElement>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const itemRefs = useRef(new Map<string, HTMLLIElement>());
 
   useEffect(() => {
     const chapterElements = chapters
@@ -53,16 +55,22 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
       }
     };
 
+    const geometryObserver = new ResizeObserver(requestUpdate);
+    chapterElements.forEach((chapter) => geometryObserver.observe(chapter));
+
     updateActiveChapter();
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
+    document.addEventListener("toggle", requestUpdate, true);
 
     return () => {
       if (frame !== null) {
         cancelAnimationFrame(frame);
       }
+      geometryObserver.disconnect();
       window.removeEventListener("scroll", requestUpdate);
       window.removeEventListener("resize", requestUpdate);
+      document.removeEventListener("toggle", requestUpdate, true);
     };
   }, [chapters]);
 
@@ -102,6 +110,22 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
     };
   }, []);
 
+  useEffect(() => {
+    const nav = navRef.current;
+    const activeItem = itemRefs.current.get(activeId);
+
+    if (!nav || !activeItem || !window.matchMedia("(max-width: 760px)").matches) {
+      return;
+    }
+
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const targetLeft = activeItem.offsetLeft - (nav.clientWidth - activeItem.offsetWidth) / 2;
+    nav.scrollTo({
+      left: Math.max(0, targetLeft),
+      behavior: reducedMotion ? "auto" : "smooth",
+    });
+  }, [activeId]);
+
   const activeChapter =
     chapters.find((chapter) => chapter.id === activeId) ?? firstAvailable;
 
@@ -135,7 +159,7 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
         </div>
       </header>
 
-      <nav className={styles.chapterNav} aria-label="Learn chapters">
+      <nav ref={navRef} className={styles.chapterNav} aria-label="Learn chapters">
         <ol>
           {chapters.map((chapter) => (
             <li
@@ -143,6 +167,13 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
                 chapter.id === activeId ? styles.activeChapterLink : undefined
               }
               key={chapter.id}
+              ref={(element) => {
+                if (element) {
+                  itemRefs.current.set(chapter.id, element);
+                } else {
+                  itemRefs.current.delete(chapter.id);
+                }
+              }}
             >
               <span className={styles.navNumber}>{chapter.number}</span>
               {chapter.available ? (

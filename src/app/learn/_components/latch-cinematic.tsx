@@ -453,6 +453,8 @@ export function LatchCinematic() {
               8.7,
             )
             .to("[data-latch-redaction]", { autoAlpha: 1, y: 0, duration: 0.4 }, 9.55)
+            .to("[data-latch-redaction]", { autoAlpha: 0, y: -8, duration: 0.35 }, 10.62)
+            .set('[data-latch-packet="response"]', { autoAlpha: 0 }, 10.72)
             .to("[data-latch-world]", { opacity: 0.58, scale: 0.97, duration: 0.9 }, 10.75)
             .to("[data-latch-release]", { autoAlpha: 1, yPercent: 0, duration: 0.75 }, 10.9)
             .to("[data-latch-scene-content]", { autoAlpha: 0, duration: 0.45 }, 11.05);
