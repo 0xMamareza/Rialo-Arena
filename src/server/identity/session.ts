@@ -34,6 +34,11 @@ type ConfirmedIdentity = {
   expiresAt: Date;
 };
 
+type ConfirmedProfile = {
+  user: CurrentUser;
+  profile: PublicProfile;
+};
+
 function hashSessionToken(rawToken: string) {
   return createHash("sha256").update(rawToken).digest("hex");
 }
@@ -81,10 +86,6 @@ export async function confirmProfile(usernameInput: string): Promise<ConfirmedId
     const [user] = await transaction
       .insert(users)
       .values({ xUsername, profileImageUrl, updatedAt: serverNow })
-      .onConflictDoUpdate({
-        target: users.xUsername,
-        set: { profileImageUrl, updatedAt: serverNow },
-      })
       .returning({
         id: users.id,
         xUsername: users.xUsername,
@@ -110,6 +111,53 @@ export async function confirmProfile(usernameInput: string): Promise<ConfirmedId
       },
       rawSessionToken,
       expiresAt,
+    };
+  });
+}
+
+export async function updateCurrentUserProfile(
+  userId: string,
+  usernameInput: string,
+): Promise<ConfirmedProfile> {
+  const xUsername = normalizeXUsername(usernameInput);
+  const profileImageUrl = buildXAvatarUrl(xUsername);
+
+  return db.transaction(async (transaction) => {
+    const timeResult = await transaction.execute<{ serverNow: string }>(
+      sql`SELECT clock_timestamp()::text AS "serverNow"`,
+    );
+    const serverNowValue = timeResult.rows[0]?.serverNow;
+
+    if (!serverNowValue) {
+      throw new Error("Database clock did not return a timestamp.");
+    }
+
+    const serverNow = new Date(serverNowValue);
+
+    if (Number.isNaN(serverNow.getTime())) {
+      throw new Error("Database clock returned an invalid timestamp.");
+    }
+
+    const [user] = await transaction
+      .update(users)
+      .set({ xUsername, profileImageUrl, updatedAt: serverNow })
+      .where(eq(users.id, userId))
+      .returning({
+        id: users.id,
+        xUsername: users.xUsername,
+        profileImageUrl: users.profileImageUrl,
+      });
+
+    if (!user) {
+      throw new Error("Current Arena user could not be updated.");
+    }
+
+    return {
+      user,
+      profile: {
+        username: user.xUsername,
+        profileImageUrl: user.profileImageUrl,
+      },
     };
   });
 }

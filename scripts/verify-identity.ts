@@ -1,16 +1,21 @@
 import assert from "node:assert/strict";
 import { createHash, randomUUID } from "node:crypto";
 
+import { NextRequest } from "next/server";
 import type { Pool } from "pg";
 
 import {
   buildXAvatarUrl,
   normalizeXUsername,
 } from "../src/lib/identity/username";
+import type { PersonalBestStats } from "../src/lib/leaderboard/api-types";
 import type * as IdentityModule from "../src/server/identity/session";
+import type * as QuizEngineModule from "../src/server/quiz/engine";
+import type { QuizEngineError } from "../src/server/quiz/types";
 import { createToolingPool } from "./lib/database";
 
 type Identity = typeof IdentityModule;
+type QuizEngine = typeof QuizEngineModule;
 
 type ProtectedDatabaseState = {
   questionCount: number;
@@ -74,17 +79,122 @@ function verifyUsernameDomain() {
   }
 }
 
-async function cleanupVerifierIdentity(pool: Pool, username: string) {
+function request(
+  pathname: string,
+  options: {
+    method?: "GET" | "POST";
+    sessionToken?: string;
+    body?: unknown;
+  } = {},
+) {
+  const headers = new Headers();
+
+  if (options.sessionToken) {
+    headers.set("cookie", `rialo_session=${options.sessionToken}`);
+  }
+  if (options.body !== undefined) {
+    headers.set("content-type", "application/json");
+  }
+
+  return new NextRequest(`http://localhost${pathname}`, {
+    method: options.method ?? "GET",
+    headers,
+    body: options.body === undefined ? undefined : JSON.stringify(options.body),
+  });
+}
+
+function getIssuedSessionToken(response: Response) {
+  const setCookie = response.headers.get("set-cookie");
+  const token = setCookie?.match(/(?:^|,\s*)rialo_session=([^;]+)/)?.[1];
+
+  assert.ok(token, "Profile confirmation did not issue an Arena session");
+  return token;
+}
+
+async function readStats(response: Response) {
+  assert.equal(response.status, 200);
+  return await response.json() as PersonalBestStats;
+}
+
+async function expectEngineError(
+  operation: () => Promise<unknown>,
+  expectedCode: string,
+) {
+  try {
+    await operation();
+    assert.fail(`Expected quiz-engine error ${expectedCode}`);
+  } catch (error) {
+    const quizError = error as QuizEngineError;
+    assert.equal(quizError.name, "QuizEngineError");
+    assert.equal(quizError.code, expectedCode);
+  }
+}
+
+async function insertCompletedAttempt(
+  pool: Pool,
+  input: {
+    userId: string;
+    score: number;
+    correctCount: number;
+    timeoutCount: number;
+  },
+) {
+  await pool.query(
+    `INSERT INTO quiz_attempts (
+       user_id,
+       status,
+       total_score,
+       correct_count,
+       timeout_count,
+       started_at,
+       completed_at
+     ) VALUES (
+       $1,
+       'completed',
+       $2,
+       $3,
+       $4,
+       clock_timestamp() - interval '1 minute',
+       clock_timestamp()
+     )`,
+    [input.userId, input.score, input.correctCount, input.timeoutCount],
+  );
+}
+
+async function cleanupVerifierIdentity(
+  pool: Pool,
+  userIds: string[],
+  usernames: string[],
+) {
   const client = await pool.connect();
 
   try {
     await client.query("BEGIN");
     await client.query(
-      `DELETE FROM sessions
-       WHERE user_id IN (SELECT id FROM users WHERE x_username = $1)`,
-      [username],
+      `CREATE TEMP TABLE identity_verifier_users ON COMMIT DROP AS
+       SELECT id
+       FROM users
+       WHERE id = ANY($1::uuid[]) OR x_username = ANY($2::text[])`,
+      [userIds, usernames],
     );
-    await client.query("DELETE FROM users WHERE x_username = $1", [username]);
+    await client.query(
+      `DELETE FROM attempt_questions
+       WHERE attempt_id IN (
+         SELECT id FROM quiz_attempts
+         WHERE user_id IN (SELECT id FROM identity_verifier_users)
+       )`,
+    );
+    await client.query(
+      `DELETE FROM quiz_attempts
+       WHERE user_id IN (SELECT id FROM identity_verifier_users)`,
+    );
+    await client.query(
+      `DELETE FROM sessions
+       WHERE user_id IN (SELECT id FROM identity_verifier_users)`,
+    );
+    await client.query(
+      "DELETE FROM users WHERE id IN (SELECT id FROM identity_verifier_users)",
+    );
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");
@@ -94,40 +204,48 @@ async function cleanupVerifierIdentity(pool: Pool, username: string) {
   }
 }
 
-async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
-  const username = `iv_${randomUUID().replaceAll("-", "").slice(0, 10)}`;
-  const mixedCaseInput = ` @${username.toUpperCase()} `;
-  const expectedAvatarUrl = `https://unavatar.io/x/${username}?fallback=false`;
+async function verifyIdentityIntegration(
+  identity: Identity,
+  engine: QuizEngine,
+  pool: Pool,
+) {
+  const suffix = randomUUID().replaceAll("-", "").slice(0, 6);
+  const sharedUsername = `iv_${suffix}_a`;
+  const existingUsername = `iv_${suffix}_b`;
+  const testUsernames = [sharedUsername, existingUsername];
+  const userIds: string[] = [];
+  const mixedCaseInput = ` @${sharedUsername.toUpperCase()} `;
+  const expectedAvatarUrl = `https://unavatar.io/x/${sharedUsername}?fallback=false`;
   const protectedStateBefore = await getProtectedDatabaseState(pool);
 
   try {
     const firstConfirmation = await identity.confirmProfile(mixedCaseInput);
-    assert.equal(firstConfirmation.user.xUsername, username);
-    assert.equal(firstConfirmation.profile.username, username);
+    userIds.push(firstConfirmation.user.id);
+    const secondConfirmation = await identity.confirmProfile(sharedUsername);
+    userIds.push(secondConfirmation.user.id);
+    const existingIdentity = await identity.confirmProfile(existingUsername);
+    userIds.push(existingIdentity.user.id);
+
+    assert.equal(firstConfirmation.user.xUsername, sharedUsername);
+    assert.equal(firstConfirmation.profile.username, sharedUsername);
     assert.equal(firstConfirmation.profile.profileImageUrl, expectedAvatarUrl);
     assert.equal(firstConfirmation.rawSessionToken.length, 43);
+    assert.notEqual(firstConfirmation.user.id, secondConfirmation.user.id);
+    assert.notEqual(
+      firstConfirmation.rawSessionToken,
+      secondConfirmation.rawSessionToken,
+    );
 
-    const userResult = await pool.query<{
-      id: string;
-      xUsername: string;
-      profileImageUrl: string;
-      updatedAt: Date;
+    const duplicateResult = await pool.query<{
+      userCount: number;
     }>(
       `SELECT
-         id,
-         x_username AS "xUsername",
-         profile_image_url AS "profileImageUrl",
-         updated_at AS "updatedAt"
+         count(*)::integer AS "userCount"
        FROM users
        WHERE x_username = $1`,
-      [username],
+      [sharedUsername],
     );
-    const storedUser = userResult.rows[0];
-
-    assert.ok(storedUser, "Confirmed user was not stored");
-    assert.equal(storedUser.id, firstConfirmation.user.id);
-    assert.equal(storedUser.xUsername, username);
-    assert.equal(storedUser.profileImageUrl, expectedAvatarUrl);
+    assert.equal(duplicateResult.rows[0]?.userCount, 2);
 
     const expectedFirstHash = createHash("sha256")
       .update(firstConfirmation.rawSessionToken)
@@ -143,7 +261,7 @@ async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
          created_at AS "createdAt"
        FROM sessions
        WHERE user_id = $1`,
-      [storedUser.id],
+      [firstConfirmation.user.id],
     );
     const firstSession = firstSessionResult.rows[0];
 
@@ -163,31 +281,97 @@ async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
       firstConfirmation.rawSessionToken,
     );
     assert.deepEqual(resolvedUser, firstConfirmation.user);
+    assert.deepEqual(
+      await identity.resolveSessionToken(secondConfirmation.rawSessionToken),
+      secondConfirmation.user,
+    );
 
-    const secondConfirmation = await identity.confirmProfile(username);
-    assert.equal(secondConfirmation.user.id, storedUser.id);
-    assert.notEqual(
-      secondConfirmation.rawSessionToken,
+    const firstAttempt = await engine.startQuizAttempt(firstConfirmation.user.id);
+    const secondAttempt = await engine.startQuizAttempt(secondConfirmation.user.id);
+
+    await expectEngineError(
+      () => engine.getQuizState(secondConfirmation.user.id, firstAttempt.attemptId),
+      "ATTEMPT_NOT_FOUND",
+    );
+    await expectEngineError(
+      () => engine.getQuizState(firstConfirmation.user.id, secondAttempt.attemptId),
+      "ATTEMPT_NOT_FOUND",
+    );
+
+    await insertCompletedAttempt(pool, {
+      userId: firstConfirmation.user.id,
+      score: 1234,
+      correctCount: 7,
+      timeoutCount: 1,
+    });
+    await insertCompletedAttempt(pool, {
+      userId: secondConfirmation.user.id,
+      score: 2345,
+      correctCount: 12,
+      timeoutCount: 1,
+    });
+
+    const statsRoute = await import("../src/app/api/stats/me/route");
+    const firstStats = await readStats(
+      await statsRoute.GET(
+        request("/api/stats/me", {
+          sessionToken: firstConfirmation.rawSessionToken,
+        }),
+      ),
+    );
+    const secondStats = await readStats(
+      await statsRoute.GET(
+        request("/api/stats/me", {
+          sessionToken: secondConfirmation.rawSessionToken,
+        }),
+      ),
+    );
+    assert.equal(firstStats.personalBest?.score, 1234);
+    assert.equal(secondStats.personalBest?.score, 2345);
+
+    const profileRoute = await import("../src/app/api/profile/confirm/route");
+    const updateResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        sessionToken: firstConfirmation.rawSessionToken,
+        body: { username: existingUsername },
+      }),
+    );
+    assert.equal(updateResponse.status, 200);
+    assert.equal(updateResponse.headers.get("set-cookie"), null);
+    assert.deepEqual(await updateResponse.json(), {
+      username: existingUsername,
+      profileImageUrl: `https://unavatar.io/x/${existingUsername}?fallback=false`,
+    });
+
+    const updatedFirstUser = await identity.resolveSessionToken(
       firstConfirmation.rawSessionToken,
     );
-
-    const reuseResult = await pool.query<{
-      userCount: number;
-      sessionCount: number;
-      updatedAt: Date;
-    }>(
-      `SELECT
-         (SELECT count(*)::integer FROM users WHERE x_username = $1) AS "userCount",
-         (SELECT count(*)::integer FROM sessions WHERE user_id = $2) AS "sessionCount",
-         (SELECT updated_at FROM users WHERE id = $2) AS "updatedAt"`,
-      [username, storedUser.id],
+    const unchangedExistingUser = await identity.resolveSessionToken(
+      existingIdentity.rawSessionToken,
     );
-    const reuse = reuseResult.rows[0];
+    assert.equal(updatedFirstUser?.id, firstConfirmation.user.id);
+    assert.equal(updatedFirstUser?.xUsername, existingUsername);
+    assert.equal(unchangedExistingUser?.id, existingIdentity.user.id);
+    assert.equal(unchangedExistingUser?.xUsername, existingUsername);
+    assert.notEqual(updatedFirstUser?.id, unchangedExistingUser?.id);
 
-    assert.ok(reuse, "Reused profile state could not be read");
-    assert.equal(reuse.userCount, 1);
-    assert.equal(reuse.sessionCount, 2);
-    assert.ok(reuse.updatedAt.getTime() >= storedUser.updatedAt.getTime());
+    const statsAfterProfileChange = await readStats(
+      await statsRoute.GET(
+        request("/api/stats/me", {
+          sessionToken: firstConfirmation.rawSessionToken,
+        }),
+      ),
+    );
+    assert.deepEqual(statsAfterProfileChange, firstStats);
+
+    const currentSessionCount = await pool.query<{ count: number }>(
+      `SELECT count(*)::integer AS count
+       FROM sessions
+       WHERE user_id = $1`,
+      [firstConfirmation.user.id],
+    );
+    assert.equal(currentSessionCount.rows[0]?.count, 1);
 
     assert.equal(await identity.resolveSessionToken("not-a-session-token"), null);
 
@@ -204,6 +388,40 @@ async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
       null,
     );
 
+    const expiredSessionResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        sessionToken: firstConfirmation.rawSessionToken,
+        body: { username: existingUsername },
+      }),
+    );
+    assert.equal(expiredSessionResponse.status, 200);
+    const expiredReplacementToken = getIssuedSessionToken(expiredSessionResponse);
+    const expiredReplacementUser = await identity.resolveSessionToken(
+      expiredReplacementToken,
+    );
+    assert.ok(expiredReplacementUser);
+    userIds.push(expiredReplacementUser.id);
+    assert.notEqual(expiredReplacementUser.id, firstConfirmation.user.id);
+    assert.notEqual(expiredReplacementUser.id, existingIdentity.user.id);
+
+    const invalidSessionResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        sessionToken: "not-a-session-token",
+        body: { username: existingUsername },
+      }),
+    );
+    assert.equal(invalidSessionResponse.status, 200);
+    const invalidReplacementToken = getIssuedSessionToken(invalidSessionResponse);
+    const invalidReplacementUser = await identity.resolveSessionToken(
+      invalidReplacementToken,
+    );
+    assert.ok(invalidReplacementUser);
+    userIds.push(invalidReplacementUser.id);
+    assert.notEqual(invalidReplacementUser.id, firstConfirmation.user.id);
+    assert.notEqual(invalidReplacementUser.id, existingIdentity.user.id);
+
     await identity.revokeSessionToken(secondConfirmation.rawSessionToken);
     assert.equal(
       await identity.resolveSessionToken(secondConfirmation.rawSessionToken),
@@ -212,10 +430,13 @@ async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
 
     console.log("Verified username normalization and validation.");
     console.log("Verified deterministic browser-direct avatar URL derivation.");
-    console.log("Verified profile creation, lowercase storage, and same-username reuse.");
+    console.log("Verified same-username clients receive isolated Arena identities.");
+    console.log("Verified session-owned attempt and personal-stat isolation.");
+    console.log("Verified authenticated profile changes preserve identity and history.");
+    console.log("Verified invalid and expired sessions create new Arena identities.");
     console.log("Verified opaque 30-day sessions, SHA-256 storage, expiry, and revocation.");
   } finally {
-    await cleanupVerifierIdentity(pool, username);
+    await cleanupVerifierIdentity(pool, userIds, testUsernames);
     const protectedStateAfter = await getProtectedDatabaseState(pool);
     assert.deepEqual(protectedStateAfter, protectedStateBefore);
 
@@ -224,13 +445,15 @@ async function verifyIdentityIntegration(identity: Identity, pool: Pool) {
       sessionCount: number;
     }>(
       `SELECT
-         (SELECT count(*)::integer FROM users WHERE x_username = $1) AS "userCount",
+         (SELECT count(*)::integer FROM users WHERE x_username = ANY($1::text[])) AS "userCount",
          (
            SELECT count(*)::integer
            FROM sessions
-           WHERE user_id IN (SELECT id FROM users WHERE x_username = $1)
+           WHERE user_id IN (
+             SELECT id FROM users WHERE x_username = ANY($1::text[])
+           )
          ) AS "sessionCount"`,
-      [username],
+      [testUsernames],
     );
     assert.deepEqual(cleanupResult.rows[0], { userCount: 0, sessionCount: 0 });
     console.log("Verified cleanup and no quiz question/attempt modifications.");
@@ -243,7 +466,8 @@ async function main() {
 
   try {
     const identity = await import("../src/server/identity/session");
-    await verifyIdentityIntegration(identity, pool);
+    const engine = await import("../src/server/quiz/engine");
+    await verifyIdentityIntegration(identity, engine, pool);
   } finally {
     await pool.end();
   }

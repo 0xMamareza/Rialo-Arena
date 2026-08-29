@@ -54,8 +54,19 @@ async function verifyDatabase() {
       'SELECT count(*)::integer AS "migrationCount" FROM drizzle.__drizzle_migrations',
     );
 
-    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 2) {
-      throw new Error("Expected exactly two applied Drizzle migrations.");
+    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 3) {
+      throw new Error("Expected exactly three applied Drizzle migrations.");
+    }
+
+    const usernameConstraintResult = await pool.query<{ count: number }>(
+      `SELECT count(*)::integer AS count
+       FROM pg_constraint
+       WHERE conrelid = 'public.users'::regclass
+         AND conname = 'users_x_username_unique'`,
+    );
+
+    if ((usernameConstraintResult.rows[0]?.count ?? 0) !== 0) {
+      throw new Error("Usernames must not be unique Arena identity keys.");
     }
 
     const storedResult = await database.execute<StoredQuestionRow>(
@@ -125,7 +136,8 @@ async function verifyDatabase() {
     console.log(
       `Verified ${APPROVED_QUESTION_COUNT} exact canonical question matches with IDs 1–${APPROVED_QUESTION_COUNT}.`,
     );
-    console.log("Verified two applied Drizzle migrations and all expected tables.");
+    console.log("Verified three applied Drizzle migrations and all expected tables.");
+    console.log("Verified xUsername is non-unique display metadata.");
     console.log("Verified the next generated question ID is beyond the seeded range.");
   } finally {
     await pool.end();

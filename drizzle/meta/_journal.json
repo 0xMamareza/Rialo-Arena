@@ -15,6 +15,13 @@
       "when": 1786741251314,
       "tag": "0001_flowery_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788037853328,
+      "tag": "0002_sharp_liz_osborn",
+      "breakpoints": true
     }
   ]
 }

@@ -1,17 +1,19 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import {
   confirmProfile,
   getSessionCookieOptions,
   SESSION_COOKIE_NAME,
+  updateCurrentUserProfile,
 } from "@/server/identity/session";
+import { getCurrentUserFromRequest } from "@/server/identity/current-user";
 
 const confirmProfileRequestSchema = z
   .object({ username: z.string() })
   .strict();
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   let body: unknown;
 
   try {
@@ -33,6 +35,17 @@ export async function POST(request: Request) {
   }
 
   try {
+    const currentUser = await getCurrentUserFromRequest(request);
+
+    if (currentUser) {
+      const identity = await updateCurrentUserProfile(
+        currentUser.id,
+        parsedBody.data.username,
+      );
+
+      return NextResponse.json(identity.profile);
+    }
+
     const identity = await confirmProfile(parsedBody.data.username);
     const response = NextResponse.json(identity.profile);
 

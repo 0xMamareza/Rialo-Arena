@@ -224,9 +224,13 @@ async function main() {
     };
 
     const lowerScoreUser = await createIdentity(`lba_${suffix}`);
-    const tiedUserA = await createIdentity(`lbb_${suffix}`);
-    const tiedUserB = await createIdentity(`lbc_${suffix}`);
+    const duplicateUsername = `lbb_${suffix}`;
+    const tiedUserA = await createIdentity(duplicateUsername);
+    const tiedUserB = await createIdentity(duplicateUsername);
     const noCompletedRunUser = await createIdentity(`lbd_${suffix}`);
+
+    assert.notEqual(tiedUserA.user.id, tiedUserB.user.id);
+    assert.equal(tiedUserA.user.xUsername, tiedUserB.user.xUsername);
 
     for (const [score, expectedTier] of [
       [0, "Explorer"],
@@ -404,6 +408,7 @@ async function main() {
 
     console.log("Verified one best completed attempt per user.");
     console.log("Verified deterministic ties and incomplete-attempt exclusion.");
+    console.log("Verified duplicate display usernames remain separate entries.");
     console.log("Verified bounded leaderboard API validation and safe DTOs.");
     console.log("Verified authenticated personal best and zero-run state.");
     console.log("Verified every Arena rank-tier boundary and invalid scores.");

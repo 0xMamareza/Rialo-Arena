@@ -42,7 +42,7 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    xUsername: text("x_username").notNull().unique(),
+    xUsername: text("x_username").notNull(),
     profileImageUrl: text("profile_image_url").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .defaultNow()
