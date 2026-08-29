@@ -4457,3 +4457,614 @@
     font-size: clamp(1.9rem, 8vw, 2.7rem);
   }
 }
+
+/* Architecture machine */
+.architectureMachine,
+.architectureMachineSequence {
+  position: relative;
+}
+
+.architectureMachine {
+  background: linear-gradient(180deg, transparent, rgb(1 1 1 / 32%) 10% 90%, transparent);
+}
+
+.architectureMachineStage {
+  position: relative;
+  height: 100svh;
+  min-height: 44rem;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse at 68% 47%, rgb(169 221 211 / 8%), transparent 45%),
+    linear-gradient(118deg, transparent 32%, rgb(232 227 213 / 2%) 55%, transparent 78%);
+}
+
+.architectureMachineStage::before,
+.architectureMachineStage::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  pointer-events: none;
+}
+
+.architectureMachineStage::before {
+  z-index: 1;
+  background-image:
+    linear-gradient(rgb(232 227 213 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(232 227 213 / 3%) 1px, transparent 1px);
+  background-size: 4.5rem 4.5rem;
+  mask-image: radial-gradient(ellipse at 67% 50%, #010101, transparent 76%);
+}
+
+.architectureMachineStage::after {
+  z-index: 4;
+  background:
+    linear-gradient(90deg, rgb(1 1 1 / 88%) 0 13%, transparent 38% 91%, rgb(1 1 1 / 58%)),
+    linear-gradient(180deg, rgb(1 1 1 / 26%), transparent 18% 78%, rgb(1 1 1 / 78%));
+}
+
+.architectureMachineWorld {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2360px;
+  transform-origin: center;
+  will-change: transform, opacity;
+}
+
+.architectureMachineSvg {
+  display: block;
+  width: 2360px;
+  height: 100%;
+  overflow: visible;
+}
+
+.architectureMachineContent {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.architectureMachineIntro,
+.architectureMachineRelease {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: flex;
+  width: min(47rem, 56vw);
+  padding-left: clamp(1.5rem, 5vw, 6rem);
+  flex-direction: column;
+  justify-content: center;
+}
+
+.architectureMachineIntro::before,
+.architectureMachineRelease::before {
+  position: absolute;
+  z-index: -1;
+  inset: -8rem -13rem;
+  background: radial-gradient(ellipse at 32% 50%, rgb(1 1 1 / 98%) 0 42%, rgb(1 1 1 / 78%) 59%, transparent 78%);
+  content: "";
+}
+
+.architectureMachineIntro h2 {
+  max-width: 10ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(3.5rem, 5.5vw, 6.5rem);
+  font-variation-settings: "wght" 410, "wdth" 79, "opsz" 116;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.architectureMachineIntro > p:last-child {
+  max-width: 32rem;
+  margin: 1.6rem 0 0;
+  color: rgb(232 227 213 / 66%);
+  font-size: clamp(0.96rem, 1.1vw, 1.08rem);
+  line-height: 1.6;
+}
+
+.architectureMachineScene {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+}
+
+.architectureMachineHeader {
+  position: absolute;
+  top: clamp(6.4rem, 10.5vh, 7.7rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  display: grid;
+  gap: 0.65rem;
+}
+
+.architectureMachineHeader span,
+.architectureMachineRelease span {
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(0.56rem, 0.64vw, 0.7rem);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.architectureMachineHeader strong {
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.15rem, 3.15vw, 3.65rem);
+  font-variation-settings: "wght" 420, "wdth" 80, "opsz" 100;
+  font-weight: 420;
+  letter-spacing: -0.04em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.architectureMachinePhases {
+  position: absolute;
+  z-index: 3;
+  bottom: clamp(5.6rem, 10vh, 7.8rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  width: min(32rem, 35vw);
+  min-height: clamp(14rem, 26vh, 15rem);
+  isolation: isolate;
+}
+
+.architectureMachinePhases::before {
+  position: absolute;
+  z-index: 0;
+  inset: -3rem -6rem -3rem -3rem;
+  background: radial-gradient(ellipse at 23% 50%, rgb(1 1 1 / 98%) 0 43%, rgb(1 1 1 / 80%) 59%, transparent 81%);
+  content: "";
+}
+
+.architectureMachinePhase {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(169 221 211 / 58%);
+}
+
+.architectureMachinePhase > span {
+  display: block;
+  margin-bottom: 0.9rem;
+  color: #a9ddd3;
+}
+
+.architectureMachinePhase h3 {
+  max-width: 14ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(1.65rem, 2.05vw, 2.5rem);
+  font-variation-settings: "wght" 450, "wdth" 82, "opsz" 90;
+  font-weight: 450;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.architectureMachinePhase p {
+  max-width: 28rem;
+  margin: 0.9rem 0 0;
+  color: rgb(232 227 213 / 72%);
+  font-size: clamp(0.84rem, 0.9vw, 0.94rem);
+  line-height: 1.48;
+}
+
+.architectureMachinePhase small {
+  position: absolute;
+  top: 1.25rem;
+  right: 0;
+  color: rgb(232 227 213 / 28%);
+}
+
+.architectureMachineRail {
+  position: absolute;
+  top: clamp(7rem, 14vh, 9rem);
+  right: clamp(1.1rem, 2vw, 2rem);
+  bottom: clamp(3rem, 6vh, 4rem);
+  display: grid;
+  width: 5.5rem;
+  padding: 0;
+  margin: 0;
+  align-content: center;
+  gap: 0.5rem;
+  color: rgb(232 227 213 / 34%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.48rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  list-style: none;
+  text-transform: uppercase;
+}
+
+.architectureMachineRail li {
+  display: grid;
+  grid-template-columns: 1rem 1fr;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.architectureMachineRail i {
+  position: relative;
+  display: block;
+  height: 1px;
+  background: rgb(232 227 213 / 18%);
+}
+
+.architectureMachineRail i::before {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #a9ddd3;
+  content: "";
+}
+
+.architectureMachineRelease {
+  visibility: hidden;
+  opacity: 0;
+}
+
+.architectureMachineRelease p {
+  max-width: 10ch;
+  margin: 1.35rem 0 0;
+  color: #e8e3d5;
+  font-family: var(--font-learn-display), "Arial Narrow", Arial, sans-serif;
+  font-size: clamp(2.8rem, 4.7vw, 5.3rem);
+  font-variation-settings: "wght" 410, "wdth" 80, "opsz" 110;
+  font-weight: 410;
+  letter-spacing: -0.045em;
+  line-height: 0.94;
+  text-transform: uppercase;
+}
+
+.architectureMachineSvg text {
+  fill: #a9ddd3;
+  font-family: Arial, sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.15px;
+}
+
+.machineRoutes path,
+.omniBranches path {
+  fill: none;
+  stroke: url(#machine-route);
+  stroke-dasharray: 380;
+  stroke-linecap: round;
+  stroke-width: 2.1;
+  filter: url(#machine-glow);
+}
+
+.machineNode {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.machineNodeHalo {
+  fill: rgb(169 221 211 / 2%);
+  stroke: rgb(169 221 211 / 17%);
+  stroke-dasharray: 3 9;
+}
+
+.machineNodeBody {
+  fill: rgb(1 1 1 / 88%);
+  stroke: rgb(169 221 211 / 42%);
+}
+
+.machineNodePort {
+  fill: #a9ddd3;
+}
+
+.machineNodeLabel {
+  fill: #e8e3d5 !important;
+  font-size: 10px !important;
+}
+
+.machineNodeDetail {
+  fill: rgb(169 221 211 / 58%) !important;
+  font-size: 5.8px !important;
+}
+
+.machineNodeMeter {
+  fill: none;
+  stroke: rgb(169 221 211 / 40%);
+  stroke-width: 1.4;
+}
+
+.machineSignal > circle:first-child,
+.edgeTraffic circle,
+.workflowSteps circle,
+.readPulse circle,
+.rexChamber circle,
+.cruisePath circle {
+  fill: #a9ddd3;
+}
+
+.machineSignalGlow {
+  fill: #a9ddd3;
+  opacity: 0.24;
+  filter: url(#machine-glow);
+}
+
+.edgeTraffic text {
+  fill: rgb(232 227 213 / 46%);
+  font-size: 6px;
+}
+
+.workflowSteps circle {
+  opacity: 0.36;
+}
+
+.workflowSteps text {
+  fill: #010101;
+  font-size: 6px;
+}
+
+.readPulse path,
+.streamBands path,
+.cruisePath path {
+  fill: none;
+  stroke: #a9ddd3;
+  stroke-linecap: round;
+}
+
+.readPulse path {
+  stroke-dasharray: 3 7;
+}
+
+.streamBands path {
+  stroke-dasharray: 220;
+  stroke-width: 2.4;
+  filter: drop-shadow(0 0 7px rgb(169 221 211 / 48%));
+}
+
+.streamBands text {
+  fill: rgb(232 227 213 / 76%);
+  font-size: 6.5px;
+  letter-spacing: 1.5px;
+}
+
+.vmInstructions rect {
+  fill: #a9ddd3;
+  opacity: 0.3;
+}
+
+.vmInstructions text {
+  fill: rgb(232 227 213 / 48%);
+  font-size: 5.5px;
+}
+
+.rexChamber path,
+.rexChamber rect {
+  fill: rgb(1 1 1 / 82%);
+  stroke: #a9ddd3;
+  stroke-width: 1.4;
+}
+
+.rexChamber circle {
+  filter: url(#machine-glow);
+}
+
+.cruisePath text {
+  fill: #e8e3d5;
+}
+
+.omniBranches circle,
+.ipcLayers rect,
+.consensusValidators circle,
+.consensusValidators rect {
+  fill: rgb(1 1 1 / 88%);
+  stroke: rgb(169 221 211 / 48%);
+}
+
+.omniBranches text,
+.ipcLayers text,
+.consensusValidators text {
+  fill: #e8e3d5;
+  font-size: 6px;
+}
+
+.ipcLayers g,
+.omniBranches g,
+.consensusValidators g {
+  opacity: 0.25;
+}
+
+.ipcLayers rect {
+  fill: rgb(1 1 1 / 94%);
+  stroke: rgb(169 221 211 / 78%);
+  stroke-width: 1.35;
+}
+
+.ipcLayers text {
+  fill: #e8e3d5;
+  font-size: 7.4px;
+  letter-spacing: 0.85px;
+}
+
+.consensusValidators rect {
+  opacity: 0.3;
+}
+
+@media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  .architectureMachineSequence {
+    height: 1180svh;
+  }
+
+  .architectureMachineScene,
+  .architectureMachineRelease {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@media (max-width: 1100px), (prefers-reduced-motion: reduce) {
+  .architectureMachineStage {
+    display: grid;
+    height: auto;
+    min-height: 0;
+    padding: 8rem clamp(1.5rem, 5vw, 4rem) 5rem;
+    gap: 2.5rem;
+  }
+
+  .architectureMachineContent,
+  .architectureMachineScene {
+    display: contents;
+  }
+
+  .architectureMachineIntro,
+  .architectureMachineHeader,
+  .architectureMachineWorld,
+  .architectureMachinePhases,
+  .architectureMachineRail,
+  .architectureMachineRelease {
+    position: relative;
+    inset: auto;
+    width: auto;
+  }
+
+  .architectureMachineIntro {
+    order: 1;
+    min-height: 28rem;
+    padding: 2rem 0;
+  }
+
+  .architectureMachineIntro::before,
+  .architectureMachineRelease::before {
+    display: none;
+  }
+
+  .architectureMachineWorld {
+    order: 2;
+    width: 100%;
+    min-height: 29rem;
+    overflow-x: auto;
+    opacity: 1 !important;
+    transform: none !important;
+    scrollbar-color: rgb(169 221 211 / 40%) transparent;
+  }
+
+  .architectureMachineSvg {
+    width: 82rem;
+    height: 29rem;
+  }
+
+  .architectureMachineHeader {
+    z-index: 10;
+    order: 3;
+  }
+
+  .architectureMachinePhases {
+    z-index: 10;
+    order: 4;
+    display: grid;
+    grid-template-columns: repeat(11, minmax(16rem, 1fr));
+    min-height: 16rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-color: rgb(169 221 211 / 40%) transparent;
+  }
+
+  .architectureMachinePhases::before {
+    display: none;
+  }
+
+  .architectureMachinePhase {
+    position: relative;
+    min-height: 14rem;
+    padding-right: 1.5rem;
+    background: rgb(1 1 1 / 88%);
+    visibility: visible !important;
+    opacity: 1 !important;
+    scroll-snap-align: start;
+  }
+
+  .architectureMachineRail {
+    display: none;
+  }
+
+  .architectureMachineRelease {
+    order: 5;
+    min-height: 22rem;
+    padding: 3rem 0;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .machineNode,
+  .edgeTraffic,
+  .workflowSteps,
+  .readPulse,
+  .streamBands,
+  .vmInstructions,
+  .rexChamber,
+  .cruisePath,
+  .omniBranches,
+  .ipcLayers,
+  .consensusValidators {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  .machineRoutes path,
+  .omniBranches path,
+  .streamBands path {
+    stroke-dashoffset: 0 !important;
+  }
+
+  .machineSignal {
+    display: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .architectureMachineStage {
+    padding: 7.5rem 1rem 4rem;
+  }
+
+  .architectureMachineIntro h2 {
+    font-size: clamp(3rem, 12.8vw, 4.7rem);
+    letter-spacing: -0.04em;
+  }
+
+  .architectureMachineWorld {
+    min-height: 23rem;
+    margin-inline: -1rem;
+    width: calc(100% + 2rem);
+  }
+
+  .architectureMachineSvg {
+    width: 68rem;
+    height: 23rem;
+  }
+
+  .architectureMachinePhases {
+    grid-template-columns: repeat(11, minmax(81vw, 1fr));
+  }
+
+  .architectureMachinePhase h3 {
+    max-width: 12ch;
+    font-size: clamp(1.9rem, 8vw, 2.7rem);
+  }
+}
+@media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  .architectureMachineStage {
+    position: sticky;
+    top: 0;
+  }
+}

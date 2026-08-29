@@ -3,6 +3,7 @@ import Image from "next/image";
 import localFont from "next/font/local";
 
 import { AgpCinematic } from "./_components/agp-cinematic";
+import { ArchitectureMachine } from "./_components/architecture-machine";
 import { LatchCinematic } from "./_components/latch-cinematic";
 import { Project1337Cinematic } from "./_components/project-1337-cinematic";
 import { ReactiveCinematic } from "./_components/reactive-cinematic";
@@ -126,58 +127,126 @@ const rialoNotes: StudyNote[] = [
 
 const architectureFacts: ChapterFact[] = [
   {
-    label: "External inputs",
-    value: "Authenticated web calls and attested data extend what programs can observe.",
+    label: "Rialo Edge",
+    value: "Bidirectional Web2 interaction lets programs communicate with external services without a middleware stack.",
   },
   {
-    label: "Workflow",
-    value: "Predicates and event-driven execution let programs wait, resume, and react.",
+    label: "Workflow and Stream",
+    value: "Native automation coordinates complex sequences while continuous feeds supply real-world data to applications.",
   },
   {
-    label: "Execution",
-    value: "Public and protected computation serve different data and privacy needs.",
+    label: "Read Path",
+    value: "Applications can access state directly from validators, reducing latency and separate read infrastructure.",
   },
   {
-    label: "Shared guarantees",
-    value: "Integrated services coordinate through the protocol's execution and consensus path.",
+    label: "Rialo VM",
+    value: "The VM is RISC-V based, compatible with SVM, with EVM and MoveVM compatibility stated as future direction.",
+  },
+  {
+    label: "REX",
+    value: "Rialo Extended Execution supports confidential computation over sensitive inputs with verifiable results.",
+  },
+  {
+    label: "Cruise",
+    value: "Native gasless transaction support creates a low to zero fee user path.",
+  },
+  {
+    label: "Omni Account and IPC",
+    value: "One account can transact across networks while Identity, Privacy, and Compliance remain first-class capabilities.",
+  },
+  {
+    label: "Consensus",
+    value: "A high-throughput parallel multi-proposer consensus path establishes transaction order and shared state.",
   },
 ];
 
 const architectureNotes: StudyNote[] = [
   {
-    title: "Integrate the supermodulars",
+    title: "External world and Rialo Edge",
     body: (
       <p>
-        A capability belongs close to execution when improving it raises the
-        value of the other integrated capabilities. Native automation becomes
-        more useful with trusted data; trusted data becomes more useful when
-        programs can act on it immediately.
+        Rialo Edge is the chain&apos;s bidirectional Web2 boundary. Programs can
+        reach APIs and external systems, then use returned data inside onchain
+        logic without assembling a separate middleware network.
       </p>
     ),
   },
   {
-    title: "Commoditize the complements",
+    title: "Workflow, Read Path, and Stream",
     body: (
       <p>
-        Not every data source or service needs to live inside the protocol.
-        Rialo&apos;s model keeps commodity inputs external while integrating the
-        attestation, protected computation, and execution paths that make those
-        inputs safe and useful.
+        Workflow provides native automation for multi-step processes. Stream
+        supplies continuous data feeds for use cases such as DeFi and RWAs.
+        Read Path lets applications access data and state updates directly from
+        validators, reducing latency and operational infrastructure.
       </p>
     ),
   },
   {
-    title: "Look for emergent workflows",
+    title: "Execution and the Rialo VM",
     body: (
       <p>
-        The architecture matters most where composition creates something no
-        isolated component could provide: recurring operations, hybrid
-        chain-to-world workflows, and verifiable computation over external data.
+        The execution engine handles event-driven and dynamic workloads. Rialo
+        VM uses RISC-V and supports SVM compatibility. Rialo&apos;s official
+        architecture overview lists EVM and MoveVM compatibility as direction
+        that is still to follow.
+      </p>
+    ),
+  },
+  {
+    title: "REX protected execution",
+    body: (
+      <p>
+        REX is the extended execution environment for confidential work.
+        Sensitive inputs can be encrypted, processed inside the protected
+        environment, and cleared while the resulting computation remains
+        verifiable without exposing the underlying private data.
+      </p>
+    ),
+  },
+  {
+    title: "Cruise and user execution",
+    body: (
+      <p>
+        Rialo Cruise provides a native gasless transaction path with low to
+        zero fees. It removes a user-facing source of friction while remaining
+        connected to the same execution and settlement machine.
+      </p>
+    ),
+  },
+  {
+    title: "Omni Account",
+    body: (
+      <p>
+        Rialo Omni Account gives a user one account that can transact across
+        multiple networks. The architecture treats cross-network reach as part
+        of the account experience rather than a separate identity for every
+        destination.
+      </p>
+    ),
+  },
+  {
+    title: "Identity, Privacy, and Compliance",
+    body: (
+      <p>
+        IPC names three first-class capabilities in Rialo: Identity, Privacy,
+        and Compliance. Their placement inside the system allows applications
+        to compose trust controls with execution instead of rebuilding them as
+        disconnected application services.
+      </p>
+    ),
+  },
+  {
+    title: "Consensus closes the loop",
+    body: (
+      <p>
+        Rialo describes a high-throughput, parallel multi-proposer consensus
+        design. Consensus orders the work that enters execution and gives the
+        connected architecture a shared view of committed state.
       </p>
     ),
   },
 ];
-
 const reactiveFacts: ChapterFact[] = [
   {
     label: "Protocol-native automation",
@@ -696,57 +765,6 @@ function RialoField() {
   );
 }
 
-function ArchitectureMap() {
-  return (
-    <div className={styles.architectureMap} aria-hidden="true">
-      <svg viewBox="0 0 760 680" role="presentation">
-        <defs>
-          <pattern id="architecture-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-            <path d="M32 0H0V32" fill="none" stroke="currentColor" strokeOpacity=".08" />
-          </pattern>
-          <linearGradient id="architecture-flow" x1="0" x2="1">
-            <stop offset="0" stopColor="#a9ddd3" stopOpacity="0" />
-            <stop offset=".5" stopColor="#a9ddd3" />
-            <stop offset="1" stopColor="#a9ddd3" stopOpacity="0" />
-          </linearGradient>
-        </defs>
-
-        <rect width="760" height="680" fill="url(#architecture-grid)" />
-        <path className={styles.architectureFlow} d="M88 110H672M150 110V235M380 110V235M610 110V235M150 333V440M380 333V440M610 333V440M150 538V610H610V538" />
-
-        <g className={styles.architectureBand}>
-          <rect x="44" y="54" width="672" height="112" rx="2" />
-          <text x="70" y="84">REAL-WORLD INPUTS</text>
-          <text className={styles.architectureModule} x="150" y="126" textAnchor="middle">WEB / API</text>
-          <text className={styles.architectureModule} x="380" y="126" textAnchor="middle">ONCHAIN STATE</text>
-          <text className={styles.architectureModule} x="610" y="126" textAnchor="middle">TIME / EVENTS</text>
-        </g>
-
-        <g className={`${styles.architectureBand} ${styles.architectureBandActive}`}>
-          <rect x="44" y="220" width="672" height="128" rx="2" />
-          <text x="70" y="250">PROTOCOL SERVICES</text>
-          <text className={styles.architectureModule} x="150" y="304" textAnchor="middle">EDGE + STREAM</text>
-          <text className={styles.architectureModule} x="380" y="304" textAnchor="middle">WORKFLOW</text>
-          <text className={styles.architectureModule} x="610" y="304" textAnchor="middle">ATTESTATION</text>
-        </g>
-
-        <g className={styles.architectureBand}>
-          <rect x="44" y="425" width="672" height="128" rx="2" />
-          <text x="70" y="455">EXECUTION</text>
-          <text className={styles.architectureModule} x="150" y="510" textAnchor="middle">RIALO VM</text>
-          <text className={styles.architectureModule} x="380" y="510" textAnchor="middle">REX</text>
-          <text className={styles.architectureModule} x="610" y="510" textAnchor="middle">STATE</text>
-        </g>
-
-        <g className={styles.architectureBase}>
-          <rect x="150" y="600" width="460" height="44" rx="22" />
-          <text x="380" y="627" textAnchor="middle">CONSENSUS / SHARED GUARANTEES</text>
-        </g>
-      </svg>
-    </div>
-  );
-}
-
 export default function LearnPage() {
   return (
     <div className={`${styles.learnPage} ${learnDisplay.variable}`}>
@@ -802,31 +820,7 @@ export default function LearnPage() {
           data-learn-chapter
           aria-labelledby="architecture-title"
         >
-          <div className={`${styles.chapterLead} ${styles.architectureLead}`}>
-            <RialoFieldBackground intensity="stage" />
-            <header className={styles.chapterCopy}>
-              <span className={styles.chapterMarker}>Chapter 02 / Architecture</span>
-              <p className={styles.chapterThesis}>Supermodular by design</p>
-              <h2 id="architecture-title">Integrate what compounds.</h2>
-              <p className={styles.chapterIntro}>
-                Rialo&apos;s architecture is not a vote for monolithic or modular.
-                It is a decision system: bring complementary capabilities close
-                to execution when their combination creates new utility.
-              </p>
-            </header>
-            <ArchitectureMap />
-          </div>
-
-          <div className={styles.architectureStatement}>
-            <span>Architecture principle / 01</span>
-            <div>
-              <p>One system. More capability.</p>
-              <small>
-                Data, workflow, privacy, and execution become more useful when
-                they share one coordinated path.
-              </small>
-            </div>
-          </div>
+          <ArchitectureMachine />
 
           <div className={styles.chapterKnowledge}>
             <ChapterFacts
@@ -836,8 +830,8 @@ export default function LearnPage() {
             <StudyNotes
               notes={architectureNotes}
               headingId="architecture-notes-title"
-              sourceHref="https://www.rialo.io/posts/rialo-foundations-ii-supermodularity/"
-              sourceLabel="Rialo Foundations II"
+              sourceHref="https://rialo.io/for-devs"
+              sourceLabel="Rialo architecture overview"
             />
           </div>
 

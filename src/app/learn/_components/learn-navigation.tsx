@@ -32,24 +32,38 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    let frame: number | null = null;
 
-        if (visible?.target.id) {
-          setActiveId(visible.target.id);
-        }
-      },
-      {
-        rootMargin: "-28% 0px -52% 0px",
-        threshold: [0, 0.1, 0.3, 0.6],
-      },
-    );
+    const updateActiveChapter = () => {
+      frame = null;
+      const probe = window.innerHeight * 0.34;
+      const active = chapterElements.find((chapter) => {
+        const bounds = chapter.getBoundingClientRect();
+        return bounds.top <= probe && bounds.bottom > probe;
+      });
 
-    chapterElements.forEach((chapter) => observer.observe(chapter));
-    return () => observer.disconnect();
+      if (active) {
+        setActiveId(active.id);
+      }
+    };
+
+    const requestUpdate = () => {
+      if (frame === null) {
+        frame = requestAnimationFrame(updateActiveChapter);
+      }
+    };
+
+    updateActiveChapter();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      if (frame !== null) {
+        cancelAnimationFrame(frame);
+      }
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
   }, [chapters]);
 
   useEffect(() => {
