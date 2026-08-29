@@ -249,6 +249,26 @@ async function runIntegrationVerification(engine: Engine, pool: Pool) {
     assert.equal(initialState.status, "active");
     assertSafePlayerState(initialState);
 
+    const repeatedStart = await engine.startQuizAttempt(owner.id);
+    assert.equal(repeatedStart.status, "active");
+    assert.equal(repeatedStart.attemptId, initialState.attemptId);
+
+    const concurrentStarts = await Promise.all([
+      engine.startQuizAttempt(owner.id),
+      engine.startQuizAttempt(owner.id),
+    ]);
+    assert.ok(
+      concurrentStarts.every(
+        (state) =>
+          state.status === "active" &&
+          state.attemptId === initialState.attemptId,
+      ),
+    );
+
+    const discoveredState = await engine.getLiveQuizState(owner.id);
+    assert.equal(discoveredState?.attemptId, initialState.attemptId);
+    assert.equal(await engine.getLiveQuizState(otherUser.id), null);
+
     const initialQuestions = await getAttemptQuestions(
       pool,
       initialState.attemptId,
@@ -500,7 +520,16 @@ async function runIntegrationVerification(engine: Engine, pool: Pool) {
       incorrectCount: finalState.incorrectCount,
     };
 
+    assert.equal(await engine.getLiveQuizState(owner.id), null);
+    const freshAttempt = await engine.startQuizAttempt(owner.id);
+    assert.equal(freshAttempt.status, "active");
+    assert.notEqual(freshAttempt.attemptId, initialState.attemptId);
+    const repeatedFreshAttempt = await engine.startQuizAttempt(owner.id);
+    assert.equal(repeatedFreshAttempt.attemptId, freshAttempt.attemptId);
+
     console.log("Verified start transaction and safe single-question player DTO.");
+    console.log("Verified repeated and concurrent starts converge on one attempt.");
+    console.log("Verified completion releases the user for a fresh attempt.");
     console.log("Verified continuous three-question timeout cascade.");
     console.log("Verified concurrent replay: one accepted, one rejected.");
     console.log("Verified ownership isolation for reads and submissions.");

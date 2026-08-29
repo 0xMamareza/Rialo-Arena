@@ -75,6 +75,13 @@ export function quizStateResponse(state: PlayerQuizState) {
   });
 }
 
+export function noLiveQuizAttemptResponse() {
+  return new NextResponse(null, {
+    status: 204,
+    headers: JSON_HEADERS,
+  });
+}
+
 export function requestMatchesQuizState(request: NextRequest, state: PlayerQuizState) {
   const candidate = request.headers.get("if-match");
 

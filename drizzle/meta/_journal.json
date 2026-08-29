@@ -22,6 +22,13 @@
       "when": 1788037853328,
       "tag": "0002_sharp_liz_osborn",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1788038784035,
+      "tag": "0003_moaning_master_mold",
+      "breakpoints": true
     }
   ]
 }

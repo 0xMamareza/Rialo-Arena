@@ -54,8 +54,8 @@ async function verifyDatabase() {
       'SELECT count(*)::integer AS "migrationCount" FROM drizzle.__drizzle_migrations',
     );
 
-    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 3) {
-      throw new Error("Expected exactly three applied Drizzle migrations.");
+    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 4) {
+      throw new Error("Expected exactly four applied Drizzle migrations.");
     }
 
     const usernameConstraintResult = await pool.query<{ count: number }>(
@@ -67,6 +67,48 @@ async function verifyDatabase() {
 
     if ((usernameConstraintResult.rows[0]?.count ?? 0) !== 0) {
       throw new Error("Usernames must not be unique Arena identity keys.");
+    }
+
+    const duplicateActiveAttemptResult = await pool.query<{
+      userId: string;
+      attemptCount: number;
+    }>(
+      `SELECT
+         user_id AS "userId",
+         count(*)::integer AS "attemptCount"
+       FROM quiz_attempts
+       WHERE status = 'active'
+       GROUP BY user_id
+       HAVING count(*) > 1
+       LIMIT 1`,
+    );
+
+    if (duplicateActiveAttemptResult.rows[0]) {
+      throw new Error(
+        `User ${duplicateActiveAttemptResult.rows[0].userId} has ${duplicateActiveAttemptResult.rows[0].attemptCount} active attempts.`,
+      );
+    }
+
+    const activeAttemptIndexResult = await pool.query<{
+      isUnique: boolean;
+      predicate: string | null;
+    }>(
+      `SELECT
+         pg_index.indisunique AS "isUnique",
+         pg_get_expr(pg_index.indpred, pg_index.indrelid) AS predicate
+       FROM pg_index
+       INNER JOIN pg_class
+         ON pg_class.oid = pg_index.indexrelid
+       WHERE pg_class.relname = 'quiz_attempts_one_active_per_user_idx'`,
+    );
+    const activeAttemptIndex = activeAttemptIndexResult.rows[0];
+
+    if (
+      !activeAttemptIndex?.isUnique ||
+      !activeAttemptIndex.predicate?.includes("status") ||
+      !activeAttemptIndex.predicate.includes("active")
+    ) {
+      throw new Error("One-active-attempt partial unique index is missing.");
     }
 
     const storedResult = await database.execute<StoredQuestionRow>(
@@ -136,8 +178,9 @@ async function verifyDatabase() {
     console.log(
       `Verified ${APPROVED_QUESTION_COUNT} exact canonical question matches with IDs 1–${APPROVED_QUESTION_COUNT}.`,
     );
-    console.log("Verified three applied Drizzle migrations and all expected tables.");
+    console.log("Verified four applied Drizzle migrations and all expected tables.");
     console.log("Verified xUsername is non-unique display metadata.");
+    console.log("Verified one active attempt per user at the database boundary.");
     console.log("Verified the next generated question ID is beyond the seeded range.");
   } finally {
     await pool.end();

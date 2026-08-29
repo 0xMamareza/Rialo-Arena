@@ -163,6 +163,50 @@ async function getDatabaseTime(transaction: QuizTransaction) {
   return parseDatabaseTimestamp(serverNow, "Database clock");
 }
 
+async function lockUserForLiveAttempt(
+  transaction: QuizTransaction,
+  userId: string,
+) {
+  const result = await transaction.execute<{ id: string }>(sql`
+    SELECT id
+    FROM users
+    WHERE id = ${userId}
+    FOR UPDATE
+  `);
+
+  if (!result.rows[0]) {
+    throw new QuizEngineError("USER_NOT_FOUND", "User was not found.");
+  }
+}
+
+async function lockLiveAttempt(
+  transaction: QuizTransaction,
+  userId: string,
+) {
+  const result = await transaction.execute<AttemptRecord>(sql`
+    SELECT
+      id,
+      user_id AS "userId",
+      status,
+      total_score AS "totalScore",
+      correct_count AS "correctCount",
+      timeout_count AS "timeoutCount",
+      started_at::text AS "startedAt",
+      completed_at::text AS "completedAt"
+    FROM quiz_attempts
+    WHERE user_id = ${userId} AND status = 'active'
+    ORDER BY created_at DESC, id ASC
+    LIMIT 2
+    FOR UPDATE
+  `);
+
+  if (result.rows.length > 1) {
+    invalidState("User has more than one active quiz attempt.");
+  }
+
+  return result.rows[0] ?? null;
+}
+
 async function lockOwnedAttempt(
   transaction: QuizTransaction,
   userId: string,
@@ -520,6 +564,31 @@ function buildCompletedState(
   };
 }
 
+async function buildSettledAttemptState(
+  transaction: QuizTransaction,
+  initialAttempt: AttemptRecord,
+  serverNow: Date,
+) {
+  let attempt = initialAttempt;
+
+  if (attempt.status === "completed") {
+    return buildCompletedState(attempt, serverNow);
+  }
+
+  if (attempt.status !== "active") {
+    invalidState("Quiz attempt is not active or completed.");
+  }
+
+  attempt = await settleExpiredQuestions(transaction, attempt, serverNow);
+
+  if (attempt.status === "completed") {
+    return buildCompletedState(attempt, serverNow);
+  }
+
+  const currentQuestion = await getPlayerQuestion(transaction, attempt.id);
+  return buildActiveState(attempt, serverNow, currentQuestion);
+}
+
 async function protectEngineOperation<T>(operation: () => Promise<T>) {
   try {
     return await operation();
@@ -540,14 +609,12 @@ export function startQuizAttempt(userId: string): Promise<PlayerQuizState> {
     validateUuid(userId, "userId");
 
     return db.transaction(async (transaction) => {
-      const userResult = await transaction.execute<{ id: string }>(
-        sql`
-          SELECT id FROM users WHERE id = ${userId} FOR KEY SHARE
-        `,
-      );
+      await lockUserForLiveAttempt(transaction, userId);
+      const serverNow = await getDatabaseTime(transaction);
+      const liveAttempt = await lockLiveAttempt(transaction, userId);
 
-      if (!userResult.rows[0]) {
-        throw new QuizEngineError("USER_NOT_FOUND", "User was not found.");
+      if (liveAttempt) {
+        return buildSettledAttemptState(transaction, liveAttempt, serverNow);
       }
 
       const selectedResult = await transaction.execute<SelectedQuestionRecord>(
@@ -575,7 +642,6 @@ export function startQuizAttempt(userId: string): Promise<PlayerQuizState> {
         );
       }
 
-      const serverNow = await getDatabaseTime(transaction);
       const [attempt] = await transaction
         .insert(quizAttempts)
         .values({
@@ -624,6 +690,26 @@ export function startQuizAttempt(userId: string): Promise<PlayerQuizState> {
   });
 }
 
+export function getLiveQuizState(
+  userId: string,
+): Promise<PlayerQuizState | null> {
+  return protectEngineOperation(async () => {
+    validateUuid(userId, "userId");
+
+    return db.transaction(async (transaction) => {
+      await lockUserForLiveAttempt(transaction, userId);
+      const liveAttempt = await lockLiveAttempt(transaction, userId);
+
+      if (!liveAttempt) {
+        return null;
+      }
+
+      const serverNow = await getDatabaseTime(transaction);
+      return buildSettledAttemptState(transaction, liveAttempt, serverNow);
+    });
+  });
+}
+
 export function getQuizState(
   userId: string,
   attemptId: string,
@@ -633,25 +719,9 @@ export function getQuizState(
     validateUuid(attemptId, "attemptId");
 
     return db.transaction(async (transaction) => {
-      let attempt = await lockOwnedAttempt(transaction, userId, attemptId);
+      const attempt = await lockOwnedAttempt(transaction, userId, attemptId);
       const serverNow = await getDatabaseTime(transaction);
-
-      if (attempt.status === "completed") {
-        return buildCompletedState(attempt, serverNow);
-      }
-
-      if (attempt.status !== "active") {
-        invalidState("Quiz attempt is not active or completed.");
-      }
-
-      attempt = await settleExpiredQuestions(transaction, attempt, serverNow);
-
-      if (attempt.status === "completed") {
-        return buildCompletedState(attempt, serverNow);
-      }
-
-      const currentQuestion = await getPlayerQuestion(transaction, attempt.id);
-      return buildActiveState(attempt, serverNow, currentQuestion);
+      return buildSettledAttemptState(transaction, attempt, serverNow);
     });
   });
 }

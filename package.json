@@ -18,6 +18,7 @@
     "quiz:validate": "TMPDIR=/tmp tsx scripts/validate-question-bank.ts",
     "quiz:engine:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-engine.ts",
     "quiz:api:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-api.ts",
+    "quiz:start:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-start.ts",
     "leaderboard:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-leaderboard.ts",
     "identity:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-identity.ts"
   },

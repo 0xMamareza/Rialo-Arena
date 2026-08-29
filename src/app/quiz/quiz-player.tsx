@@ -142,9 +142,7 @@ export function QuizPlayer({
   profile,
 }: QuizPlayerProps) {
   const router = useRouter();
-  const [screen, setScreen] = useState<QuizScreen>(
-    initialAttemptId ? "loading" : "ready",
-  );
+  const [screen, setScreen] = useState<QuizScreen>("loading");
   const [quizState, setQuizState] = useState<QuizApiPlayerState | null>(null);
   const [remainingMs, setRemainingMs] = useState(DISPLAY_QUESTION_WINDOW_MS);
   const [notice, setNotice] = useState<string | null>(null);
@@ -155,6 +153,7 @@ export function QuizPlayer({
   const clockRef = useRef<SyncedClock | null>(null);
   const pendingRef = useRef(false);
   const timeoutSyncTagRef = useRef<string | null>(null);
+  const recoveryCheckedRef = useRef(false);
 
   const routeToIdentity = useCallback(() => {
     const identityDestination = attemptIdRef.current
@@ -225,6 +224,55 @@ export function QuizPlayer({
     },
     [routeToIdentity],
   );
+
+  const discoverLiveAttempt = useCallback(async () => {
+    const response = await fetch("/api/quiz/start", {
+      method: "GET",
+      cache: "no-store",
+      credentials: "same-origin",
+    });
+
+    if (response.status === 204) {
+      etagRef.current = null;
+      attemptIdRef.current = null;
+      clockRef.current = null;
+      setQuizState(null);
+      setNotice(null);
+      setErrorMessage(null);
+      setScreen("ready");
+      return null;
+    }
+
+    const result = await parseQuizResponse(response);
+    applyAuthoritativeState(result.state, result.etag);
+    router.replace(
+      `/quiz?attempt=${encodeURIComponent(result.state.attemptId)}`,
+      { scroll: false },
+    );
+    return result.state;
+  }, [applyAuthoritativeState, router]);
+
+  useEffect(() => {
+    if (initialAttemptId || recoveryCheckedRef.current) return;
+
+    recoveryCheckedRef.current = true;
+    let cancelled = false;
+    const recoveryTask = window.setTimeout(() => {
+      void discoverLiveAttempt().catch((error: unknown) => {
+        if (cancelled) return;
+        handleRequestFailure(
+          error,
+          "The Arena could not check for an active attempt.",
+        );
+        setScreen("error");
+      });
+    }, 0);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(recoveryTask);
+    };
+  }, [discoverLiveAttempt, handleRequestFailure, initialAttemptId]);
 
   useEffect(() => {
     if (!initialAttemptId || quizState?.attemptId === initialAttemptId) return;
@@ -427,6 +475,17 @@ export function QuizPlayer({
         await fetchAttempt(initialAttemptId, "restore");
       } catch (error) {
         handleRequestFailure(error, "The Arena could not restore this attempt.");
+        setScreen("error");
+      }
+    } else {
+      setScreen("loading");
+      try {
+        await discoverLiveAttempt();
+      } catch (error) {
+        handleRequestFailure(
+          error,
+          "The Arena could not check for an active attempt.",
+        );
         setScreen("error");
       }
     }

@@ -206,6 +206,17 @@ async function main() {
       await startRoute.POST(request("/api/quiz/start", { method: "POST" })),
     );
     assert.equal(unauthorizedStart.response.status, 401);
+    const unauthorizedRecovery = await startRoute.GET(
+      request("/api/quiz/start"),
+    );
+    assert.equal(unauthorizedRecovery.status, 401);
+
+    const emptyRecovery = await startRoute.GET(
+      request("/api/quiz/start", {
+        sessionToken: owner.rawSessionToken,
+      }),
+    );
+    assert.equal(emptyRecovery.status, 204);
 
     const start = await readResponse(
       await startRoute.POST(
@@ -220,6 +231,79 @@ async function main() {
     assert.equal(initialState.status, "active");
     const initialEtag = start.response.headers.get("etag");
     assert.ok(initialEtag, "Start response did not include an ETag");
+
+    const repeatedStart = await readResponse(
+      await startRoute.POST(
+        request("/api/quiz/start", {
+          method: "POST",
+          sessionToken: owner.rawSessionToken,
+        }),
+      ),
+    );
+    assert.equal(repeatedStart.response.status, 200);
+    assert.equal(
+      assertSafeState(repeatedStart.body, rawTokens).attemptId,
+      initialState.attemptId,
+    );
+    assert.equal(repeatedStart.response.headers.get("etag"), initialEtag);
+
+    const concurrentStarts = await Promise.all([
+      startRoute.POST(
+        request("/api/quiz/start", {
+          method: "POST",
+          sessionToken: owner.rawSessionToken,
+        }),
+      ),
+      startRoute.POST(
+        request("/api/quiz/start", {
+          method: "POST",
+          sessionToken: owner.rawSessionToken,
+        }),
+      ),
+    ]);
+    const concurrentStartStates = await Promise.all(
+      concurrentStarts.map(async (response) => ({
+        response,
+        state: assertSafeState(await response.json(), rawTokens),
+      })),
+    );
+    assert.ok(concurrentStartStates.every(({ response }) => response.status === 200));
+    assert.ok(
+      concurrentStartStates.every(
+        ({ response, state }) =>
+          state.attemptId === initialState.attemptId &&
+          response.headers.get("etag") === initialEtag,
+      ),
+    );
+
+    const recoveredStart = await readResponse(
+      await startRoute.GET(
+        request("/api/quiz/start", {
+          sessionToken: owner.rawSessionToken,
+        }),
+      ),
+    );
+    assert.equal(recoveredStart.response.status, 200);
+    assert.equal(
+      assertSafeState(recoveredStart.body, rawTokens).attemptId,
+      initialState.attemptId,
+    );
+    assert.equal(recoveredStart.response.headers.get("etag"), initialEtag);
+
+    const nonOwnerRecovery = await startRoute.GET(
+      request("/api/quiz/start", {
+        sessionToken: nonOwner.rawSessionToken,
+      }),
+    );
+    assert.equal(nonOwnerRecovery.status, 204);
+
+    const activeAttemptCount = await pool.query<{ count: number }>(
+      `SELECT count(*)::integer AS count
+       FROM quiz_attempts
+       WHERE user_id = $1 AND status = 'active'`,
+      [owner.user.id],
+    );
+    assert.equal(activeAttemptCount.rows[0]?.count, 1);
 
     const attemptId = initialState.attemptId;
     const context = { params: Promise.resolve({ attemptId }) };
@@ -387,6 +471,8 @@ async function main() {
     assert.deepEqual(timeoutRows.rows[0], { count: 3, nonzero: 0 });
 
     console.log("Verified unauthenticated rejection and session-bound access.");
+    console.log("Verified idempotent and concurrent start convergence.");
+    console.log("Verified read-only active-attempt discovery and isolation.");
     console.log("Verified 15-question safe state contract and hidden-field exclusions.");
     console.log("Verified owner access and indistinguishable non-owner lookup.");
     console.log("Verified strict choice validation and ETag preconditions.");

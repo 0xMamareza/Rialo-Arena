@@ -160,6 +160,9 @@ export const quizAttempts = pgTable(
       table.userId,
       table.createdAt.desc(),
     ),
+    uniqueIndex("quiz_attempts_one_active_per_user_idx")
+      .on(table.userId)
+      .where(sql`${table.status} = 'active'`),
     index("quiz_attempts_completed_score_idx")
       .on(table.totalScore.desc(), table.completedAt.desc())
       .where(sql`${table.status} = 'completed'`),
