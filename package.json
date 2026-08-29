@@ -17,6 +17,7 @@
     "db:check": "drizzle-kit check",
     "quiz:validate": "TMPDIR=/tmp tsx scripts/validate-question-bank.ts",
     "quiz:engine:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-engine.ts",
+    "quiz:api:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-api.ts",
     "identity:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-identity.ts"
   },
   "dependencies": {
