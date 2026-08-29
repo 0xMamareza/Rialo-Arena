@@ -6,6 +6,7 @@ import {
   integer,
   pgEnum,
   pgTable,
+  primaryKey,
   smallint,
   text,
   timestamp,
@@ -82,6 +83,34 @@ export const sessions = pgTable(
       sql`${table.expiresAt} > ${table.createdAt}`,
     ),
     index("sessions_user_id_idx").on(table.userId),
+  ],
+);
+
+export const rateLimitBuckets = pgTable(
+  "rate_limit_buckets",
+  {
+    scope: text("scope").notNull(),
+    keyHash: text("key_hash").notNull(),
+    requestCount: integer("request_count").default(1).notNull(),
+    windowStartedAt: timestamp("window_started_at", { withTimezone: true })
+      .notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.scope, table.keyHash] }),
+    check(
+      "rate_limit_buckets_key_hash_check",
+      sql`${table.keyHash} ~ '^[0-9a-f]{64}$'`,
+    ),
+    check(
+      "rate_limit_buckets_request_count_check",
+      sql`${table.requestCount} >= 1`,
+    ),
+    check(
+      "rate_limit_buckets_expiry_check",
+      sql`${table.expiresAt} > ${table.windowStartedAt}`,
+    ),
+    index("rate_limit_buckets_expires_at_idx").on(table.expiresAt),
   ],
 );
 

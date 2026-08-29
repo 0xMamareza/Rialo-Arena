@@ -8,6 +8,10 @@ import type {
   PersonalBestStats,
 } from "@/lib/leaderboard/api-types";
 import { getCurrentUserFromRequest } from "@/server/identity/current-user";
+import {
+  consumeRateLimit,
+  PERSONAL_STATS_RATE_LIMIT,
+} from "@/server/rate-limit/limiter";
 
 const PRIVATE_HEADERS = { "Cache-Control": "private, no-store" } as const;
 const PUBLIC_HEADERS = { "Cache-Control": "no-store" } as const;
@@ -16,10 +20,11 @@ function errorResponse(
   code: LeaderboardApiErrorBody["error"]["code"],
   message: string,
   status: number,
+  headers: Record<string, string> = {},
 ) {
   return NextResponse.json<LeaderboardApiErrorBody>(
     { error: { code, message } },
-    { status, headers: PRIVATE_HEADERS },
+    { status, headers: { ...PRIVATE_HEADERS, ...headers } },
   );
 }
 
@@ -49,6 +54,12 @@ export async function withAuthenticatedStatsRequest(
       return errorResponse("UNAUTHORIZED", "Authentication is required.", 401);
     }
 
+    const decision = await consumeRateLimit(PERSONAL_STATS_RATE_LIMIT, user.id);
+
+    if (!decision.allowed) {
+      return leaderboardRateLimited(decision.retryAfterSeconds);
+    }
+
     return NextResponse.json(await operation(user.id), {
       headers: PRIVATE_HEADERS,
     });
@@ -59,6 +70,15 @@ export async function withAuthenticatedStatsRequest(
       500,
     );
   }
+}
+
+export function leaderboardRateLimited(retryAfterSeconds: number) {
+  return errorResponse(
+    "RATE_LIMITED",
+    "Too many requests. Try again shortly.",
+    429,
+    { "Retry-After": String(retryAfterSeconds) },
+  );
 }
 
 export function leaderboardFailure() {

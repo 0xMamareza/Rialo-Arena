@@ -13,6 +13,9 @@ import type * as IdentityModule from "../src/server/identity/session";
 import type * as QuizEngineModule from "../src/server/quiz/engine";
 import type { QuizEngineError } from "../src/server/quiz/types";
 import { createToolingPool } from "./lib/database";
+import { cleanupVerifierRateLimits } from "./lib/rate-limit";
+
+const IDENTITY_VERIFIER_IP = "2001:db8::101";
 
 type Identity = typeof IdentityModule;
 type QuizEngine = typeof QuizEngineModule;
@@ -88,6 +91,7 @@ function request(
   } = {},
 ) {
   const headers = new Headers();
+  headers.set("x-forwarded-for", IDENTITY_VERIFIER_IP);
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
@@ -195,6 +199,10 @@ async function cleanupVerifierIdentity(
     await client.query(
       "DELETE FROM users WHERE id IN (SELECT id FROM identity_verifier_users)",
     );
+    await cleanupVerifierRateLimits(client, {
+      clientIps: [IDENTITY_VERIFIER_IP],
+      userIds,
+    });
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");

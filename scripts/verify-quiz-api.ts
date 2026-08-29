@@ -7,6 +7,7 @@ import type { Pool } from "pg";
 import { QUIZ_QUESTION_COUNT } from "../src/lib/quiz/domain";
 import type { QuizApiPlayerState } from "../src/lib/quiz/api-types";
 import { createToolingPool } from "./lib/database";
+import { cleanupVerifierRateLimits } from "./lib/rate-limit";
 
 const FORBIDDEN_KEYS = new Set([
   "correctOption",
@@ -144,6 +145,7 @@ async function cleanup(pool: Pool, identities: Identity[]) {
     await client.query("DELETE FROM quiz_attempts WHERE user_id = ANY($1::uuid[])", [userIds]);
     await client.query("DELETE FROM sessions WHERE user_id = ANY($1::uuid[])", [userIds]);
     await client.query("DELETE FROM users WHERE id = ANY($1::uuid[])", [userIds]);
+    await cleanupVerifierRateLimits(client, { userIds });
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");

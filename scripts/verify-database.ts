@@ -31,6 +31,7 @@ async function verifyDatabase() {
     const relationsResult = await pool.query<{
       users: string | null;
       sessions: string | null;
+      rateLimitBuckets: string | null;
       questions: string | null;
       quizAttempts: string | null;
       attemptQuestions: string | null;
@@ -39,6 +40,7 @@ async function verifyDatabase() {
       `SELECT
         to_regclass('public.users')::text AS "users",
         to_regclass('public.sessions')::text AS "sessions",
+        to_regclass('public.rate_limit_buckets')::text AS "rateLimitBuckets",
         to_regclass('public.questions')::text AS "questions",
         to_regclass('public.quiz_attempts')::text AS "quizAttempts",
         to_regclass('public.attempt_questions')::text AS "attemptQuestions",
@@ -54,8 +56,8 @@ async function verifyDatabase() {
       'SELECT count(*)::integer AS "migrationCount" FROM drizzle.__drizzle_migrations',
     );
 
-    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 4) {
-      throw new Error("Expected exactly four applied Drizzle migrations.");
+    if ((migrationResult.rows[0]?.migrationCount ?? 0) !== 5) {
+      throw new Error("Expected exactly five applied Drizzle migrations.");
     }
 
     const usernameConstraintResult = await pool.query<{ count: number }>(
@@ -109,6 +111,33 @@ async function verifyDatabase() {
       !activeAttemptIndex.predicate.includes("active")
     ) {
       throw new Error("One-active-attempt partial unique index is missing.");
+    }
+
+    const rateLimitSchemaResult = await pool.query<{
+      expiryIndexCount: number;
+      primaryKeyCount: number;
+    }>(
+      `SELECT
+         (
+           SELECT count(*)::integer
+           FROM pg_constraint
+           WHERE conrelid = 'public.rate_limit_buckets'::regclass
+             AND contype = 'p'
+         ) AS "primaryKeyCount",
+         (
+           SELECT count(*)::integer
+           FROM pg_indexes
+           WHERE schemaname = 'public'
+             AND tablename = 'rate_limit_buckets'
+             AND indexname = 'rate_limit_buckets_expires_at_idx'
+         ) AS "expiryIndexCount"`,
+    );
+
+    if (
+      rateLimitSchemaResult.rows[0]?.primaryKeyCount !== 1 ||
+      rateLimitSchemaResult.rows[0]?.expiryIndexCount !== 1
+    ) {
+      throw new Error("Rate-limit bucket constraints or expiry index are missing.");
     }
 
     const storedResult = await database.execute<StoredQuestionRow>(
@@ -178,9 +207,10 @@ async function verifyDatabase() {
     console.log(
       `Verified ${APPROVED_QUESTION_COUNT} exact canonical question matches with IDs 1–${APPROVED_QUESTION_COUNT}.`,
     );
-    console.log("Verified four applied Drizzle migrations and all expected tables.");
+    console.log("Verified five applied Drizzle migrations and all expected tables.");
     console.log("Verified xUsername is non-unique display metadata.");
     console.log("Verified one active attempt per user at the database boundary.");
+    console.log("Verified persistent rate-limit bucket constraints and expiry index.");
     console.log("Verified the next generated question ID is beyond the seeded range.");
   } finally {
     await pool.end();

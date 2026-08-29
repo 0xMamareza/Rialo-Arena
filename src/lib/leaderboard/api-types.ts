@@ -29,7 +29,11 @@ export type PersonalBestStats = {
 
 export type LeaderboardApiErrorBody = {
   error: {
-    code: "UNAUTHORIZED" | "INVALID_REQUEST" | "INTERNAL_ERROR";
+    code:
+      | "UNAUTHORIZED"
+      | "INVALID_REQUEST"
+      | "RATE_LIMITED"
+      | "INTERNAL_ERROR";
     message: string;
   };
 };

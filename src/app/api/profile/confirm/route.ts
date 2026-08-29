@@ -8,12 +8,42 @@ import {
   updateCurrentUserProfile,
 } from "@/server/identity/session";
 import { getCurrentUserFromRequest } from "@/server/identity/current-user";
+import { getClientIpRateLimitKey } from "@/server/rate-limit/client-ip";
+import {
+  consumeRateLimit,
+  PROFILE_CONFIRM_RATE_LIMIT,
+} from "@/server/rate-limit/limiter";
 
 const confirmProfileRequestSchema = z
   .object({ username: z.string() })
   .strict();
 
 export async function POST(request: NextRequest) {
+  try {
+    const decision = await consumeRateLimit(
+      PROFILE_CONFIRM_RATE_LIMIT,
+      getClientIpRateLimitKey(request),
+    );
+
+    if (!decision.allowed) {
+      return NextResponse.json(
+        { error: "Too many profile requests. Try again later." },
+        {
+          status: 429,
+          headers: {
+            "Cache-Control": "private, no-store",
+            "Retry-After": String(decision.retryAfterSeconds),
+          },
+        },
+      );
+    }
+  } catch {
+    return NextResponse.json(
+      { error: "We couldn't prepare your profile. Try again." },
+      { status: 500 },
+    );
+  }
+
   let body: unknown;
 
   try {

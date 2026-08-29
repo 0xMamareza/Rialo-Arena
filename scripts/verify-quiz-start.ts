@@ -7,6 +7,7 @@ import type { Pool } from "pg";
 import type { QuizApiPlayerState } from "../src/lib/quiz/api-types";
 import type { QuizEngineError } from "../src/server/quiz/types";
 import { createToolingPool } from "./lib/database";
+import { cleanupVerifierRateLimits } from "./lib/rate-limit";
 
 type Identity = Awaited<
   ReturnType<typeof import("../src/server/identity/session")["confirmProfile"]>
@@ -80,6 +81,7 @@ async function cleanup(pool: Pool, identities: Identity[]) {
     await client.query("DELETE FROM users WHERE id = ANY($1::uuid[])", [
       userIds,
     ]);
+    await cleanupVerifierRateLimits(client, { userIds });
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");
@@ -227,10 +229,8 @@ async function main() {
     );
     assert.equal(fresh.state.status, "active");
     assert.notEqual(fresh.state.attemptId, first.state.attemptId);
-    const repeatedFresh = await readState(
-      await startRoute.POST(request(owner.rawSessionToken, "POST")),
-    );
-    assert.equal(repeatedFresh.state.attemptId, fresh.state.attemptId);
+    const repeatedFresh = await engine.startQuizAttempt(owner.user.id);
+    assert.equal(repeatedFresh.attemptId, fresh.state.attemptId);
     assert.equal(await countActiveAttempts(pool, owner.user.id), 1);
 
     console.log("Verified first, repeated, lost-response, and concurrent starts.");

@@ -10,6 +10,9 @@ import type {
   PersonalBestStats,
 } from "../src/lib/leaderboard/api-types";
 import { createToolingPool } from "./lib/database";
+import { cleanupVerifierRateLimits } from "./lib/rate-limit";
+
+const LEADERBOARD_VERIFIER_IP = "2001:db8::102";
 
 const FORBIDDEN_KEYS = new Set([
   "attemptId",
@@ -33,6 +36,7 @@ function request(
   options: { sessionToken?: string } = {},
 ) {
   const headers = new Headers();
+  headers.set("x-forwarded-for", LEADERBOARD_VERIFIER_IP);
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
@@ -157,6 +161,10 @@ async function cleanup(pool: Pool, identities: Identity[]) {
       [userIds],
     );
     await client.query("DELETE FROM users WHERE id = ANY($1::uuid[])", [userIds]);
+    await cleanupVerifierRateLimits(client, {
+      clientIps: [LEADERBOARD_VERIFIER_IP],
+      userIds,
+    });
     await client.query("COMMIT");
   } catch (error) {
     await client.query("ROLLBACK");

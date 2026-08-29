@@ -6,6 +6,10 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import type { QuizApiPlayerState } from "@/lib/quiz/api-types";
 import { getCurrentUserFromRequest } from "@/server/identity/current-user";
+import {
+  consumeRateLimit,
+  type RateLimitPolicy,
+} from "@/server/rate-limit/limiter";
 
 import {
   QuizEngineError,
@@ -19,6 +23,7 @@ export type QuizApiErrorCode =
   | "ATTEMPT_COMPLETED"
   | "STALE_QUESTION"
   | "PRECONDITION_REQUIRED"
+  | "RATE_LIMITED"
   | "QUIZ_UNAVAILABLE"
   | "INTERNAL_ERROR";
 
@@ -31,10 +36,15 @@ type QuizApiErrorBody = {
 
 const JSON_HEADERS = { "Cache-Control": "private, no-store" } as const;
 
-function errorResponse(code: QuizApiErrorCode, message: string, status: number) {
+function errorResponse(
+  code: QuizApiErrorCode,
+  message: string,
+  status: number,
+  headers: Record<string, string> = {},
+) {
   return NextResponse.json<QuizApiErrorBody>(
     { error: { code, message } },
-    { status, headers: JSON_HEADERS },
+    { status, headers: { ...JSON_HEADERS, ...headers } },
   );
 }
 
@@ -98,12 +108,21 @@ export function requestMatchesQuizState(request: NextRequest, state: PlayerQuizS
 export async function withAuthenticatedQuizRequest(
   request: NextRequest,
   operation: (userId: string) => Promise<NextResponse>,
+  rateLimitPolicy?: RateLimitPolicy,
 ) {
   try {
     const user = await getCurrentUserFromRequest(request);
 
     if (!user) {
       return errorResponse("UNAUTHORIZED", "Authentication is required.", 401);
+    }
+
+    if (rateLimitPolicy) {
+      const decision = await consumeRateLimit(rateLimitPolicy, user.id);
+
+      if (!decision.allowed) {
+        return quizRateLimited(decision.retryAfterSeconds);
+      }
     }
 
     return await operation(user.id);
@@ -156,6 +175,15 @@ export async function withAuthenticatedQuizRequest(
         );
     }
   }
+}
+
+export function quizRateLimited(retryAfterSeconds: number) {
+  return errorResponse(
+    "RATE_LIMITED",
+    "Too many quiz requests. Try again shortly.",
+    429,
+    { "Retry-After": String(retryAfterSeconds) },
+  );
 }
 
 export function quizPreconditionRequired() {
