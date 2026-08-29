@@ -281,6 +281,7 @@ export function StakeServiceCinematic() {
           <div className={styles.sfsContentLayer}>
             <header className={styles.sfsIntro} data-sfs-intro>
               <span className={styles.chapterMarker}>Chapter 04 / Stake-for-Service</span>
+              <span className={styles.systemType}>Economic mechanism</span>
               <p className={styles.chapterThesis}>Yield into utility</p>
               <h2 id="sfs-title">Keep the stake. Route the rewards.</h2>
               <p>Future yield becomes a renewable budget for network services.</p>

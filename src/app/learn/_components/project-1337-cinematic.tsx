@@ -147,7 +147,7 @@ export function Project1337Cinematic() {
           <RialoFieldBackground intensity="stage" />
           <div className={styles.p1337World} data-p1337-world><MarketEngineDiagram /></div>
           <div className={styles.p1337ContentLayer}>
-            <header className={styles.p1337Intro} data-p1337-intro><span className={styles.chapterMarker}>Chapter 05 / Project 1337</span><p className={styles.chapterThesis}>Live markets into verified state</p><h2 id="p1337-title">Price moves. Rialo keeps pace.</h2><p>A high-speed pipeline turns financial-market motion into signed onchain output.</p></header>
+            <header className={styles.p1337Intro} data-p1337-intro><span className={styles.chapterMarker}>Chapter 05 / Project 1337</span><span className={styles.systemType}>Architecture experiment</span><p className={styles.chapterThesis}>Live markets into verified state</p><h2 id="p1337-title">Price moves. Rialo keeps pace.</h2><p>A high-speed pipeline turns financial-market motion into signed onchain output.</p></header>
             <div className={styles.p1337SceneContent} data-p1337-content>
               <header className={styles.p1337SceneHeader}><span>Project 1337 / Market engine</span><strong>Signal, not raw noise.</strong></header>
               <div className={styles.p1337PhaseDeck}>{phases.map((phase, index) => <article className={styles.p1337Phase} data-p1337-phase key={phase.code}><span>{phase.eyebrow}</span><h3>{phase.title}</h3><p>{phase.body}</p><small>{String(index + 1).padStart(2, "0")} / 05</small></article>)}</div>

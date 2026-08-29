@@ -523,11 +523,13 @@ export function LatchCinematic() {
           <div className={styles.latchContentLayer}>
             <header className={styles.latchIntro} data-latch-intro>
               <span className={styles.chapterMarker}>Chapter 07 / Latch</span>
+              <span className={styles.systemType}>Security product</span>
               <p className={styles.chapterThesis}>Programmable authority</p>
               <h2 id="latch-title">The key never crosses the line.</h2>
               <p>
-                A scoped token enters. Ordered policy decides. The real credential
-                appears only when the request is allowed.
+                Scoped authority enters. Hardware identity can bind the caller,
+                while attested policy can protect encrypted requests. The real
+                credential never leaves Latch.
               </p>
             </header>
 

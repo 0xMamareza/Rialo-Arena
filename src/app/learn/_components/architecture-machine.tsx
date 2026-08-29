@@ -14,12 +14,14 @@ const phases = [
   { code: "WORKFLOW", eyebrow: "03 / Workflow", title: "Complex logic keeps moving.", body: "Autonomous multi-step workflows model real-world processes inside the protocol." },
   { code: "READ", eyebrow: "04 / Read Path", title: "Applications read from validators.", body: "The direct read path reduces the infrastructure and latency between state and an application." },
   { code: "STREAM", eyebrow: "05 / Stream", title: "Data arrives as a living feed.", body: "Native streams continuously deliver external data for DeFi, RWAs, and other applications." },
-  { code: "VM", eyebrow: "06 / Rialo VM", title: "Programs enter a flexible engine.", body: "The RISC-V VM supports SVM compatibility, with EVM and MoveVM compatibility in the stated direction." },
-  { code: "REX", eyebrow: "07 / REX", title: "Sensitive work enters a protected chamber.", body: "Extended execution processes encrypted inputs and exposes verifiable results without revealing the private data." },
-  { code: "CRUISE", eyebrow: "08 / Cruise", title: "The user path sheds gas friction.", body: "Cruise provides native gasless transactions with low to zero fees." },
-  { code: "OMNI", eyebrow: "09 / Omni Account", title: "One account reaches many networks.", body: "A single Rialo account can transact across multiple network contexts." },
-  { code: "IPC", eyebrow: "10 / IPC", title: "Trust controls become first-class.", body: "Identity, Privacy, and Compliance sit inside the architecture instead of being rebuilt around it." },
-  { code: "CONSENSUS", eyebrow: "11 / Consensus", title: "Validators converge on one order.", body: "Parallel proposers feed an ordered block path that anchors the machine's shared guarantees." },
+  { code: "EXECUTION", eyebrow: "06 / Execution Engine", title: "Events become coordinated work.", body: "Event-driven execution, Conditional Transactions, and hybrid concurrency organize dynamic workloads." },
+  { code: "VM", eyebrow: "07 / Rialo VM", title: "Instructions enter a flexible runtime.", body: "The RISC-V VM supports SVM compatibility, with EVM and MoveVM compatibility still stated as future direction." },
+  { code: "REX", eyebrow: "08 / REX", title: "Sensitive work enters a protected chamber.", body: "Extended execution processes encrypted inputs and exposes verifiable results without revealing the private data." },
+  { code: "CRUISE", eyebrow: "09 / Cruise", title: "The user path sheds gas friction.", body: "Cruise provides native gasless transactions with low to zero fees." },
+  { code: "OMNI", eyebrow: "10 / Omni Account", title: "One account reaches many networks.", body: "Omni Account preserves one account experience across multiple network contexts." },
+  { code: "INTEROP", eyebrow: "11 / Interop", title: "Networks exchange value and messages.", body: "Native interoperability handles cross-network movement and communication separately from account identity." },
+  { code: "IPC", eyebrow: "12 / IPC", title: "Trust controls become first-class.", body: "Identity, Privacy, and Compliance sit inside the architecture instead of being rebuilt around it." },
+  { code: "CONSENSUS", eyebrow: "13 / Consensus", title: "Validators converge on one order.", body: "Parallel proposers feed an ordered block path that anchors the machine's shared guarantees." },
 ] as const;
 
 const moduleNodes = [
@@ -28,11 +30,13 @@ const moduleNodes = [
   ["workflow", "WORKFLOW", 830, 210, "AUTONOMOUS SEQUENCES"],
   ["read", "READ PATH", 830, 410, "VALIDATOR TO APP"],
   ["stream", "STREAM", 830, 610, "CONTINUOUS FEEDS"],
-  ["vm", "RIALO VM", 1160, 310, "RISC-V / SVM"],
+  ["execution", "EXECUTION ENGINE", 1160, 230, "EVENTS / CONDITIONS / CONCURRENCY"],
+  ["vm", "RIALO VM", 1160, 450, "RISC-V / SVM"],
   ["rex", "REX", 1460, 190, "CONFIDENTIAL EXECUTION"],
-  ["cruise", "CRUISE", 1460, 430, "GASLESS PATH"],
-  ["omni", "OMNI ACCOUNT", 1760, 270, "ONE ACCOUNT"],
-  ["ipc", "IPC", 1760, 560, "IDENTITY / PRIVACY / COMPLIANCE"],
+  ["cruise", "CRUISE", 1460, 450, "GASLESS PATH"],
+  ["omni", "OMNI ACCOUNT", 1760, 190, "ACCOUNT CONTINUITY"],
+  ["interop", "INTEROP", 1760, 410, "CROSS-NETWORK MOVEMENT"],
+  ["ipc", "IPC", 1760, 610, "IDENTITY / PRIVACY / COMPLIANCE"],
   ["consensus", "CONSENSUS", 2110, 390, "ORDERED SHARED STATE"],
 ] as const;
 
@@ -65,16 +69,18 @@ function ArchitectureTopology() {
         <path data-machine-route="edge-workflow" d="M598 310C680 310 707 210 742 210" />
         <path data-machine-route="edge-read" d="M598 310H742" />
         <path data-machine-route="edge-stream" d="M598 310C680 310 707 610 742 610" />
-        <path data-machine-route="workflow-vm" d="M918 210C1010 210 1025 310 1072 310" />
-        <path data-machine-route="read-vm" d="M918 410C1010 410 1025 310 1072 310" />
-        <path data-machine-route="stream-vm" d="M918 610C1010 610 1025 310 1072 310" />
-        <path data-machine-route="vm-rex" d="M1248 310C1324 310 1330 190 1372 190" />
-        <path data-machine-route="vm-cruise" d="M1248 310C1324 310 1330 430 1372 430" />
-        <path data-machine-route="rex-omni" d="M1548 190C1632 190 1642 270 1672 270" />
-        <path data-machine-route="cruise-omni" d="M1548 430C1632 430 1642 270 1672 270" />
-        <path data-machine-route="omni-ipc" d="M1760 326V504" />
-        <path data-machine-route="ipc-consensus" d="M1848 560C1960 560 1980 390 2022 390" />
-        <path data-machine-route="omni-consensus" d="M1848 270C1960 270 1980 390 2022 390" />
+        <path data-machine-route="workflow-execution" d="M918 210C1010 210 1025 230 1072 230" />
+        <path data-machine-route="read-execution" d="M918 410C1010 410 1025 230 1072 230" />
+        <path data-machine-route="stream-execution" d="M918 610C1010 610 1025 230 1072 230" />
+        <path data-machine-route="execution-vm" d="M1160 286V394" />
+        <path data-machine-route="vm-rex" d="M1248 450C1324 450 1330 190 1372 190" />
+        <path data-machine-route="vm-cruise" d="M1248 450H1372" />
+        <path data-machine-route="rex-omni" d="M1548 190H1672" />
+        <path data-machine-route="cruise-omni" d="M1548 450C1632 450 1642 190 1672 190" />
+        <path data-machine-route="omni-interop" d="M1760 246V354" />
+        <path data-machine-route="omni-ipc" d="M1760 246V554" />
+        <path data-machine-route="interop-consensus" d="M1848 410H2022" />
+        <path data-machine-route="ipc-consensus" d="M1848 610C1960 610 1980 390 2022 390" />
       </g>
 
       {moduleNodes.map(([id, label, x, y, detail]) => <MachineNode id={id} label={label} x={x} y={y} detail={detail} key={id} />)}
@@ -95,26 +101,38 @@ function ArchitectureTopology() {
         <text x="1000" y="656" textAnchor="middle">CONTINUOUS LIVE FEED</text>
       </g>
 
+      <g className={styles.executionEngine} data-machine-micro="execution">
+        <path d="M1098 320H1222" />
+        {["EVENT", "CONDITION", "HYBRID"].map((label, index) => <g data-execution-pulse key={label} transform={`translate(${1104 + index * 56} 320)`}><circle r="8" /><text y="27" textAnchor="middle">{label}</text></g>)}
+      </g>
+
       <g className={styles.vmInstructions} data-machine-micro="vm">
-        {[0, 1, 2, 3, 4].map((line) => <rect data-vm-instruction key={line} x={1102 + line * 24} y="382" width="14" height={18 + line * 7} rx="2" />)}
-        <text x="1160" y="447" textAnchor="middle">RISC-V INSTRUCTION FLOW</text>
+        {[0, 1, 2, 3, 4].map((line) => <rect data-vm-instruction key={line} x={1102 + line * 24} y="520" width="14" height={18 + line * 7} rx="2" />)}
+        <text x="1160" y="585" textAnchor="middle">RISC-V INSTRUCTION FLOW</text>
       </g>
 
       <g className={styles.rexChamber} data-machine-micro="rex" transform="translate(1460 190)">
         <path d="M-38 0A38 38 0 0 1 38 0V50H-38Z" /><rect x="-50" y="-2" width="100" height="74" rx="8" /><circle data-rex-core cy="34" r="12" />
       </g>
 
-      <g className={styles.cruisePath} data-machine-micro="cruise" transform="translate(1460 430)">
+      <g className={styles.cruisePath} data-machine-micro="cruise" transform="translate(1460 450)">
         <path d="M-54 84C-28 48 30 48 56 84" /><circle data-cruise-packet cx="-54" cy="84" r="7" /><text y="108" textAnchor="middle">GAS / 0</text>
       </g>
 
       <g className={styles.omniBranches} data-machine-micro="omni">
-        <path data-omni-branch d="M1760 270C1844 196 1884 180 1930 180" /><path data-omni-branch d="M1760 270H1930" /><path data-omni-branch d="M1760 270C1844 344 1884 360 1930 360" />
-        {[[1930,180,"NET A"],[1930,270,"NET B"],[1930,360,"NET C"]].map(([x,y,label]) => <g data-omni-network key={String(label)} transform={`translate(${x} ${y})`}><circle r="22" /><text y="4" textAnchor="middle">{label}</text></g>)}
+        <path data-omni-branch d="M1760 190C1844 124 1884 110 1930 110" /><path data-omni-branch d="M1760 190H1930" /><path data-omni-branch d="M1760 190C1844 256 1884 270 1930 270" />
+        {[[1930,110,"NET A"],[1930,190,"NET B"],[1930,270,"NET C"]].map(([x,y,label]) => <g data-omni-network key={String(label)} transform={`translate(${x} ${y})`}><circle r="22" /><text y="4" textAnchor="middle">{label}</text></g>)}
+      </g>
+
+      <g className={styles.interopFlow} data-machine-micro="interop">
+        <path d="M1842 472H1982" /><path d="M1982 504H1842" />
+        <circle data-interop-packet="out" cx="1842" cy="472" r="7" />
+        <circle data-interop-packet="in" cx="1982" cy="504" r="7" />
+        <text x="1912" y="536" textAnchor="middle">VALUE / MESSAGE</text>
       </g>
 
       <g className={styles.ipcLayers} data-machine-micro="ipc">
-        {[["IDENTITY", 1648], ["PRIVACY", 1760], ["COMPLIANCE", 1872]].map(([label,x]) => <g data-ipc-layer key={String(label)} transform={`translate(${x} 650)`}><rect x="-45" y="-21" width="90" height="42" rx="21" /><text y="4" textAnchor="middle">{label}</text></g>)}
+        {[["IDENTITY", 1648], ["PRIVACY", 1760], ["COMPLIANCE", 1872]].map(([label,x]) => <g data-ipc-layer key={String(label)} transform={`translate(${x} 720)`}><rect x="-45" y="-21" width="90" height="42" rx="21" /><text y="4" textAnchor="middle">{label}</text></g>)}
       </g>
 
       <g className={styles.consensusValidators} data-machine-micro="consensus">
@@ -130,8 +148,9 @@ function ArchitectureTopology() {
 const cameraStates = [
   { x: 0, scale: 0.69 }, { x: -80, scale: 0.78 }, { x: -280, scale: 0.86 },
   { x: -300, scale: 0.88 }, { x: -320, scale: 0.86 }, { x: -545, scale: 0.9 },
-  { x: -760, scale: 0.94 }, { x: -760, scale: 0.91 }, { x: -955, scale: 0.9 },
-  { x: -975, scale: 0.88 }, { x: -1175, scale: 0.88 },
+  { x: -545, scale: 0.9 }, { x: -760, scale: 0.94 }, { x: -760, scale: 0.91 },
+  { x: -955, scale: 0.9 }, { x: -975, scale: 0.9 }, { x: -975, scale: 0.88 },
+  { x: -1175, scale: 0.88 },
 ] as const;
 
 export function ArchitectureMachine() {
@@ -192,23 +211,28 @@ export function ArchitectureMachine() {
           .to('[data-workflow-step]', { opacity: 1, scale: 1.3, transformOrigin: "center", duration: 0.18, stagger: 0.12, yoyo: true, repeat: 1 }, 2.75)
           .to('[data-read-packet]', { x: 124, duration: 0.72 }, 3.8)
           .to('[data-stream-line]', { strokeDashoffset: 0, duration: 0.82, stagger: 0.1 }, 4.92)
-          .to('[data-machine-route="workflow-vm"], [data-machine-route="read-vm"], [data-machine-route="stream-vm"]', { strokeDashoffset: 0, duration: 0.76, stagger: 0.07 }, 5.65)
-          .to('[data-vm-instruction]', { opacity: 1, scaleY: 1.55, transformOrigin: "bottom", duration: 0.2, stagger: 0.1, yoyo: true, repeat: 1 }, 6.02)
-          .to('[data-machine-route="vm-rex"]', { strokeDashoffset: 0, duration: 0.7 }, 6.82)
-          .to('[data-rex-core]', { scale: 1.75, opacity: 0.35, transformOrigin: "center", duration: 0.35, yoyo: true, repeat: 2 }, 7.05)
-          .to('[data-machine-route="vm-cruise"]', { strokeDashoffset: 0, duration: 0.7 }, 7.92)
-          .to('[data-cruise-packet]', { x: 110, duration: 0.74 }, 8.15)
-          .to('[data-machine-route="rex-omni"], [data-machine-route="cruise-omni"]', { strokeDashoffset: 0, duration: 0.72, stagger: 0.1 }, 9.05)
-          .to('[data-omni-branch]', { strokeDashoffset: 0, duration: 0.7, stagger: 0.1 }, 9.32)
-          .to('[data-omni-network]', { opacity: 1, duration: 0.25, stagger: 0.1 }, 9.72)
-          .to('[data-machine-route="omni-ipc"]', { strokeDashoffset: 0, duration: 0.68 }, 10.1)
-          .to('[data-ipc-layer]', { opacity: 1, y: -8, duration: 0.25, stagger: 0.12 }, 10.32)
-          .to('[data-machine-route="ipc-consensus"], [data-machine-route="omni-consensus"]', { strokeDashoffset: 0, duration: 0.85, stagger: 0.1 }, 11.18)
-          .to('[data-validator]', { opacity: 1, x: (index) => index % 3 === 0 ? 24 : index % 3 === 2 ? -24 : 0, y: (index) => index < 3 ? 34 : -34, duration: 0.42, stagger: 0.07 }, 11.5)
-          .to('[data-consensus-block]', { opacity: 1, scale: 1.08, transformOrigin: "center", duration: 0.28, yoyo: true, repeat: 1 }, 12.02)
-          .to('[data-architecture-world]', { opacity: 0.5, scale: 0.83, duration: 0.82 }, 12.86)
-          .to('[data-architecture-release]', { autoAlpha: 1, yPercent: 0, duration: 0.7 }, 12.98)
-          .to('[data-architecture-content]', { autoAlpha: 0, duration: 0.42 }, 13.08);
+          .to('[data-machine-route="workflow-execution"], [data-machine-route="read-execution"], [data-machine-route="stream-execution"]', { strokeDashoffset: 0, duration: 0.76, stagger: 0.07 }, 5.65)
+          .to('[data-execution-pulse]', { opacity: 1, scale: 1.35, transformOrigin: "center", duration: 0.2, stagger: 0.1, yoyo: true, repeat: 1 }, 6.02)
+          .to('[data-machine-route="execution-vm"]', { strokeDashoffset: 0, duration: 0.7 }, 6.82)
+          .to('[data-vm-instruction]', { opacity: 1, scaleY: 1.55, transformOrigin: "bottom", duration: 0.2, stagger: 0.1, yoyo: true, repeat: 1 }, 7.05)
+          .to('[data-machine-route="vm-rex"]', { strokeDashoffset: 0, duration: 0.7 }, 7.92)
+          .to('[data-rex-core]', { scale: 1.75, opacity: 0.35, transformOrigin: "center", duration: 0.35, yoyo: true, repeat: 2 }, 8.15)
+          .to('[data-machine-route="vm-cruise"]', { strokeDashoffset: 0, duration: 0.7 }, 9.05)
+          .to('[data-cruise-packet]', { x: 110, duration: 0.74 }, 9.32)
+          .to('[data-machine-route="rex-omni"], [data-machine-route="cruise-omni"]', { strokeDashoffset: 0, duration: 0.72, stagger: 0.1 }, 10.1)
+          .to('[data-omni-branch]', { strokeDashoffset: 0, duration: 0.7, stagger: 0.1 }, 10.32)
+          .to('[data-omni-network]', { opacity: 1, duration: 0.25, stagger: 0.1 }, 10.72)
+          .to('[data-machine-route="omni-interop"]', { strokeDashoffset: 0, duration: 0.68 }, 11.18)
+          .to('[data-interop-packet="out"]', { x: 140, duration: 0.72 }, 11.4)
+          .to('[data-interop-packet="in"]', { x: -140, duration: 0.72 }, 11.4)
+          .to('[data-machine-route="omni-ipc"]', { strokeDashoffset: 0, duration: 0.68 }, 12.34)
+          .to('[data-ipc-layer]', { opacity: 1, y: -8, duration: 0.25, stagger: 0.12 }, 12.56)
+          .to('[data-machine-route="interop-consensus"], [data-machine-route="ipc-consensus"]', { strokeDashoffset: 0, duration: 0.85, stagger: 0.1 }, 13.42)
+          .to('[data-validator]', { opacity: 1, x: (index) => index % 3 === 0 ? 24 : index % 3 === 2 ? -24 : 0, y: (index) => index < 3 ? 34 : -34, duration: 0.42, stagger: 0.07 }, 13.7)
+          .to('[data-consensus-block]', { opacity: 1, scale: 1.08, transformOrigin: "center", duration: 0.28, yoyo: true, repeat: 1 }, 14.22)
+          .to('[data-architecture-world]', { opacity: 0.5, scale: 0.83, duration: 0.82 }, 15.06)
+          .to('[data-architecture-release]', { autoAlpha: 1, yPercent: 0, duration: 0.7 }, 15.18)
+          .to('[data-architecture-content]', { autoAlpha: 0, duration: 0.42 }, 15.28);
 
         return () => timeline.scrollTrigger?.kill();
       });
@@ -225,13 +249,14 @@ export function ArchitectureMachine() {
           <div className={styles.architectureMachineContent}>
             <header className={styles.architectureMachineIntro} data-architecture-intro>
               <span className={styles.chapterMarker}>Chapter 02 / Architecture</span>
+              <span className={styles.systemType}>Core architecture</span>
               <p className={styles.chapterThesis}>One living system</p>
               <h2 id="architecture-title">Enter the Rialo machine.</h2>
               <p>Follow a signal from the external world to shared consensus.</p>
             </header>
             <div className={styles.architectureMachineScene} data-architecture-content>
               <header className={styles.architectureMachineHeader}><span>Architecture / Connected topology</span><strong>Every capability compounds.</strong></header>
-              <div className={styles.architectureMachinePhases}>{phases.map((phase, index) => <article className={styles.architectureMachinePhase} data-architecture-phase key={phase.code}><span>{phase.eyebrow}</span><h3>{phase.title}</h3><p>{phase.body}</p><small>{String(index + 1).padStart(2, "0")} / 11</small></article>)}</div>
+              <div className={styles.architectureMachinePhases}>{phases.map((phase, index) => <article className={styles.architectureMachinePhase} data-architecture-phase key={phase.code}><span>{phase.eyebrow}</span><h3>{phase.title}</h3><p>{phase.body}</p><small>{String(index + 1).padStart(2, "0")} / {phases.length}</small></article>)}</div>
               <ol className={styles.architectureMachineRail} aria-label="Architecture machine phases">{phases.map((phase) => <li data-architecture-step key={phase.code}><i /><span>{phase.code}</span></li>)}</ol>
             </div>
             <div className={styles.architectureMachineRelease} data-architecture-release><span>World / Execution / Agreement</span><p>One machine. Shared guarantees.</p></div>

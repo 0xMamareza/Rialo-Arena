@@ -326,6 +326,29 @@
   color: rgb(232 227 213 / 42%);
 }
 
+.systemType {
+  display: block;
+  width: max-content;
+  padding: 0.32rem 0.52rem;
+  border: 1px solid rgb(169 221 211 / 28%);
+  border-radius: 999px;
+  color: rgb(169 221 211 / 68%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.56rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.chapterMarker:has(+ .systemType) {
+  margin-bottom: 0.65rem;
+}
+
+.systemType + .chapterThesis {
+  margin-top: clamp(1.5rem, 3.2vh, 2.5rem);
+}
+
 .chapterThesis {
   margin: 0 0 1.25rem;
   color: #a9ddd3;
@@ -4790,6 +4813,8 @@
 .edgeTraffic circle,
 .workflowSteps circle,
 .readPulse circle,
+.executionEngine circle,
+.interopFlow circle,
 .rexChamber circle,
 .cruisePath circle {
   fill: #a9ddd3;
@@ -4837,6 +4862,26 @@
   fill: rgb(232 227 213 / 76%);
   font-size: 6.5px;
   letter-spacing: 1.5px;
+}
+
+.executionEngine path,
+.interopFlow path {
+  fill: none;
+  stroke: rgb(169 221 211 / 72%);
+  stroke-dasharray: 5 8;
+  stroke-linecap: round;
+  stroke-width: 1.6;
+}
+
+.executionEngine text,
+.interopFlow text {
+  fill: rgb(232 227 213 / 64%);
+  font-size: 5.7px;
+}
+
+.executionEngine circle,
+.interopFlow circle {
+  filter: drop-shadow(0 0 6px rgb(169 221 211 / 45%));
 }
 
 .vmInstructions rect {
@@ -4903,7 +4948,7 @@
 
 @media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
   .architectureMachineSequence {
-    height: 1180svh;
+    height: 1380svh;
   }
 
   .architectureMachineScene,
@@ -4973,7 +5018,7 @@
     z-index: 10;
     order: 4;
     display: grid;
-    grid-template-columns: repeat(11, minmax(16rem, 1fr));
+    grid-template-columns: repeat(13, minmax(16rem, 1fr));
     min-height: 16rem;
     overflow-x: auto;
     scroll-snap-type: x mandatory;
@@ -5011,10 +5056,12 @@
   .workflowSteps,
   .readPulse,
   .streamBands,
+  .executionEngine,
   .vmInstructions,
   .rexChamber,
   .cruisePath,
   .omniBranches,
+  .interopFlow,
   .ipcLayers,
   .consensusValidators {
     opacity: 1 !important;
@@ -5054,7 +5101,7 @@
   }
 
   .architectureMachinePhases {
-    grid-template-columns: repeat(11, minmax(81vw, 1fr));
+    grid-template-columns: repeat(13, minmax(81vw, 1fr));
   }
 
   .architectureMachinePhase h3 {
@@ -5067,4 +5114,12 @@
     position: sticky;
     top: 0;
   }
+}
+
+.agpApproachCopy > .systemType {
+  width: max-content;
+  margin-top: 0.65rem;
+  color: rgb(169 221 211 / 68%);
+  font-size: 0.56rem;
+  letter-spacing: 0.14em;
 }

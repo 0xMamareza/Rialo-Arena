@@ -270,6 +270,7 @@ export function ReactiveCinematic() {
           <div className={styles.reactiveContentLayer}>
             <header className={styles.reactiveIntro} data-reactive-intro>
               <span className={styles.chapterMarker}>Chapter 03 / Reactive transactions</span>
+              <span className={styles.systemType}>Protocol primitive</span>
               <p className={styles.chapterThesis}>Native blockchain automation</p>
               <h2 id="reactive-title">The chain knows when to act.</h2>
               <p>Define the condition once. Validators carry the workflow forward.</p>

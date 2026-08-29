@@ -139,6 +139,10 @@ const architectureFacts: ChapterFact[] = [
     value: "Applications can access state directly from validators, reducing latency and separate read infrastructure.",
   },
   {
+    label: "Execution Engine",
+    value: "Event-driven execution, Conditional Transactions, and hybrid concurrency coordinate dynamic workloads.",
+  },
+  {
     label: "Rialo VM",
     value: "The VM is RISC-V based, compatible with SVM, with EVM and MoveVM compatibility stated as future direction.",
   },
@@ -151,8 +155,16 @@ const architectureFacts: ChapterFact[] = [
     value: "Native gasless transaction support creates a low to zero fee user path.",
   },
   {
-    label: "Omni Account and IPC",
-    value: "One account can transact across networks while Identity, Privacy, and Compliance remain first-class capabilities.",
+    label: "Omni Account",
+    value: "One account provides account continuity across multiple networks.",
+  },
+  {
+    label: "Interop",
+    value: "Native interoperability handles cross-network movement and communication as a distinct system capability.",
+  },
+  {
+    label: "IPC",
+    value: "Identity, Privacy, and Compliance remain first-class capabilities inside the architecture.",
   },
   {
     label: "Consensus",
@@ -183,13 +195,23 @@ const architectureNotes: StudyNote[] = [
     ),
   },
   {
-    title: "Execution and the Rialo VM",
+    title: "Execution Engine",
     body: (
       <p>
-        The execution engine handles event-driven and dynamic workloads. Rialo
-        VM uses RISC-V and supports SVM compatibility. Rialo&apos;s official
-        architecture overview lists EVM and MoveVM compatibility as direction
-        that is still to follow.
+        The Execution Engine coordinates event-driven work, Conditional
+        Transactions, and hybrid concurrency for dynamic workloads. It decides
+        how work advances; it is distinct from the runtime that executes program
+        instructions.
+      </p>
+    ),
+  },
+  {
+    title: "Rialo VM",
+    body: (
+      <p>
+        Rialo VM is the RISC-V runtime and supports SVM compatibility. Rialo&apos;s
+        current architecture overview lists EVM and MoveVM compatibility as
+        future direction.
       </p>
     ),
   },
@@ -222,6 +244,17 @@ const architectureNotes: StudyNote[] = [
         multiple networks. The architecture treats cross-network reach as part
         of the account experience rather than a separate identity for every
         destination.
+      </p>
+    ),
+  },
+  {
+    title: "Interop is not the account",
+    body: (
+      <p>
+        Omni Account preserves one account experience across network contexts.
+        Rialo Interop is the separate movement and communication layer between
+        networks. Account continuity describes who acts; interoperability
+        describes how value and messages cross boundaries.
       </p>
     ),
   },
@@ -600,6 +633,14 @@ const latchFacts: ChapterFact[] = [
     value: "One token can route to multiple services with a separate Secret and policy pipeline per mount.",
   },
   {
+    label: "Hardware-bound identity",
+    value: "The identity filter can bind authority to enrolled agent keys, limiting the value of a stolen token.",
+  },
+  {
+    label: "Attested protection",
+    value: "For stronger isolation, policy can evaluate encrypted payloads inside an attested execution environment.",
+  },
+  {
     label: "Full trace",
     value: "Allowed and denied calls share an audit trail with the deciding filter and its reason.",
   },
@@ -673,6 +714,17 @@ const latchNotes: StudyNote[] = [
         Rotate a Secret once and every Latch derived from it uses the new
         credential without issuing new lat_ tokens. Revoke or disable one Latch
         to cut off that caller without rotating the shared credential.
+      </p>
+    ),
+  },
+  {
+    title: "Identity and attested execution",
+    body: (
+      <p>
+        A Latch can require a hardware-bound agent identity, so possession of
+        the token alone is insufficient. When stronger isolation is selected,
+        policy can evaluate encrypted payloads inside a REX enclave and expose
+        an attestation trail showing which protected path ran.
       </p>
     ),
   },
@@ -782,11 +834,12 @@ export default function LearnPage() {
             <RialoFieldBackground intensity="stage" />
             <header className={styles.chapterCopy}>
               <span className={styles.chapterMarker}>Chapter 01 / Rialo</span>
+              <span className={styles.systemType}>Protocol foundation</span>
               <p className={styles.chapterThesis}>The real-world blockchain</p>
               <h1 id="rialo-title">The chain meets the world.</h1>
               <p className={styles.chapterIntro}>
-                Rialo joins real data, timing, private inputs, and reliable
-                execution in one programmable system.
+                Rialo brings Web3 to the users, apps, and services of the real
+                world while keeping execution decentralized and results verifiable.
               </p>
               <div className={styles.scrollCue} aria-hidden="true">
                 <span /> Scroll to trace the system

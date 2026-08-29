@@ -266,6 +266,7 @@ export function AgpCinematic() {
             <div className={styles.agpSceneIntro} data-agp-scene-intro>
               <div className={styles.agpApproachCopy}>
                 <span>Chapter 08 / Field test</span>
+                <span className={styles.systemType}>Applied agent demonstration</span>
                 <p>Reasoning enters the circuit.</p>
                 <small>
                   Hidden checkpoints turn every question into distance, cost,
