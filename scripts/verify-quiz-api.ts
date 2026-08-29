@@ -5,7 +5,7 @@ import { NextRequest } from "next/server";
 import type { Pool } from "pg";
 
 import { QUIZ_QUESTION_COUNT } from "../src/lib/quiz/domain";
-import type { QuizApiPlayerState } from "../src/server/quiz/http";
+import type { QuizApiPlayerState } from "../src/lib/quiz/api-types";
 import { createToolingPool } from "./lib/database";
 
 const FORBIDDEN_KEYS = new Set([
@@ -192,7 +192,9 @@ async function main() {
   try {
     const identity = await import("../src/server/identity/session");
     const startRoute = await import("../src/app/api/quiz/start/route");
-    const attemptRoute = await import("../src/app/api/quiz/attempt/[attemptId]/route");
+    const attemptRoute = await import(
+      "../src/app/api/quiz/attempt/[attemptId]/(state)/route"
+    );
     const answerRoute = await import("../src/app/api/quiz/attempt/[attemptId]/answer/route");
 
     const owner = await identity.confirmProfile(`qa_${randomUUID().slice(0, 8)}`);

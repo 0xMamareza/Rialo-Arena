@@ -71,6 +71,7 @@
 }
 
 .primaryButton:focus-visible,
+.startQuizLink:focus-visible,
 .secondaryButton:focus-visible,
 .changeButton:focus-visible,
 .closeButton:focus-visible,
@@ -152,6 +153,34 @@
 .changeButton:hover,
 .secondaryButton:hover:not(:disabled) {
   color: #a9ddd3;
+}
+
+.startQuizLink {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3.75rem;
+  padding: 0 1.3rem;
+  border: 1px solid rgb(169 221 211 / 48%);
+  background: rgb(169 221 211 / 9%);
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease,
+    border-color 160ms ease;
+}
+
+.startQuizLink:hover {
+  border-color: #a9ddd3;
+  background: #a9ddd3;
+  color: #010101;
 }
 
 .attribution {
@@ -559,6 +588,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .primaryButton,
+  .startQuizLink,
   .inputShell {
     transition: none;
   }

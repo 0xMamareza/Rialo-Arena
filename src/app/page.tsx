@@ -28,8 +28,18 @@ const externalLinks = [
   { label: "RIALO", href: "https://rialo.io/" },
 ];
 
-export default async function Home() {
-  const currentUser = await getCurrentUser();
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{
+    quiz?: string | string[];
+    attempt?: string | string[];
+  }>;
+}) {
+  const [currentUser, query] = await Promise.all([
+    getCurrentUser(),
+    searchParams,
+  ]);
   const initialProfile = currentUser
     ? {
         username: currentUser.xUsername,
@@ -89,7 +99,13 @@ export default async function Home() {
               ))}
             </dl>
 
-            <ProfilePanel initialProfile={initialProfile} />
+            <ProfilePanel
+              initialProfile={initialProfile}
+              quizEntryRequested={query.quiz === "1"}
+              quizAttemptId={
+                typeof query.attempt === "string" ? query.attempt : null
+              }
+            />
           </div>
         </section>
 

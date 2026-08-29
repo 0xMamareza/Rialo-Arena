@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   useEffect,
   useId,
@@ -23,6 +25,8 @@ type PublicProfile = {
 
 type ProfilePanelProps = {
   initialProfile: PublicProfile | null;
+  quizEntryRequested?: boolean;
+  quizAttemptId?: string | null;
 };
 
 type FlowStep = "entry" | "loading" | "confirm" | "image-error" | "submitting";
@@ -72,14 +76,21 @@ function isPublicProfile(value: unknown): value is PublicProfile {
   );
 }
 
-export function ProfilePanel({ initialProfile }: ProfilePanelProps) {
+export function ProfilePanel({
+  initialProfile,
+  quizEntryRequested = false,
+  quizAttemptId = null,
+}: ProfilePanelProps) {
+  const router = useRouter();
   const [profile, setProfile] = useState(initialProfile);
   const [profileAvatarFailed, setProfileAvatarFailed] = useState(false);
   const [step, setStep] = useState<FlowStep>("entry");
   const [usernameInput, setUsernameInput] = useState("");
   const [preview, setPreview] = useState<PreviewProfile | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(
+    quizEntryRequested && !initialProfile,
+  );
   const dialogRef = useRef<HTMLDialogElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const titleId = useId();
@@ -92,6 +103,14 @@ export function ProfilePanel({ initialProfile }: ProfilePanelProps) {
       return () => cancelAnimationFrame(frame);
     }
   }, [dialogOpen, step]);
+
+  useEffect(() => {
+    if (!quizEntryRequested || profile || dialogRef.current?.open) {
+      return;
+    }
+
+    dialogRef.current?.showModal();
+  }, [profile, quizEntryRequested]);
 
   const resetEntry = (suggestedUsername = "") => {
     setUsernameInput(suggestedUsername);
@@ -176,7 +195,15 @@ export function ProfilePanel({ initialProfile }: ProfilePanelProps) {
 
       setProfile(body);
       setProfileAvatarFailed(false);
-      closeDialog();
+
+      if (quizEntryRequested) {
+        const quizDestination = quizAttemptId
+          ? `/quiz?attempt=${encodeURIComponent(quizAttemptId)}`
+          : "/quiz";
+        router.push(quizDestination);
+      } else {
+        closeDialog();
+      }
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -212,6 +239,9 @@ export function ProfilePanel({ initialProfile }: ProfilePanelProps) {
           <button className={styles.changeButton} type="button" onClick={openDialog}>
             Change
           </button>
+          <Link className={styles.startQuizLink} href="/quiz">
+            Start quiz <span aria-hidden="true">→</span>
+          </Link>
           <a
             className={styles.attribution}
             href="https://unavatar.io"

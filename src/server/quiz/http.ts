@@ -4,21 +4,13 @@ import { createHash, timingSafeEqual } from "node:crypto";
 
 import { NextResponse, type NextRequest } from "next/server";
 
+import type { QuizApiPlayerState } from "@/lib/quiz/api-types";
 import { getCurrentUserFromRequest } from "@/server/identity/current-user";
 
 import {
   QuizEngineError,
-  type ActivePlayerQuizState,
-  type CompletedPlayerQuizState,
-  type PlayerCurrentQuestion,
   type PlayerQuizState,
 } from "./types";
-
-export type QuizApiPlayerState =
-  | (Omit<ActivePlayerQuizState, "currentQuestion"> & {
-      currentQuestion: Omit<PlayerCurrentQuestion, "attemptQuestionId">;
-    })
-  | CompletedPlayerQuizState;
 
 export type QuizApiErrorCode =
   | "UNAUTHORIZED"
