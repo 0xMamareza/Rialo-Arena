@@ -2,6 +2,9 @@ import { z } from "zod";
 
 const X_USERNAME_PATTERN = /^[a-z0-9_]+$/;
 
+export const RIALO_AVATAR_FALLBACK_PATH =
+  "/brand/rialo/rialo-symbol-off-white.svg";
+
 export const xUsernameSchema = z
   .string()
   .transform((value) => {

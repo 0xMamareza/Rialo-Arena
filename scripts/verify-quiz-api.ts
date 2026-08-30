@@ -37,9 +37,15 @@ function request(
     sessionToken?: string;
     body?: unknown;
     etag?: string;
+    origin?: string | null;
   } = {},
 ) {
   const headers = new Headers();
+  const method = options.method ?? "GET";
+
+  if (method === "POST" && options.origin !== null) {
+    headers.set("origin", options.origin ?? "http://localhost");
+  }
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
@@ -52,7 +58,7 @@ function request(
   }
 
   return new NextRequest(`http://localhost${pathname}`, {
-    method: options.method ?? "GET",
+    method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
@@ -213,6 +219,28 @@ async function main() {
     );
     assert.equal(unauthorizedRecovery.status, 401);
 
+    const rejectedForeignStart = await readResponse(
+      await startRoute.POST(
+        request("/api/quiz/start", {
+          method: "POST",
+          origin: "https://foreign.example",
+          sessionToken: owner.rawSessionToken,
+        }),
+      ),
+    );
+    assert.equal(rejectedForeignStart.response.status, 403);
+    assert.equal(
+      (rejectedForeignStart.body as { error?: { code?: string } }).error?.code,
+      "ORIGIN_FORBIDDEN",
+    );
+    const attemptsAfterRejectedStart = await pool.query<{ count: number }>(
+      `SELECT count(*)::integer AS count
+       FROM quiz_attempts
+       WHERE user_id = $1`,
+      [owner.user.id],
+    );
+    assert.equal(attemptsAfterRejectedStart.rows[0]?.count, 0);
+
     const emptyRecovery = await startRoute.GET(
       request("/api/quiz/start", {
         sessionToken: owner.rawSessionToken,
@@ -320,6 +348,45 @@ async function main() {
     assert.equal(ownerFetch.response.status, 200);
     assertSafeState(ownerFetch.body, rawTokens);
     assert.equal(ownerFetch.response.headers.get("cache-control"), "private, no-store");
+
+    const rejectedForeignAnswer = await readResponse(
+      await answerRoute.POST(
+        request(`/api/quiz/attempt/${attemptId}/answer`, {
+          method: "POST",
+          origin: "https://foreign.example",
+          sessionToken: owner.rawSessionToken,
+          etag: initialEtag,
+          body: { choiceIndex: 0 },
+        }),
+        context,
+      ),
+    );
+    assert.equal(rejectedForeignAnswer.response.status, 403);
+    assert.equal(
+      (rejectedForeignAnswer.body as { error?: { code?: string } }).error?.code,
+      "ORIGIN_FORBIDDEN",
+    );
+    const stateAfterRejectedAnswer = await readResponse(
+      await attemptRoute.GET(
+        request(`/api/quiz/attempt/${attemptId}`, {
+          sessionToken: owner.rawSessionToken,
+        }),
+        context,
+      ),
+    );
+    assert.equal(stateAfterRejectedAnswer.response.headers.get("etag"), initialEtag);
+    const rejectedAnswerState = assertSafeState(
+      stateAfterRejectedAnswer.body,
+      rawTokens,
+    );
+    assert.equal(rejectedAnswerState.status, "active");
+    if (rejectedAnswerState.status !== "active") {
+      assert.fail("Rejected answer changed the attempt out of active state");
+    }
+    assert.equal(
+      rejectedAnswerState.position,
+      initialState.position,
+    );
 
     const missingId = randomUUID();
     const nonOwnerFetch = await readResponse(

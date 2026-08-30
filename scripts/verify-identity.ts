@@ -7,6 +7,7 @@ import type { Pool } from "pg";
 import {
   buildXAvatarUrl,
   normalizeXUsername,
+  RIALO_AVATAR_FALLBACK_PATH,
 } from "../src/lib/identity/username";
 import type { PersonalBestStats } from "../src/lib/leaderboard/api-types";
 import type * as IdentityModule from "../src/server/identity/session";
@@ -68,6 +69,10 @@ function verifyUsernameDomain() {
   assert.equal(normalizeXUsername(" @Mama_Reza "), "mama_reza");
   assert.equal(normalizeXUsername("A"), "a");
   assert.equal(buildXAvatarUrl("@Mama_Reza"), "https://unavatar.io/x/mama_reza?fallback=false");
+  assert.equal(
+    RIALO_AVATAR_FALLBACK_PATH,
+    "/brand/rialo/rialo-symbol-off-white.svg",
+  );
 
   for (const invalidUsername of [
     "",
@@ -88,10 +93,16 @@ function request(
     method?: "GET" | "POST";
     sessionToken?: string;
     body?: unknown;
+    origin?: string | null;
   } = {},
 ) {
   const headers = new Headers();
+  const method = options.method ?? "GET";
   headers.set("x-forwarded-for", IDENTITY_VERIFIER_IP);
+
+  if (method === "POST" && options.origin !== null) {
+    headers.set("origin", options.origin ?? "http://localhost");
+  }
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
@@ -101,7 +112,7 @@ function request(
   }
 
   return new NextRequest(`http://localhost${pathname}`, {
-    method: options.method ?? "GET",
+    method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
@@ -220,13 +231,76 @@ async function verifyIdentityIntegration(
   const suffix = randomUUID().replaceAll("-", "").slice(0, 6);
   const sharedUsername = `iv_${suffix}_a`;
   const existingUsername = `iv_${suffix}_b`;
-  const testUsernames = [sharedUsername, existingUsername];
+  const avatarUsername = `iv_${suffix}_c`;
+  const logoutUsername = `iv_${suffix}_d`;
+  const blockedUsername = `iv_${suffix}_z`;
+  const testUsernames = [
+    sharedUsername,
+    existingUsername,
+    avatarUsername,
+    logoutUsername,
+    blockedUsername,
+  ];
   const userIds: string[] = [];
   const mixedCaseInput = ` @${sharedUsername.toUpperCase()} `;
   const expectedAvatarUrl = `https://unavatar.io/x/${sharedUsername}?fallback=false`;
   const protectedStateBefore = await getProtectedDatabaseState(pool);
 
   try {
+    const profileRoute = await import("../src/app/api/profile/confirm/route");
+    const logoutRoute = await import("../src/app/api/session/logout/route");
+
+    const foreignOriginResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        origin: "https://foreign.example",
+        body: { username: blockedUsername },
+      }),
+    );
+    assert.equal(foreignOriginResponse.status, 403);
+    assert.equal(
+      (await foreignOriginResponse.json() as { error?: { code?: string } }).error
+        ?.code,
+      "ORIGIN_FORBIDDEN",
+    );
+
+    const missingOriginResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        origin: null,
+        body: { username: blockedUsername },
+      }),
+    );
+    assert.equal(missingOriginResponse.status, 403);
+
+    const blockedProfileCount = await pool.query<{ count: number }>(
+      `SELECT count(*)::integer AS count
+       FROM users
+       WHERE x_username = $1`,
+      [blockedUsername],
+    );
+    assert.equal(blockedProfileCount.rows[0]?.count, 0);
+
+    const avatarIndependentResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        body: { username: avatarUsername },
+      }),
+    );
+    assert.equal(avatarIndependentResponse.status, 200);
+    assert.deepEqual(await avatarIndependentResponse.clone().json(), {
+      username: avatarUsername,
+      profileImageUrl: `https://unavatar.io/x/${avatarUsername}?fallback=false`,
+    });
+    const avatarIndependentToken = getIssuedSessionToken(
+      avatarIndependentResponse,
+    );
+    const avatarIndependentUser = await identity.resolveSessionToken(
+      avatarIndependentToken,
+    );
+    assert.ok(avatarIndependentUser);
+    userIds.push(avatarIndependentUser.id);
+
     const firstConfirmation = await identity.confirmProfile(mixedCaseInput);
     userIds.push(firstConfirmation.user.id);
     const secondConfirmation = await identity.confirmProfile(sharedUsername);
@@ -337,7 +411,6 @@ async function verifyIdentityIntegration(
     assert.equal(firstStats.personalBest?.score, 1234);
     assert.equal(secondStats.personalBest?.score, 2345);
 
-    const profileRoute = await import("../src/app/api/profile/confirm/route");
     const updateResponse = await profileRoute.POST(
       request("/api/profile/confirm", {
         method: "POST",
@@ -436,13 +509,71 @@ async function verifyIdentityIntegration(
       null,
     );
 
+    const logoutIdentity = await identity.confirmProfile(logoutUsername);
+    userIds.push(logoutIdentity.user.id);
+
+    const rejectedLogout = await logoutRoute.POST(
+      request("/api/session/logout", {
+        method: "POST",
+        origin: "https://foreign.example",
+        sessionToken: logoutIdentity.rawSessionToken,
+      }),
+    );
+    assert.equal(rejectedLogout.status, 403);
+    assert.equal(
+      (await identity.resolveSessionToken(logoutIdentity.rawSessionToken))?.id,
+      logoutIdentity.user.id,
+    );
+
+    const logoutResponse = await logoutRoute.POST(
+      request("/api/session/logout", {
+        method: "POST",
+        sessionToken: logoutIdentity.rawSessionToken,
+      }),
+    );
+    assert.equal(logoutResponse.status, 200);
+    assert.deepEqual(await logoutResponse.json(), { ok: true });
+    const clearedCookie = logoutResponse.headers.get("set-cookie") ?? "";
+    assert.match(clearedCookie, /rialo_session=;/);
+    assert.match(clearedCookie, /Max-Age=0/i);
+    assert.equal(
+      await identity.resolveSessionToken(logoutIdentity.rawSessionToken),
+      null,
+    );
+    assert.equal(
+      (
+        await statsRoute.GET(
+          request("/api/stats/me", {
+            sessionToken: logoutIdentity.rawSessionToken,
+          }),
+        )
+      ).status,
+      401,
+    );
+
+    const nextDeviceUserResponse = await profileRoute.POST(
+      request("/api/profile/confirm", {
+        method: "POST",
+        body: { username: logoutUsername },
+      }),
+    );
+    assert.equal(nextDeviceUserResponse.status, 200);
+    const nextDeviceToken = getIssuedSessionToken(nextDeviceUserResponse);
+    const nextDeviceUser = await identity.resolveSessionToken(nextDeviceToken);
+    assert.ok(nextDeviceUser);
+    userIds.push(nextDeviceUser.id);
+    assert.notEqual(nextDeviceUser.id, logoutIdentity.user.id);
+
     console.log("Verified username normalization and validation.");
     console.log("Verified deterministic browser-direct avatar URL derivation.");
+    console.log("Verified avatar-independent confirmation and first-party fallback.");
+    console.log("Verified shared same-origin policy and mutation-free rejection.");
     console.log("Verified same-username clients receive isolated Arena identities.");
     console.log("Verified session-owned attempt and personal-stat isolation.");
     console.log("Verified authenticated profile changes preserve identity and history.");
     console.log("Verified invalid and expired sessions create new Arena identities.");
     console.log("Verified opaque 30-day sessions, SHA-256 storage, expiry, and revocation.");
+    console.log("Verified logout revocation, cookie clearing, and fresh-device identity.");
   } finally {
     await cleanupVerifierIdentity(pool, userIds, testUsernames);
     const protectedStateAfter = await getProtectedDatabaseState(pool);

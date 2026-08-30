@@ -1,15 +1,20 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 import {
   getSessionCookieOptions,
   revokeSessionToken,
   SESSION_COOKIE_NAME,
 } from "@/server/identity/session";
+import { validateMutationOrigin } from "@/server/security/mutation-origin";
 
-export async function POST() {
-  const cookieStore = await cookies();
-  const rawSessionToken = cookieStore.get(SESSION_COOKIE_NAME)?.value;
+export async function POST(request: NextRequest) {
+  const originRejection = validateMutationOrigin(request);
+
+  if (originRejection) {
+    return originRejection;
+  }
+
+  const rawSessionToken = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
   await revokeSessionToken(rawSessionToken);
 

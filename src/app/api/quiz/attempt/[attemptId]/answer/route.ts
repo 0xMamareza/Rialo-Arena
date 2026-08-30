@@ -12,6 +12,7 @@ import {
   staleQuizState,
   withAuthenticatedQuizRequest,
 } from "@/server/quiz/http";
+import { validateMutationOrigin } from "@/server/security/mutation-origin";
 
 type AttemptRouteContext = {
   params: Promise<{ attemptId: string }>;
@@ -24,6 +25,12 @@ const answerRequestSchema = z
 export const runtime = "nodejs";
 
 export function POST(request: NextRequest, context: AttemptRouteContext) {
+  const originRejection = validateMutationOrigin(request);
+
+  if (originRejection) {
+    return originRejection;
+  }
+
   return withAuthenticatedQuizRequest(
     request,
     async (userId) => {

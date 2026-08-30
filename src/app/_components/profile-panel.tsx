@@ -14,6 +14,7 @@ import {
 import {
   buildXAvatarUrl,
   normalizeXUsername,
+  RIALO_AVATAR_FALLBACK_PATH,
 } from "@/lib/identity/username";
 
 import styles from "./profile-panel.module.css";
@@ -29,7 +30,7 @@ type ProfilePanelProps = {
   quizAttemptId?: string | null;
 };
 
-type FlowStep = "entry" | "loading" | "confirm" | "image-error" | "submitting";
+type FlowStep = "entry" | "confirm" | "submitting";
 
 type PreviewProfile = PublicProfile;
 
@@ -64,6 +65,21 @@ function DirectAvatar({
   );
 }
 
+function RialoAvatarFallback({ className = "" }: { className?: string }) {
+  return (
+    <span className={`${styles.avatarFallback} ${className}`} aria-hidden="true">
+      {/* First-party fallback is intentionally independent of avatar services. */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={RIALO_AVATAR_FALLBACK_PATH}
+        alt=""
+        width="160"
+        height="160"
+      />
+    </span>
+  );
+}
+
 function isPublicProfile(value: unknown): value is PublicProfile {
   if (!value || typeof value !== "object") {
     return false;
@@ -84,6 +100,11 @@ export function ProfilePanel({
   const router = useRouter();
   const [profile, setProfile] = useState(initialProfile);
   const [profileAvatarFailed, setProfileAvatarFailed] = useState(false);
+  const [profileAvatarLoaded, setProfileAvatarLoaded] = useState(false);
+  const [previewAvatarFailed, setPreviewAvatarFailed] = useState(false);
+  const [previewAvatarLoaded, setPreviewAvatarLoaded] = useState(false);
+  const [logoutPending, setLogoutPending] = useState(false);
+  const [logoutError, setLogoutError] = useState<string | null>(null);
   const [step, setStep] = useState<FlowStep>("entry");
   const [usernameInput, setUsernameInput] = useState("");
   const [preview, setPreview] = useState<PreviewProfile | null>(null);
@@ -112,15 +133,36 @@ export function ProfilePanel({
     dialogRef.current?.showModal();
   }, [profile, quizEntryRequested]);
 
+  useEffect(() => {
+    if (!profile || profileAvatarLoaded || profileAvatarFailed) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setProfileAvatarFailed(true), 4_000);
+    return () => window.clearTimeout(timeout);
+  }, [profile, profileAvatarFailed, profileAvatarLoaded]);
+
+  useEffect(() => {
+    if (!preview || previewAvatarLoaded || previewAvatarFailed) {
+      return;
+    }
+
+    const timeout = window.setTimeout(() => setPreviewAvatarFailed(true), 4_000);
+    return () => window.clearTimeout(timeout);
+  }, [preview, previewAvatarFailed, previewAvatarLoaded]);
+
   const resetEntry = (suggestedUsername = "") => {
     setUsernameInput(suggestedUsername);
     setPreview(null);
+    setPreviewAvatarFailed(false);
+    setPreviewAvatarLoaded(false);
     setErrorMessage(null);
     setStep("entry");
   };
 
   const openDialog = () => {
     resetEntry(profile?.username ?? "");
+    setLogoutError(null);
     setDialogOpen(true);
     dialogRef.current?.showModal();
   };
@@ -149,8 +191,10 @@ export function ProfilePanel({
         username,
         profileImageUrl: buildXAvatarUrl(username),
       });
+      setPreviewAvatarFailed(false);
+      setPreviewAvatarLoaded(false);
       setErrorMessage(null);
-      setStep("loading");
+      setStep("confirm");
     } catch (error) {
       const message =
         error && typeof error === "object" && "issues" in error
@@ -162,7 +206,7 @@ export function ProfilePanel({
   };
 
   const confirmAccount = async () => {
-    if (!preview || step !== "confirm") {
+    if (!preview || step === "submitting") {
       return;
     }
 
@@ -195,6 +239,7 @@ export function ProfilePanel({
 
       setProfile(body);
       setProfileAvatarFailed(false);
+      setProfileAvatarLoaded(false);
 
       if (quizEntryRequested) {
         const quizDestination = quizAttemptId
@@ -214,20 +259,50 @@ export function ProfilePanel({
     }
   };
 
+  const logout = async () => {
+    if (logoutPending) {
+      return;
+    }
+
+    setLogoutPending(true);
+    setLogoutError(null);
+
+    try {
+      const response = await fetch("/api/session/logout", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error("Logout failed");
+      }
+
+      setProfile(null);
+      setProfileAvatarFailed(false);
+      setProfileAvatarLoaded(false);
+      resetEntry();
+      router.replace("/");
+      router.refresh();
+    } catch {
+      setLogoutError("We couldn't sign you out. Try again.");
+    } finally {
+      setLogoutPending(false);
+    }
+  };
+
   return (
     <div className={styles.identityPanel}>
       {profile ? (
         <div className={styles.readyState}>
           <div className={styles.readyProfile}>
             {profileAvatarFailed ? (
-              <span className={styles.avatarFallback} aria-hidden="true">
-                @
-              </span>
+              <RialoAvatarFallback />
             ) : (
               <DirectAvatar
                 src={profile.profileImageUrl}
                 alt={`Public X avatar for @${profile.username}`}
                 className={styles.readyAvatar}
+                onLoad={() => setProfileAvatarLoaded(true)}
                 onError={() => setProfileAvatarFailed(true)}
               />
             )}
@@ -236,9 +311,24 @@ export function ProfilePanel({
               <strong>@{profile.username}</strong>
             </div>
           </div>
-          <button className={styles.changeButton} type="button" onClick={openDialog}>
-            Change
-          </button>
+          <div className={styles.profileActions}>
+            <button className={styles.changeButton} type="button" onClick={openDialog}>
+              Change
+            </button>
+            <button
+              className={styles.changeButton}
+              type="button"
+              disabled={logoutPending}
+              onClick={logout}
+            >
+              {logoutPending ? "Signing out" : "Logout"}
+            </button>
+          </div>
+          {logoutError ? (
+            <p className={`${styles.error} ${styles.readyError}`} role="alert">
+              {logoutError}
+            </p>
+          ) : null}
           <Link className={styles.startQuizLink} href="/quiz">
             Start quiz <span aria-hidden="true">→</span>
           </Link>
@@ -258,7 +348,7 @@ export function ProfilePanel({
             <span aria-hidden="true">→</span>
           </button>
           <p>
-            Confirm your public avatar to prepare an Arena profile. This does not
+            Choose public profile metadata for your Arena identity. This does not
             verify X account ownership.
           </p>
         </div>
@@ -326,36 +416,28 @@ export function ProfilePanel({
             <div className={styles.confirmation}>
               <span className={styles.stepMarker}>Profile setup / 02</span>
               <h2 className={styles.headline} id={titleId}>
-                <span>Is this your</span>
-                <span>account?</span>
+                <span>Use this</span>
+                <span>profile?</span>
               </h2>
               <p id={descriptionId}>
-                Confirm this is the profile you want to use in Rialo Arena.
+                Confirm the public metadata you want to display. This does not
+                verify ownership.
               </p>
 
-              {preview && step !== "image-error" ? (
+              {preview ? (
                 <div className={styles.avatarFrame} aria-live="polite">
-                  <DirectAvatar
-                    src={preview.profileImageUrl}
-                    alt={`Public X avatar for @${preview.username}`}
-                    className={styles.previewAvatar}
-                    onLoad={() => {
-                      if (step === "loading") {
-                        setStep("confirm");
-                      }
-                    }}
-                    onError={() => setStep("image-error")}
-                  />
-                  {step === "loading" ? (
-                    <span className={styles.loadingLabel}>Loading avatar…</span>
-                  ) : null}
+                  {previewAvatarFailed ? (
+                    <RialoAvatarFallback className={styles.previewAvatar} />
+                  ) : (
+                    <DirectAvatar
+                      src={preview.profileImageUrl}
+                      alt={`Public X avatar for @${preview.username}`}
+                      className={styles.previewAvatar}
+                      onLoad={() => setPreviewAvatarLoaded(true)}
+                      onError={() => setPreviewAvatarFailed(true)}
+                    />
+                  )}
                 </div>
-              ) : null}
-
-              {step === "image-error" ? (
-                <p className={styles.avatarError} role="alert">
-                  We couldn&apos;t find that profile. Check the username and try again.
-                </p>
               ) : null}
 
               {preview ? <strong className={styles.previewUsername}>@{preview.username}</strong> : null}
@@ -367,24 +449,22 @@ export function ProfilePanel({
               ) : null}
 
               <div className={styles.confirmActions}>
-                {step === "confirm" || step === "submitting" ? (
-                  <button
-                    className={styles.primaryButton}
-                    type="button"
-                    disabled={step === "submitting"}
-                    onClick={confirmAccount}
-                  >
-                    {step === "submitting" ? "Preparing profile…" : "Yes, continue"}
-                    <span aria-hidden="true">→</span>
-                  </button>
-                ) : null}
+                <button
+                  className={styles.primaryButton}
+                  type="button"
+                  disabled={step === "submitting"}
+                  onClick={confirmAccount}
+                >
+                  {step === "submitting" ? "Preparing profile…" : "Yes, continue"}
+                  <span aria-hidden="true">→</span>
+                </button>
                 <button
                   className={styles.secondaryButton}
                   type="button"
                   disabled={step === "submitting"}
                   onClick={() => resetEntry(preview?.username ?? "")}
                 >
-                  {step === "image-error" ? "Try again" : "No, try again"}
+                  No, try again
                 </button>
               </div>
 

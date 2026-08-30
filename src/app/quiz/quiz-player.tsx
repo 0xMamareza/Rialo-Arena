@@ -11,6 +11,7 @@ import {
   type CSSProperties,
 } from "react";
 
+import { RIALO_AVATAR_FALLBACK_PATH } from "@/lib/identity/username";
 import type { PersonalBestStats } from "@/lib/leaderboard/api-types";
 import type {
   QuizApiChoiceIndex,
@@ -628,6 +629,9 @@ export function QuizPlayer({
             width="36"
             height="36"
             referrerPolicy="no-referrer"
+            onError={(event) => {
+              event.currentTarget.src = RIALO_AVATAR_FALLBACK_PATH;
+            }}
           />
           <span>@{profile.username}</span>
         </div>

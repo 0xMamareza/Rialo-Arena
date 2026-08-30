@@ -65,7 +65,8 @@
 }
 
 .primaryButton:disabled,
-.secondaryButton:disabled {
+.secondaryButton:disabled,
+.changeButton:disabled {
   cursor: wait;
   opacity: 0.58;
 }
@@ -132,8 +133,17 @@
 .avatarFallback {
   display: grid;
   place-items: center;
-  color: #a9ddd3;
-  font-size: 1.35rem;
+}
+
+.avatarFallback img {
+  width: 54%;
+  height: 54%;
+  object-fit: contain;
+}
+
+.profileActions {
+  display: flex;
+  align-items: center;
 }
 
 .changeButton,
@@ -153,6 +163,10 @@
 .changeButton:hover,
 .secondaryButton:hover:not(:disabled) {
   color: #a9ddd3;
+}
+
+.readyError {
+  grid-column: 1 / -1;
 }
 
 .startQuizLink {

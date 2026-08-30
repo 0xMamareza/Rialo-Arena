@@ -13,12 +13,19 @@ import {
   consumeRateLimit,
   PROFILE_CONFIRM_RATE_LIMIT,
 } from "@/server/rate-limit/limiter";
+import { validateMutationOrigin } from "@/server/security/mutation-origin";
 
 const confirmProfileRequestSchema = z
   .object({ username: z.string() })
   .strict();
 
 export async function POST(request: NextRequest) {
+  const originRejection = validateMutationOrigin(request);
+
+  if (originRejection) {
+    return originRejection;
+  }
+
   try {
     const decision = await consumeRateLimit(
       PROFILE_CONFIRM_RATE_LIMIT,

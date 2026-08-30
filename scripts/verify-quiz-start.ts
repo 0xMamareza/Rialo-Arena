@@ -16,6 +16,10 @@ type Identity = Awaited<
 function request(sessionToken?: string, method: "GET" | "POST" = "GET") {
   const headers = new Headers();
 
+  if (method === "POST") {
+    headers.set("origin", "http://localhost");
+  }
+
   if (sessionToken) {
     headers.set("cookie", `rialo_session=${sessionToken}`);
   }

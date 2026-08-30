@@ -21,6 +21,11 @@ function request(
   } = {},
 ) {
   const headers = new Headers();
+  const method = options.method ?? "GET";
+
+  if (method === "POST") {
+    headers.set("origin", "http://localhost");
+  }
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
@@ -33,7 +38,7 @@ function request(
   }
 
   return new NextRequest(`http://localhost${pathname}`, {
-    method: options.method ?? "GET",
+    method,
     headers,
     body: options.body === undefined ? undefined : JSON.stringify(options.body),
   });
