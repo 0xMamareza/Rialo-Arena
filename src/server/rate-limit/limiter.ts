@@ -1,10 +1,11 @@
 import "server-only";
 
-import { createHash } from "node:crypto";
+import { createHmac } from "node:crypto";
 
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { getRateLimitHmacSecret } from "@/server/config/environment";
 
 export type RateLimitPolicy = {
   scope: string;
@@ -30,6 +31,12 @@ export const QUIZ_ANSWER_RATE_LIMIT = {
   windowSeconds: 60,
 } as const satisfies RateLimitPolicy;
 
+export const QUIZ_STATE_RATE_LIMIT = {
+  scope: "quiz-state:user",
+  limit: 120,
+  windowSeconds: 60,
+} as const satisfies RateLimitPolicy;
+
 export const LEADERBOARD_RATE_LIMIT = {
   scope: "leaderboard:ip",
   limit: 120,
@@ -49,10 +56,18 @@ export type RateLimitDecision = {
   retryAfterSeconds: number;
 };
 
-export function hashRateLimitKey(policy: RateLimitPolicy, rawKey: string) {
-  return createHash("sha256")
+export function createRateLimitKeyHash(
+  policy: RateLimitPolicy,
+  rawKey: string,
+  hmacSecret: string,
+) {
+  return createHmac("sha256", hmacSecret)
     .update(`rialo-arena-rate-limit:v1:${policy.scope}:${rawKey}`)
     .digest("hex");
+}
+
+export function hashRateLimitKey(policy: RateLimitPolicy, rawKey: string) {
+  return createRateLimitKeyHash(policy, rawKey, getRateLimitHmacSecret());
 }
 
 export async function consumeRateLimit(

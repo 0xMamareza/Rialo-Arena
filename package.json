@@ -2,6 +2,9 @@
   "name": "rialo-arena",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=24 <25"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -22,7 +25,10 @@
     "quiz:start:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-quiz-start.ts",
     "leaderboard:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-leaderboard.ts",
     "identity:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-identity.ts",
-    "maintenance:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-rate-limit-maintenance.ts"
+    "maintenance:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-rate-limit-maintenance.ts",
+    "production:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-production-hardening.ts",
+    "db:fresh:verify": "TMPDIR=/tmp tsx scripts/verify-fresh-database.ts",
+    "build:verify": "TMPDIR=/tmp tsx scripts/verify-production-build.ts"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

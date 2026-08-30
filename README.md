@@ -1,34 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Rialo Arena
 
-## Getting Started
+Rialo Arena is a Next.js 16 application backed by PostgreSQL. The supported runtime is Node 24.x, pinned in `.nvmrc` and enforced at runtime.
 
-First, run the development server:
+## Required configuration
+
+Copy `.env.example` to the ignored `.env.local` for local development. Never commit real credentials or limiter secrets.
+
+- `DATABASE_URL`: application PostgreSQL URL.
+- `DATABASE_CONNECTION_MODE`: `direct` or `pooled`. Local development uses `direct`.
+- `DATABASE_TLS_MODE`: `disable` or `verify-full`. Production must set this explicitly. Use `verify-full` for normal public or hosted PostgreSQL TLS. Use `disable` only for an intentionally trusted private transport.
+- `DATABASE_DIRECT_URL`: required by migration, seed, and verification tooling when the application URL is pooled. It must bypass transaction pooling.
+- `RATE_LIMIT_HMAC_SECRET`: production-only secret with at least 32 bytes. Rotate deliberately because changing it creates new limiter-key identities.
+- `TRUSTED_PROXY_IP_HEADER`: must be exactly `x-real-ip` in production.
+
+Production startup fails if required configuration is missing, malformed, uses the placeholder limiter secret, or runs outside Node 24.x.
+
+## Trusted reverse proxy contract
+
+The application origin must not be directly reachable from the public internet. The one trusted reverse proxy must:
+
+1. Remove any client-supplied `x-real-ip` and `x-forwarded-for` headers.
+2. Write one canonical, validated IPv4 or IPv6 address to `x-real-ip`.
+3. Forward requests to a network-restricted application origin.
+4. Terminate HTTPS before forwarding when the application server itself uses HTTP.
+
+Rialo Arena ignores `x-forwarded-for`. A missing or invalid trusted client IP is placed in one conservative shared limiter bucket rather than bypassing throttling. Persisted IP limiter identifiers are HMAC-SHA-256 values; raw IP addresses are never stored.
+
+## Local development
+
+Use WSL2/Ubuntu with Node 24 from nvm:
 
 ```bash
+nvm use
+npm ci
+npm run db:up
+npm run db:migrate
+npm run db:seed
+npm run db:verify
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The local application defaults to direct PostgreSQL with TLS disabled. Open `http://localhost:3000` unless another port is selected by Next.js.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Fresh deployment order
 
-## Learn More
+Take a restorable database backup before applying migrations, then run:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm ci
+npm run db:migrate
+npm run db:seed
+npm run db:verify
+npm run build
+npm run build:verify
+npm run start
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`db:seed` is idempotent for the canonical 89-question bank. `db:verify` checks the migration sequence, schema invariants, and exact canonical questions. Do not run `db:generate` during deployment.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+`drizzle-kit` and `tsx` are devDependencies required by migration, seed, verification, and maintenance commands. If the runtime image omits devDependencies, run those commands in a controlled release/operations stage that includes them before starting the reduced runtime image.
 
-## Deploy on Vercel
+## Maintenance and backups
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Schedule `npm run maintenance` at least once per minute. It deletes expired sessions and limiter buckets and settles overdue active quiz attempts through the authoritative quiz engine. It does not delete completed attempt history.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Maintain automated PostgreSQL backups appropriate to the deployment and test restoration regularly. Always capture a backup before schema migrations.
+
+## Verification
+
+Important release checks include:
+
+```bash
+npm run lint
+npm run typecheck
+npm run production:verify
+npm run db:fresh:verify
+npm run build
+npm run build:verify
+```
+
+The project currently has four moderate npm audit findings in dev-only `drizzle-kit` tooling through `@esbuild-kit/esm-loader` and `@esbuild-kit/core-utils` to `esbuild`. The available forced audit fix proposes a breaking drizzle-kit downgrade and must not be applied automatically. These packages are not part of the production application runtime when devDependencies are omitted.
+
+## HTTP hardening
+
+Next.js centrally emits frame protection, `nosniff`, a strict referrer policy, a restrictive permissions policy, and production HSTS. `X-Powered-By` is disabled. The CSP is intentionally limited to `frame-ancestors 'none'`; a broader CSP is deferred until nonce or hash behavior is verified against Next.js, GSAP, and current assets.

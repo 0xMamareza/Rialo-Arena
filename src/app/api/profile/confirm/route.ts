@@ -8,6 +8,7 @@ import {
   updateCurrentUserProfile,
 } from "@/server/identity/session";
 import { getCurrentUserFromRequest } from "@/server/identity/current-user";
+import { readLimitedJson } from "@/server/http/json-body";
 import { getClientIpRateLimitKey } from "@/server/rate-limit/client-ip";
 import {
   consumeRateLimit,
@@ -24,6 +25,19 @@ export async function POST(request: NextRequest) {
 
   if (originRejection) {
     return originRejection;
+  }
+
+  const jsonBody = await readLimitedJson(request);
+
+  if (!jsonBody.ok) {
+    return NextResponse.json(
+      {
+        error: jsonBody.reason === "too-large"
+          ? "Request body is too large."
+          : "Enter a valid X username.",
+      },
+      { status: jsonBody.reason === "too-large" ? 413 : 400 },
+    );
   }
 
   try {
@@ -51,18 +65,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: unknown;
-
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json(
-      { error: "Enter a valid X username." },
-      { status: 400 },
-    );
-  }
-
-  const parsedBody = confirmProfileRequestSchema.safeParse(body);
+  const parsedBody = confirmProfileRequestSchema.safeParse(jsonBody.value);
 
   if (!parsedBody.success) {
     return NextResponse.json(

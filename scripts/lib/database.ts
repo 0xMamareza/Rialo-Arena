@@ -3,26 +3,25 @@ import { resolve } from "node:path";
 import { config } from "dotenv";
 import { Pool } from "pg";
 
+import { getToolingDatabaseEnvironment } from "../../src/server/config/environment";
+
 config({ path: resolve(process.cwd(), ".env.local"), quiet: true });
 
 export function requireDatabaseUrl() {
-  const databaseUrl = process.env.DATABASE_URL?.trim();
-
-  if (!databaseUrl) {
-    throw new Error(
-      "DATABASE_URL is required. Create an ignored .env.local from .env.example.",
-    );
-  }
-
-  return databaseUrl;
+  return getToolingDatabaseEnvironment().toolingDatabaseUrl;
 }
 
 export function createToolingPool() {
+  const database = getToolingDatabaseEnvironment();
+
   return new Pool({
-    connectionString: requireDatabaseUrl(),
+    connectionString: database.toolingDatabaseUrl,
     max: 1,
     connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 1_000,
     allowExitOnIdle: true,
+    ssl: database.tlsMode === "verify-full"
+      ? { rejectUnauthorized: true }
+      : false,
   });
 }

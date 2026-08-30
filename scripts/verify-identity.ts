@@ -98,7 +98,7 @@ function request(
 ) {
   const headers = new Headers();
   const method = options.method ?? "GET";
-  headers.set("x-forwarded-for", IDENTITY_VERIFIER_IP);
+  headers.set("x-real-ip", IDENTITY_VERIFIER_IP);
 
   if (method === "POST" && options.origin !== null) {
     headers.set("origin", options.origin ?? "http://localhost");

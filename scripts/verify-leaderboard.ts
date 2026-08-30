@@ -36,7 +36,7 @@ function request(
   options: { sessionToken?: string } = {},
 ) {
   const headers = new Headers();
-  headers.set("x-forwarded-for", LEADERBOARD_VERIFIER_IP);
+  headers.set("x-real-ip", LEADERBOARD_VERIFIER_IP);
 
   if (options.sessionToken) {
     headers.set("cookie", `rialo_session=${options.sessionToken}`);

@@ -6,6 +6,7 @@ import {
   PERSONAL_STATS_RATE_LIMIT,
   PROFILE_CONFIRM_RATE_LIMIT,
   QUIZ_ANSWER_RATE_LIMIT,
+  QUIZ_STATE_RATE_LIMIT,
   QUIZ_START_RATE_LIMIT,
 } from "../../src/server/rate-limit/limiter";
 
@@ -32,6 +33,10 @@ export async function cleanupVerifierRateLimits(
       {
         scope: QUIZ_ANSWER_RATE_LIMIT.scope,
         keyHash: hashRateLimitKey(QUIZ_ANSWER_RATE_LIMIT, userId),
+      },
+      {
+        scope: QUIZ_STATE_RATE_LIMIT.scope,
+        keyHash: hashRateLimitKey(QUIZ_STATE_RATE_LIMIT, userId),
       },
       {
         scope: PERSONAL_STATS_RATE_LIMIT.scope,

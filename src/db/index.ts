@@ -3,13 +3,11 @@ import "server-only";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
+import { getDatabaseEnvironment } from "@/server/config/environment";
+
 import * as schema from "./schema";
 
-const databaseUrl = process.env.DATABASE_URL?.trim();
-
-if (!databaseUrl) {
-  throw new Error("DATABASE_URL is required for PostgreSQL access");
-}
+const database = getDatabaseEnvironment();
 
 const globalForDatabase = globalThis as typeof globalThis & {
   rialoArenaPool?: Pool;
@@ -17,11 +15,16 @@ const globalForDatabase = globalThis as typeof globalThis & {
 
 function createPool() {
   return new Pool({
-    connectionString: databaseUrl,
-    max: process.env.NODE_ENV === "production" ? 10 : 5,
+    connectionString: database.databaseUrl,
+    max: process.env.NODE_ENV === "production"
+      ? database.connectionMode === "pooled" ? 5 : 10
+      : 5,
     connectionTimeoutMillis: 5_000,
     idleTimeoutMillis: 30_000,
     allowExitOnIdle: process.env.NODE_ENV !== "production",
+    ssl: database.tlsMode === "verify-full"
+      ? { rejectUnauthorized: true }
+      : false,
   });
 }
 

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { createHash, randomUUID } from "node:crypto";
+import { createHash, createHmac, randomUUID } from "node:crypto";
 
 import { NextRequest } from "next/server";
 import type { Pool } from "pg";
@@ -31,7 +31,7 @@ function request(
     headers.set("cookie", `rialo_session=${options.sessionToken}`);
   }
   if (options.clientIp) {
-    headers.set("x-forwarded-for", options.clientIp);
+    headers.set("x-real-ip", options.clientIp);
   }
   if (options.body !== undefined) {
     headers.set("content-type", "application/json");
@@ -144,10 +144,14 @@ async function main() {
       "../src/server/maintenance/run-maintenance"
     );
     const limiter = await import("../src/server/rate-limit/limiter");
+    const clientIp = await import("../src/server/rate-limit/client-ip");
     const profileRoute = await import("../src/app/api/profile/confirm/route");
     const startRoute = await import("../src/app/api/quiz/start/route");
     const answerRoute = await import(
       "../src/app/api/quiz/attempt/[attemptId]/answer/route"
+    );
+    const attemptRoute = await import(
+      "../src/app/api/quiz/attempt/[attemptId]/route"
     );
     const leaderboardRoute = await import(
       "../src/app/api/leaderboard/route"
@@ -156,6 +160,19 @@ async function main() {
     const suffix = randomUUID().replaceAll("-", "").slice(0, 8);
     const ipA = `2001:db8:${suffix.slice(0, 4)}:${suffix.slice(4)}::1`;
     const ipB = `2001:db8:${suffix.slice(0, 4)}:${suffix.slice(4)}::2`;
+
+    const spoofedRequest = new NextRequest("http://localhost/api/leaderboard", {
+      headers: { "x-forwarded-for": ipA },
+    });
+    assert.equal(
+      clientIp.getClientIpRateLimitKey(spoofedRequest),
+      clientIp.UNAVAILABLE_CLIENT_IP,
+    );
+    const trustedProxyRequest = new NextRequest(
+      "http://localhost/api/leaderboard",
+      { headers: { "x-forwarded-for": ipA, "x-real-ip": ipB } },
+    );
+    assert.equal(clientIp.getClientIpRateLimitKey(trustedProxyRequest), ipB);
 
     const rememberBucket = (policy: RateLimitPolicy, rawKey: string) => {
       const key = {
@@ -179,6 +196,11 @@ async function main() {
     assert.deepEqual(limiter.QUIZ_ANSWER_RATE_LIMIT, {
       scope: "quiz-answer:user",
       limit: 60,
+      windowSeconds: 60,
+    });
+    assert.deepEqual(limiter.QUIZ_STATE_RATE_LIMIT, {
+      scope: "quiz-state:user",
+      limit: 120,
       windowSeconds: 60,
     });
     assert.deepEqual(limiter.LEADERBOARD_RATE_LIMIT, {
@@ -370,6 +392,70 @@ async function main() {
     assert.match(storedIpBucket.rows[0]?.keyHash ?? "", /^[0-9a-f]{64}$/);
     assert.notEqual(storedIpBucket.rows[0]?.keyHash, ipA);
 
+    const hmacSecretA = "a".repeat(32);
+    const hmacSecretB = "b".repeat(32);
+    const hmacKeyA = limiter.createRateLimitKeyHash(
+      limiter.PROFILE_CONFIRM_RATE_LIMIT,
+      ipA,
+      hmacSecretA,
+    );
+    assert.equal(
+      hmacKeyA,
+      createHmac("sha256", hmacSecretA)
+        .update(
+          `rialo-arena-rate-limit:v1:${limiter.PROFILE_CONFIRM_RATE_LIMIT.scope}:${ipA}`,
+        )
+        .digest("hex"),
+    );
+    assert.notEqual(
+      hmacKeyA,
+      limiter.createRateLimitKeyHash(
+        limiter.PROFILE_CONFIRM_RATE_LIMIT,
+        ipA,
+        hmacSecretB,
+      ),
+    );
+
+    rememberBucket(limiter.QUIZ_STATE_RATE_LIMIT, owner.user.id);
+    rememberBucket(limiter.QUIZ_STATE_RATE_LIMIT, otherUser.user.id);
+    const missingAttemptId = randomUUID();
+    const attemptContext = {
+      params: Promise.resolve({ attemptId: missingAttemptId }),
+    };
+    const attemptStateResponses = await Promise.all(
+      Array.from({ length: 120 }, () =>
+        attemptRoute.GET(
+          request(`/api/quiz/attempt/${missingAttemptId}`, {
+            sessionToken: owner.rawSessionToken,
+          }),
+          attemptContext,
+        ),
+      ),
+    );
+    assert.ok(
+      attemptStateResponses.every((response) => response.status === 404),
+    );
+    await assertRateLimited(
+      await attemptRoute.GET(
+        request(`/api/quiz/attempt/${missingAttemptId}`, {
+          sessionToken: owner.rawSessionToken,
+        }),
+        attemptContext,
+      ),
+      "standard",
+    );
+    assert.equal(
+      (
+        await attemptRoute.GET(
+          request(`/api/quiz/attempt/${missingAttemptId}`, {
+            sessionToken: otherUser.rawSessionToken,
+          }),
+          attemptContext,
+        )
+      ).status,
+      404,
+    );
+
     const concurrencyPolicy = {
       scope: `verify-concurrency:${suffix}`,
       limit: 5,
@@ -531,7 +617,9 @@ async function main() {
 
     console.log("Verified every configured endpoint limit and Retry-After response.");
     console.log("Verified atomic concurrency, key isolation, and expired-window reuse.");
-    console.log("Verified persisted client IP keys are SHA-256 hashes only.");
+    console.log("Verified trusted proxy extraction ignores spoofed forwarding chains.");
+    console.log("Verified persisted client IP keys are secret-keyed HMACs only.");
+    console.log("Verified authenticated attempt-state GET throttling.");
     console.log("Verified maintenance expires transient state and settles quiz timeouts.");
     console.log("Verified maintenance reruns preserve completed attempt history.");
   } finally {

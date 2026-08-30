@@ -19,6 +19,7 @@ import {
 export type QuizApiErrorCode =
   | "UNAUTHORIZED"
   | "INVALID_REQUEST"
+  | "REQUEST_TOO_LARGE"
   | "ATTEMPT_NOT_FOUND"
   | "ATTEMPT_COMPLETED"
   | "STALE_QUESTION"
@@ -50,6 +51,14 @@ function errorResponse(
 
 export function invalidQuizRequest(message = "Request body is invalid.") {
   return errorResponse("INVALID_REQUEST", message, 400);
+}
+
+export function quizRequestTooLarge() {
+  return errorResponse(
+    "REQUEST_TOO_LARGE",
+    "Request body is too large.",
+    413,
+  );
 }
 
 export function quizStateTag(state: PlayerQuizState) {
