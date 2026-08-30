@@ -62,7 +62,11 @@
 .profile,
 .entry > a,
 .errorState > a,
-.resultActions > a {
+.resultActions > a,
+.currentRunLabel,
+.personalBestHeading,
+.personalBestGrid span,
+.personalBestStatus {
   font-family: "Arial Narrow", Arial, sans-serif;
   font-size: 0.64rem;
   font-weight: 700;
@@ -387,19 +391,29 @@
   cursor: pointer;
 }
 
-.results { justify-items: center; text-align: center; }
+.results {
+  justify-items: center;
+  padding-block: clamp(2rem, 5vh, 4rem);
+  text-align: center;
+}
 .results h1 { font-size: clamp(3.5rem, 7vw, 6.5rem); }
+
+.currentRunLabel {
+  margin-top: 1.35rem;
+  color: rgb(232 227 213 / 42%);
+  font-size: 0.56rem;
+}
 
 .finalScore {
   display: flex;
   align-items: baseline;
-  margin-top: clamp(1.5rem, 4vh, 3rem);
+  margin-top: 0.6rem;
   color: #a9ddd3;
 }
 
 .finalScore strong {
   font-family: var(--font-arena-pressure), "Arial Narrow", Arial, sans-serif;
-  font-size: clamp(5rem, 13vw, 11rem);
+  font-size: clamp(5rem, 10vw, 8rem);
   font-stretch: 78%;
   font-weight: 520;
   letter-spacing: -0.075em;
@@ -414,16 +428,16 @@
   letter-spacing: 0.12em;
 }
 
-.results dl {
+.runBreakdown {
   display: grid;
   grid-template-columns: repeat(3, minmax(8rem, 1fr));
   width: min(100%, 42rem);
-  margin: clamp(2rem, 5vh, 4rem) 0 0;
+  margin: clamp(1.25rem, 2.5vh, 2rem) 0 0;
   border-block: 1px solid rgb(232 227 213 / 16%);
 }
 
-.results dl > div { display: grid; gap: 0.5rem; padding: 1.25rem; }
-.results dl > div + div { border-left: 1px solid rgb(232 227 213 / 16%); }
+.runBreakdown > div { display: grid; gap: 0.5rem; padding: 1rem 1.25rem; }
+.runBreakdown > div + div { border-left: 1px solid rgb(232 227 213 / 16%); }
 
 .results dt {
   color: rgb(232 227 213 / 42%);
@@ -435,8 +449,89 @@
 }
 
 .results dd { margin: 0; font-size: 1.35rem; }
+.personalBest {
+  width: min(100%, 48rem);
+  margin-top: 1.25rem;
+  border: 1px solid rgb(232 227 213 / 14%);
+  background: rgb(1 1 1 / 45%);
+  text-align: left;
+  backdrop-filter: blur(8px);
+}
+
+.personalBestHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 2.4rem;
+  padding: 0.55rem 0.85rem;
+  border-bottom: 1px solid rgb(232 227 213 / 12%);
+  color: #a9ddd3;
+  font-size: 0.55rem;
+}
+
+.personalBestHeading span:last-child {
+  color: rgb(232 227 213 / 32%);
+}
+
+.personalBestGrid {
+  display: grid;
+  grid-template-columns: 1.45fr repeat(3, 1fr);
+}
+
+.personalBestGrid > div {
+  display: grid;
+  align-content: center;
+  min-width: 0;
+  min-height: 4.75rem;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.personalBestGrid > div + div {
+  border-left: 1px solid rgb(232 227 213 / 12%);
+}
+
+.personalBestGrid span {
+  color: rgb(232 227 213 / 40%);
+  font-size: 0.5rem;
+}
+
+.personalBestGrid strong {
+  overflow: hidden;
+  color: #e8e3d5;
+  font-size: 0.95rem;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.personalBestScore strong {
+  color: #a9ddd3;
+  font-family: var(--font-arena-pressure), "Arial Narrow", Arial, sans-serif;
+  font-size: 1.45rem;
+  font-stretch: 78%;
+  letter-spacing: -0.035em;
+}
+
+.personalBestScore small {
+  color: rgb(232 227 213 / 38%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.52rem;
+  letter-spacing: 0.08em;
+}
+
+.personalBestStatus {
+  min-height: 4.75rem;
+  margin: 0;
+  padding: 1rem;
+  color: rgb(232 227 213 / 52%);
+  font-size: 0.56rem;
+  line-height: 1.6;
+}
+
 .resultActions { display: grid; width: min(100%, 25rem); justify-items: stretch; }
-.resultActions button { width: 100%; }
+.resultActions button { width: 100%; margin-top: 1.25rem; }
 .resultActions > a { justify-self: center; }
 
 .quizPage a:focus-visible,
@@ -466,12 +561,18 @@
   .choices button { min-height: 4.5rem; padding: 0.75rem 0.9rem; }
   .runStatus { align-items: flex-start; flex-direction: column; min-height: 3.5rem; gap: 0.35rem; }
   .runStatus button { margin-left: 0; }
-  .finalScore { margin-top: 2rem; }
+  .currentRunLabel { margin-top: 1rem; }
+  .finalScore { margin-top: 0.5rem; }
   .finalScore strong { font-size: clamp(4.5rem, 25vw, 7rem); }
-  .results dl { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .results dl > div { padding: 1rem 0.55rem; }
+  .runBreakdown { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .runBreakdown > div { padding: 1rem 0.55rem; }
   .results dt { font-size: 0.52rem; }
   .results dd { font-size: 1.1rem; }
+  .personalBestGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .personalBestGrid > div:nth-child(3) { border-left: 0; }
+  .personalBestGrid > div:nth-child(n + 3) {
+    border-top: 1px solid rgb(232 227 213 / 12%);
+  }
 }
 
 @media (max-width: 430px) {

@@ -11,6 +11,7 @@ import {
   type CSSProperties,
 } from "react";
 
+import type { PersonalBestStats } from "@/lib/leaderboard/api-types";
 import type {
   QuizApiChoiceIndex,
   QuizApiErrorBody,
@@ -23,6 +24,11 @@ const DISPLAY_QUESTION_WINDOW_MS = 20_000;
 const MAXIMUM_SCORE = 3_000;
 
 type QuizScreen = "ready" | "loading" | "playing" | "completed" | "error";
+
+type PersonalStatsLoadState =
+  | { status: "idle" }
+  | { status: "ready"; attemptId: string; stats: PersonalBestStats }
+  | { status: "error"; attemptId: string };
 
 type QuizPlayerProps = {
   className: string;
@@ -136,6 +142,49 @@ function formatQuestionPosition(position: number, count: number) {
   return `${String(position).padStart(2, "0")} / ${String(count).padStart(2, "0")}`;
 }
 
+const ARENA_TIERS = new Set([
+  "Explorer",
+  "Builder",
+  "Operator",
+  "Architect",
+  "Vanguard",
+  "Apex",
+]);
+
+function isPersonalBestStats(value: unknown): value is PersonalBestStats {
+  if (!value || typeof value !== "object") return false;
+  const stats = value as Record<string, unknown>;
+  const best = stats.personalBest;
+  const bestRecord = best as Record<string, unknown> | null;
+  const bestIsValid =
+    best === null ||
+    (best !== null &&
+      typeof best === "object" &&
+      typeof bestRecord?.score === "number" &&
+      Number.isInteger(bestRecord.score) &&
+      bestRecord.score >= 0 &&
+      bestRecord.score <= MAXIMUM_SCORE &&
+      typeof bestRecord.correctCount === "number" &&
+      Number.isInteger(bestRecord.correctCount) &&
+      typeof bestRecord.timeoutCount === "number" &&
+      Number.isInteger(bestRecord.timeoutCount));
+  const tierIsValid =
+    stats.tier === null ||
+    (typeof stats.tier === "string" && ARENA_TIERS.has(stats.tier));
+
+  return (
+    bestIsValid &&
+    typeof stats.completedAttemptsCount === "number" &&
+    Number.isInteger(stats.completedAttemptsCount) &&
+    stats.completedAttemptsCount >= 0 &&
+    (stats.globalRank === null ||
+      (typeof stats.globalRank === "number" &&
+        Number.isInteger(stats.globalRank) &&
+        stats.globalRank > 0)) &&
+    tierIsValid
+  );
+}
+
 export function QuizPlayer({
   className,
   initialAttemptId,
@@ -148,12 +197,13 @@ export function QuizPlayer({
   const [notice, setNotice] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [requestPending, setRequestPending] = useState(false);
+  const [personalStatsState, setPersonalStatsState] =
+    useState<PersonalStatsLoadState>({ status: "idle" });
   const etagRef = useRef<string | null>(null);
   const attemptIdRef = useRef<string | null>(initialAttemptId);
   const clockRef = useRef<SyncedClock | null>(null);
   const pendingRef = useRef(false);
   const timeoutSyncTagRef = useRef<string | null>(null);
-  const recoveryCheckedRef = useRef(false);
 
   const routeToIdentity = useCallback(() => {
     const identityDestination = attemptIdRef.current
@@ -253,9 +303,8 @@ export function QuizPlayer({
   }, [applyAuthoritativeState, router]);
 
   useEffect(() => {
-    if (initialAttemptId || recoveryCheckedRef.current) return;
+    if (initialAttemptId) return;
 
-    recoveryCheckedRef.current = true;
     let cancelled = false;
     const recoveryTask = window.setTimeout(() => {
       void discoverLiveAttempt().catch((error: unknown) => {
@@ -309,6 +358,47 @@ export function QuizPlayer({
     quizState?.attemptId,
     router,
   ]);
+
+  const completedAttemptId =
+    quizState?.status === "completed" ? quizState.attemptId : null;
+
+  useEffect(() => {
+    if (!completedAttemptId) return;
+
+    const attemptId = completedAttemptId;
+    const controller = new AbortController();
+
+    async function loadPersonalStats() {
+      try {
+        const response = await fetch("/api/stats/me", {
+          method: "GET",
+          cache: "no-store",
+          credentials: "same-origin",
+          signal: controller.signal,
+        });
+        const body: unknown = await response.json().catch(() => null);
+
+        if (!response.ok || !isPersonalBestStats(body)) {
+          throw new Error("Personal stats are unavailable.");
+        }
+
+        setPersonalStatsState({
+          status: "ready",
+          attemptId,
+          stats: body,
+        });
+      } catch {
+        if (controller.signal.aborted) return;
+        setPersonalStatsState({
+          status: "error",
+          attemptId,
+        });
+      }
+    }
+
+    void loadPersonalStats();
+    return () => controller.abort();
+  }, [completedAttemptId]);
 
   const startAttempt = async () => {
     if (pendingRef.current) return;
@@ -500,6 +590,11 @@ export function QuizPlayer({
   const timerStyle = {
     "--timer-progress": `${timerProgress * 360}deg`,
   } as CSSProperties;
+  const displayedPersonalStatsState =
+    personalStatsState.status !== "idle" &&
+    personalStatsState.attemptId === completedAttemptId
+      ? personalStatsState
+      : ({ status: "loading" } as const);
 
   return (
     <main className={`${styles.quizPage} ${className}`}>
@@ -649,20 +744,85 @@ export function QuizPlayer({
         <section className={styles.results} aria-labelledby="results-title">
           <span className={styles.eyebrow}>Attempt completed</span>
           <h1 id="results-title">Run recorded.</h1>
+          <span className={styles.currentRunLabel}>Current run</span>
           <div className={styles.finalScore}>
             <strong>{quizState.totalScore.toLocaleString("en-US")}</strong>
             <span>/ {MAXIMUM_SCORE.toLocaleString("en-US")}</span>
           </div>
-          <dl>
+          <dl className={styles.runBreakdown}>
             <div><dt>Correct</dt><dd>{quizState.correctCount}</dd></div>
             <div><dt>Timed out</dt><dd>{quizState.timeoutCount}</dd></div>
             <div><dt>Completed</dt><dd>15 / 15</dd></div>
           </dl>
+          <section
+            className={styles.personalBest}
+            aria-labelledby="personal-best-title"
+            aria-live="polite"
+          >
+            <div className={styles.personalBestHeading}>
+              <span id="personal-best-title">All-time Personal Best</span>
+              <span>Server ranked</span>
+            </div>
+
+            {displayedPersonalStatsState.status === "loading" ? (
+              <p className={styles.personalBestStatus}>Loading your record...</p>
+            ) : null}
+
+            {displayedPersonalStatsState.status === "error" ? (
+              <p className={styles.personalBestStatus} role="status">
+                Personal Best is temporarily unavailable. Your run is still
+                recorded.
+              </p>
+            ) : null}
+
+            {displayedPersonalStatsState.status === "ready" &&
+            displayedPersonalStatsState.stats.personalBest ? (
+              <div className={styles.personalBestGrid}>
+                <div className={styles.personalBestScore}>
+                  <span>Best score</span>
+                  <strong>
+                    {displayedPersonalStatsState.stats.personalBest.score.toLocaleString(
+                      "en-US",
+                    )}
+                    <small> / 3,000</small>
+                  </strong>
+                </div>
+                <div>
+                  <span>Arena tier</span>
+                  <strong>
+                    {displayedPersonalStatsState.stats.tier ?? "Unranked"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Global rank</span>
+                  <strong>
+                    {displayedPersonalStatsState.stats.globalRank
+                      ? `#${displayedPersonalStatsState.stats.globalRank}`
+                      : "Unranked"}
+                  </strong>
+                </div>
+                <div>
+                  <span>Completed runs</span>
+                  <strong>
+                    {displayedPersonalStatsState.stats.completedAttemptsCount}
+                  </strong>
+                </div>
+              </div>
+            ) : null}
+
+            {displayedPersonalStatsState.status === "ready" &&
+            !displayedPersonalStatsState.stats.personalBest ? (
+              <p className={styles.personalBestStatus}>
+                No completed Personal Best is available yet.
+              </p>
+            ) : null}
+          </section>
           <div className={styles.resultActions}>
             <button type="button" onClick={startAttempt} disabled={requestPending}>
               {requestPending ? "Preparing attempt" : "Play again"}
               <span aria-hidden="true">→</span>
             </button>
+            <Link href="/leaderboard">View Leaderboard</Link>
             <Link href="/">Return to Arena</Link>
           </div>
         </section>

@@ -40,6 +40,7 @@
 }
 
 .externalNav,
+.productNav,
 .eyebrow,
 .fact dt,
 .footer {
@@ -53,6 +54,7 @@
 }
 
 .externalNav,
+.productNav,
 .footer {
   color: rgb(232 227 213 / 54%);
 }
@@ -76,6 +78,29 @@
 }
 
 .externalNav a:focus-visible {
+  outline: 1px solid #a9ddd3;
+  outline-offset: 0.25rem;
+}
+
+.productNav {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 1.6vw, 1.5rem);
+}
+
+.productNav a {
+  padding-block: 0.45rem;
+  color: inherit;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.productNav a:hover,
+.productNav a:focus-visible {
+  color: #a9ddd3;
+}
+
+.productNav a:focus-visible {
   outline: 1px solid #a9ddd3;
   outline-offset: 0.25rem;
 }
@@ -264,7 +289,15 @@
   }
 
   .footer {
+    align-items: flex-start;
+    gap: 0.75rem;
     font-size: 0.58rem;
+    flex-direction: column;
+  }
+
+  .productNav {
+    width: 100%;
+    justify-content: space-between;
   }
 }
 

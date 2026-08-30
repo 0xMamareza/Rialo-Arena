@@ -195,7 +195,7 @@ async function main() {
     const identity = await import("../src/server/identity/session");
     const startRoute = await import("../src/app/api/quiz/start/route");
     const attemptRoute = await import(
-      "../src/app/api/quiz/attempt/[attemptId]/(state)/route"
+      "../src/app/api/quiz/attempt/[attemptId]/route"
     );
     const answerRoute = await import("../src/app/api/quiz/attempt/[attemptId]/answer/route");
 

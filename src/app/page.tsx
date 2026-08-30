@@ -1,5 +1,6 @@
 import Image from "next/image";
 import localFont from "next/font/local";
+import Link from "next/link";
 
 import { ArenaIntro } from "./_components/arena-intro";
 import { ProfilePanel } from "./_components/profile-panel";
@@ -111,6 +112,11 @@ export default async function Home({
 
         <footer className={styles.footer}>
           <span>Built for the Rialo community</span>
+          <nav className={styles.productNav} aria-label="Arena navigation">
+            <Link href="/quiz">Quiz</Link>
+            <Link href="/learn">Learn</Link>
+            <Link href="/leaderboard">Leaderboard</Link>
+          </nav>
         </footer>
       </main>
     </ArenaIntro>
