@@ -26,13 +26,36 @@ export type QuizApiActiveState = QuizApiTotals & {
   };
 };
 
+export type QuizApiReviewState = QuizApiTotals & {
+  status: "review";
+  position: number;
+  currentQuestion: {
+    position: number;
+    questionText: string;
+    options: Array<{
+      index: QuizApiChoiceIndex;
+      label: QuizApiChoiceLabel;
+      text: string;
+    }>;
+  };
+  review: {
+    selectedChoiceIndex: QuizApiChoiceIndex;
+    correctChoiceIndex: QuizApiChoiceIndex;
+    wasCorrect: boolean;
+    reviewEndsAt: string;
+  };
+};
+
 export type QuizApiCompletedState = QuizApiTotals & {
   status: "completed";
   incorrectCount: number;
   completedAt: string;
 };
 
-export type QuizApiPlayerState = QuizApiActiveState | QuizApiCompletedState;
+export type QuizApiPlayerState =
+  | QuizApiActiveState
+  | QuizApiReviewState
+  | QuizApiCompletedState;
 
 export type QuizApiErrorBody = {
   error: {

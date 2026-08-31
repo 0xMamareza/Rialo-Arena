@@ -117,6 +117,14 @@ export default async function Home({
             <Link href="/learn">Learn</Link>
             <Link href="/leaderboard">Leaderboard</Link>
           </nav>
+          <a
+            className={styles.avatarAttribution}
+            href="https://unavatar.io"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Avatars provided by Unavatar
+          </a>
         </footer>
       </main>
     </ArenaIntro>

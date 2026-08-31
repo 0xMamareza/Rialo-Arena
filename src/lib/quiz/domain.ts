@@ -16,6 +16,7 @@ export const ATTEMPT_QUESTION_STATUSES = [
 ] as const;
 
 export const QUIZ_QUESTION_COUNT = 15;
+export const ANSWER_REVIEW_DURATION_MS = 3_000;
 export const MAX_QUESTION_POINTS = 200;
 export const MAX_QUIZ_SCORE = QUIZ_QUESTION_COUNT * MAX_QUESTION_POINTS;
 

@@ -13,6 +13,7 @@ import {
 
 import { RIALO_AVATAR_FALLBACK_PATH } from "@/lib/identity/username";
 import type { PersonalBestStats } from "@/lib/leaderboard/api-types";
+import { ANSWER_REVIEW_DURATION_MS } from "@/lib/quiz/domain";
 import type {
   QuizApiChoiceIndex,
   QuizApiErrorBody,
@@ -80,7 +81,10 @@ function isQuizApiState(value: unknown): value is QuizApiPlayerState {
     );
   }
 
-  if (candidate.status !== "active" || typeof candidate.position !== "number") {
+  if (
+    (candidate.status !== "active" && candidate.status !== "review") ||
+    typeof candidate.position !== "number"
+  ) {
     return false;
   }
 
@@ -88,11 +92,9 @@ function isQuizApiState(value: unknown): value is QuizApiPlayerState {
   if (!question || typeof question !== "object") return false;
   const current = question as Record<string, unknown>;
 
-  return (
+  const questionIsValid =
     typeof current.position === "number" &&
     typeof current.questionText === "string" &&
-    typeof current.activatedAt === "string" &&
-    typeof current.deadlineAt === "string" &&
     Array.isArray(current.options) &&
     current.options.length === 4 &&
     current.options.every((option, index) => {
@@ -103,7 +105,30 @@ function isQuizApiState(value: unknown): value is QuizApiPlayerState {
         choice.label === ["A", "B", "C", "D"][index] &&
         typeof choice.text === "string"
       );
-    })
+    });
+
+  if (!questionIsValid) return false;
+
+  if (candidate.status === "active") {
+    return (
+      typeof current.activatedAt === "string" &&
+      typeof current.deadlineAt === "string"
+    );
+  }
+
+  const review = candidate.review;
+  if (!review || typeof review !== "object") return false;
+  const result = review as Record<string, unknown>;
+
+  return (
+    Number.isInteger(result.selectedChoiceIndex) &&
+    Number(result.selectedChoiceIndex) >= 0 &&
+    Number(result.selectedChoiceIndex) <= 3 &&
+    Number.isInteger(result.correctChoiceIndex) &&
+    Number(result.correctChoiceIndex) >= 0 &&
+    Number(result.correctChoiceIndex) <= 3 &&
+    typeof result.wasCorrect === "boolean" &&
+    typeof result.reviewEndsAt === "string"
   );
 }
 
@@ -221,9 +246,13 @@ export function QuizPlayer({
       setQuizState(state);
       setErrorMessage(null);
 
-      if (state.status === "active") {
+      if (state.status === "active" || state.status === "review") {
         const serverNowMs = Date.parse(state.serverNow);
-        const deadlineMs = Date.parse(state.currentQuestion.deadlineAt);
+        const deadlineMs = Date.parse(
+          state.status === "active"
+            ? state.currentQuestion.deadlineAt
+            : state.review.reviewEndsAt,
+        );
         clockRef.current = {
           serverNowMs,
           deadlineMs,
@@ -241,7 +270,10 @@ export function QuizPlayer({
   );
 
   const fetchAttempt = useCallback(
-    async (attemptId: string, reason: "restore" | "resync" | "timeout") => {
+    async (
+      attemptId: string,
+      reason: "restore" | "resync" | "timeout" | "review",
+    ) => {
       const response = await fetch(
         `/api/quiz/attempt/${encodeURIComponent(attemptId)}`,
         {
@@ -255,6 +287,8 @@ export function QuizPlayer({
 
       if (reason === "timeout") {
         setNotice("Time expired. The server advanced the attempt.");
+      } else if (reason === "review") {
+        setNotice(null);
       } else if (reason === "resync") {
         setNotice("Attempt synchronized with the server.");
       }
@@ -432,7 +466,7 @@ export function QuizPlayer({
   };
 
   const resyncCurrentAttempt = useCallback(
-    async (reason: "resync" | "timeout") => {
+    async (reason: "resync" | "timeout" | "review") => {
       if (!quizState || pendingRef.current) return;
 
       pendingRef.current = true;
@@ -453,7 +487,12 @@ export function QuizPlayer({
   );
 
   useEffect(() => {
-    if (screen !== "playing" || quizState?.status !== "active") return;
+    if (
+      screen !== "playing" ||
+      (quizState?.status !== "active" && quizState?.status !== "review")
+    ) {
+      return;
+    }
 
     const updateCountdown = () => {
       const clock = clockRef.current;
@@ -470,7 +509,9 @@ export function QuizPlayer({
         timeoutSyncTagRef.current !== etagRef.current
       ) {
         timeoutSyncTagRef.current = etagRef.current;
-        void resyncCurrentAttempt("timeout");
+        void resyncCurrentAttempt(
+          quizState.status === "review" ? "review" : "timeout",
+        );
       }
     };
 
@@ -480,7 +521,12 @@ export function QuizPlayer({
   }, [quizState, resyncCurrentAttempt, screen]);
 
   useEffect(() => {
-    if (screen !== "playing" || quizState?.status !== "active") return;
+    if (
+      screen !== "playing" ||
+      (quizState?.status !== "active" && quizState?.status !== "review")
+    ) {
+      return;
+    }
 
     const synchronizeAfterInterruption = () => {
       if (document.visibilityState === "visible" && !pendingRef.current) {
@@ -517,7 +563,7 @@ export function QuizPlayer({
 
     try {
       const response = await fetch(
-        `/api/quiz/attempt/${encodeURIComponent(quizState.attemptId)}/answer`,
+        `/api/quiz/answer/${encodeURIComponent(quizState.attemptId)}`,
         {
           method: "POST",
           cache: "no-store",
@@ -538,7 +584,13 @@ export function QuizPlayer({
 
       const result = await parseQuizResponse(response);
       applyAuthoritativeState(result.state, result.etag);
-      setNotice(result.state.status === "active" ? "Answer recorded." : null);
+      setNotice(
+        result.state.status === "review"
+          ? result.state.review.wasCorrect
+            ? "Correct. Next question in three seconds."
+            : "Answer recorded. Correct option shown."
+          : null,
+      );
     } catch (error) {
       if (error instanceof QuizRequestError && error.status === 401) {
         routeToIdentity();
@@ -582,11 +634,18 @@ export function QuizPlayer({
     }
   };
 
-  const activeState = quizState?.status === "active" ? quizState : null;
+  const questionState =
+    quizState?.status === "active" || quizState?.status === "review"
+      ? quizState
+      : null;
+  const isReview = questionState?.status === "review";
   const secondsRemaining = Math.max(0, Math.ceil(remainingMs / 1_000));
+  const displayedWindowMs = isReview
+    ? ANSWER_REVIEW_DURATION_MS
+    : DISPLAY_QUESTION_WINDOW_MS;
   const timerProgress = Math.max(
     0,
-    Math.min(1, remainingMs / DISPLAY_QUESTION_WINDOW_MS),
+    Math.min(1, remainingMs / displayedWindowMs),
   );
   const timerStyle = {
     "--timer-progress": `${timerProgress * 360}deg`,
@@ -673,27 +732,27 @@ export function QuizPlayer({
         </section>
       ) : null}
 
-      {screen === "playing" && activeState ? (
+      {screen === "playing" && questionState ? (
         <section className={styles.play} aria-labelledby="current-question">
           <div className={styles.runMeta}>
             <div>
               <span>Question</span>
-              <strong>{formatQuestionPosition(activeState.position, activeState.questionCount)}</strong>
+              <strong>{formatQuestionPosition(questionState.position, questionState.questionCount)}</strong>
             </div>
             <div>
               <span>Current score</span>
-              <strong>{activeState.totalScore.toLocaleString("en-US")}</strong>
+              <strong>{questionState.totalScore.toLocaleString("en-US")}</strong>
             </div>
           </div>
 
-          <div className={styles.progress} aria-label={`${activeState.position} of ${activeState.questionCount} questions`}>
-            {Array.from({ length: activeState.questionCount }, (_, index) => (
+          <div className={styles.progress} aria-label={`${questionState.position} of ${questionState.questionCount} questions`}>
+            {Array.from({ length: questionState.questionCount }, (_, index) => (
               <span
                 key={index}
                 data-state={
-                  index + 1 < activeState.position
+                  index + 1 < questionState.position
                     ? "complete"
-                    : index + 1 === activeState.position
+                    : index + 1 === questionState.position
                       ? "current"
                       : "upcoming"
                 }
@@ -703,37 +762,70 @@ export function QuizPlayer({
 
           <div className={styles.questionLayout}>
             <div className={styles.questionCopy}>
-              <span className={styles.eyebrow}>Choose one answer</span>
-              <h1 id="current-question">{activeState.currentQuestion.questionText}</h1>
+              <span className={styles.eyebrow}>
+                {isReview
+                  ? questionState.review.wasCorrect
+                    ? "Correct answer"
+                    : "Answer review"
+                  : "Choose one answer"}
+              </span>
+              <h1 id="current-question">{questionState.currentQuestion.questionText}</h1>
             </div>
 
-            <div className={styles.timer} style={timerStyle} data-low={secondsRemaining <= 5 || undefined}>
+            <div
+              className={styles.timer}
+              style={timerStyle}
+              data-low={!isReview && secondsRemaining <= 5 || undefined}
+              data-review={isReview || undefined}
+            >
               <div>
                 <time>{String(secondsRemaining).padStart(2, "0")}</time>
-                <span>seconds</span>
+                <span>{isReview ? "review" : "seconds"}</span>
               </div>
             </div>
           </div>
 
           <div className={styles.choices} aria-busy={requestPending}>
-            {activeState.currentQuestion.options.map((option) => (
+            {questionState.currentQuestion.options.map((option) => {
+              const result = isReview
+                ? option.index === questionState.review.correctChoiceIndex
+                  ? "correct"
+                  : option.index === questionState.review.selectedChoiceIndex
+                    ? "wrong"
+                    : "subdued"
+                : undefined;
+
+              return (
               <button
                 type="button"
                 key={option.index}
+                data-result={result}
                 disabled={
-                  requestPending || remainingMs <= 0 || Boolean(errorMessage)
+                  isReview ||
+                  requestPending ||
+                  remainingMs <= 0 ||
+                  Boolean(errorMessage)
                 }
                 onClick={() => void submitChoice(option.index)}
               >
                 <span>{option.label}</span>
                 <strong>{option.text}</strong>
-                <i aria-hidden="true">↗</i>
+                <i aria-hidden="true">
+                  {result === "correct" ? "✓" : result === "wrong" ? "×" : "↗"}
+                </i>
               </button>
-            ))}
+              );
+            })}
           </div>
 
           <div className={styles.runStatus} aria-live="polite">
-            <span>{requestPending ? "Server check in progress" : "Server time is authoritative"}</span>
+            <span>
+              {requestPending
+                ? "Server check in progress"
+                : isReview
+                  ? "Authoritative answer review"
+                  : "Server time is authoritative"}
+            </span>
             {notice ? <p>{notice}</p> : null}
             {errorMessage ? (
               <button type="button" onClick={retrySynchronization} disabled={requestPending}>

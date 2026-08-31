@@ -128,7 +128,7 @@ async function main() {
 
   const profileRoute = await import("../src/app/api/profile/confirm/route");
   const answerRoute = await import(
-    "../src/app/api/quiz/attempt/[attemptId]/answer/route"
+    "../src/app/api/quiz/answer/[attemptId]/route"
   );
   const oversizedBody = JSON.stringify({ value: "x".repeat(3_000) });
   const oversizedHeaders = {
@@ -146,7 +146,7 @@ async function main() {
   assert.equal(oversizedProfile.status, 413);
   const oversizedAnswer = await answerRoute.POST(
     new NextRequest(
-      `http://localhost/api/quiz/attempt/${randomUUID()}/answer`,
+      `http://localhost/api/quiz/answer/${randomUUID()}`,
       {
         method: "POST",
         headers: oversizedHeaders,

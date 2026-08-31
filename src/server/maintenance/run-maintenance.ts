@@ -3,6 +3,7 @@ import "server-only";
 import { sql } from "drizzle-orm";
 
 import { db } from "@/db";
+import { ANSWER_REVIEW_DURATION_MS } from "@/lib/quiz/domain";
 import { getQuizState } from "@/server/quiz/engine";
 
 export type MaintenanceResult = {
@@ -21,11 +22,33 @@ export async function runMaintenance(): Promise<MaintenanceResult> {
       quiz_attempts.id AS "attemptId",
       quiz_attempts.user_id AS "userId"
     FROM quiz_attempts
-    INNER JOIN attempt_questions
-      ON attempt_questions.attempt_id = quiz_attempts.id
     WHERE quiz_attempts.status = 'active'
-      AND attempt_questions.status = 'active'
-      AND attempt_questions.deadline_at <= clock_timestamp()
+      AND (
+        EXISTS (
+          SELECT 1
+          FROM attempt_questions
+          WHERE attempt_questions.attempt_id = quiz_attempts.id
+            AND attempt_questions.status = 'active'
+            AND attempt_questions.deadline_at <= clock_timestamp()
+        )
+        OR (
+          NOT EXISTS (
+            SELECT 1
+            FROM attempt_questions
+            WHERE attempt_questions.attempt_id = quiz_attempts.id
+              AND attempt_questions.status = 'active'
+          )
+          AND EXISTS (
+            SELECT 1
+            FROM attempt_questions
+            WHERE attempt_questions.attempt_id = quiz_attempts.id
+              AND attempt_questions.status = 'answered'
+              AND attempt_questions.answered_at
+                + ${ANSWER_REVIEW_DURATION_MS} * interval '1 millisecond'
+                <= clock_timestamp()
+          )
+        )
+      )
     ORDER BY quiz_attempts.created_at, quiz_attempts.id
   `);
 

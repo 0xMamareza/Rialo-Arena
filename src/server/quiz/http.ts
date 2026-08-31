@@ -62,9 +62,12 @@ export function quizRequestTooLarge() {
 }
 
 export function quizStateTag(state: PlayerQuizState) {
-  const source = state.status === "active"
-    ? state.currentQuestion.attemptQuestionId
-    : `${state.attemptId}:${state.completedAt}`;
+  const source =
+    state.status === "completed"
+      ? `${state.attemptId}:${state.completedAt}`
+      : state.status === "review"
+        ? `${state.currentQuestion.attemptQuestionId}:${state.review.reviewEndsAt}`
+        : state.currentQuestion.attemptQuestionId;
   const digest = createHash("sha256").update(source).digest("base64url");
 
   return `"${digest}"`;
@@ -82,6 +85,15 @@ export function quizStateResponse(state: PlayerQuizState) {
         options: state.currentQuestion.options,
         activatedAt: state.currentQuestion.activatedAt,
         deadlineAt: state.currentQuestion.deadlineAt,
+      },
+    };
+  } else if (state.status === "review") {
+    playerState = {
+      ...state,
+      currentQuestion: {
+        position: state.currentQuestion.position,
+        questionText: state.currentQuestion.questionText,
+        options: state.currentQuestion.options,
       },
     };
   }

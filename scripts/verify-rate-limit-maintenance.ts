@@ -148,7 +148,7 @@ async function main() {
     const profileRoute = await import("../src/app/api/profile/confirm/route");
     const startRoute = await import("../src/app/api/quiz/start/route");
     const answerRoute = await import(
-      "../src/app/api/quiz/attempt/[attemptId]/answer/route"
+      "../src/app/api/quiz/answer/[attemptId]/route"
     );
     const attemptRoute = await import(
       "../src/app/api/quiz/attempt/[attemptId]/route"
@@ -293,7 +293,7 @@ async function main() {
     const answerResponses = await Promise.all(
       Array.from({ length: 60 }, () =>
         answerRoute.POST(
-          request("/api/quiz/attempt/unused/answer", {
+          request("/api/quiz/answer/unused", {
             method: "POST",
             sessionToken: owner.rawSessionToken,
             body: { choiceIndex: 4 },
@@ -305,7 +305,7 @@ async function main() {
     assert.ok(answerResponses.every((response) => response.status === 400));
     await assertRateLimited(
       await answerRoute.POST(
-        request("/api/quiz/attempt/unused/answer", {
+        request("/api/quiz/answer/unused", {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           body: { choiceIndex: 4 },
@@ -317,7 +317,7 @@ async function main() {
     assert.equal(
       (
         await answerRoute.POST(
-          request("/api/quiz/attempt/unused/answer", {
+          request("/api/quiz/answer/unused", {
             method: "POST",
             sessionToken: otherUser.rawSessionToken,
             body: { choiceIndex: 4 },
@@ -600,6 +600,44 @@ async function main() {
       await identity.resolveSessionToken(maintenanceUser.rawSessionToken),
     );
 
+    const reviewAttempt = await engine.startQuizAttempt(
+      maintenanceUser.user.id,
+    );
+    assert.equal(reviewAttempt.status, "active");
+    if (reviewAttempt.status !== "active") {
+      assert.fail("Maintenance review attempt did not start active");
+    }
+    const reviewState = await engine.submitQuizAnswer({
+      userId: maintenanceUser.user.id,
+      attemptId: reviewAttempt.attemptId,
+      attemptQuestionId: reviewAttempt.currentQuestion.attemptQuestionId,
+      choiceIndex: 0,
+    });
+    assert.equal(reviewState.status, "review");
+    await pool.query(
+      `UPDATE attempt_questions
+       SET answered_at = clock_timestamp() - interval '3100 milliseconds'
+       WHERE attempt_id = $1 AND status = 'answered'`,
+      [reviewAttempt.attemptId],
+    );
+
+    const reviewMaintenance = await maintenance.runMaintenance();
+    assert.ok(reviewMaintenance.overdueAttemptsVisited >= 1);
+    const resumedAfterReview = await engine.getQuizState(
+      maintenanceUser.user.id,
+      reviewAttempt.attemptId,
+    );
+    assert.equal(resumedAfterReview.status, "active");
+    if (resumedAfterReview.status !== "active") {
+      assert.fail("Maintenance did not release an expired answer review");
+    }
+    assert.equal(resumedAfterReview.position, 2);
+    assert.equal(
+      new Date(resumedAfterReview.currentQuestion.deadlineAt).getTime() -
+        new Date(resumedAfterReview.currentQuestion.activatedAt).getTime(),
+      20_000,
+    );
+
     const completedBeforeRerun = await pool.query(
       `SELECT status, total_score, correct_count, timeout_count, completed_at
        FROM quiz_attempts
@@ -621,6 +659,7 @@ async function main() {
     console.log("Verified persisted client IP keys are secret-keyed HMACs only.");
     console.log("Verified authenticated attempt-state GET throttling.");
     console.log("Verified maintenance expires transient state and settles quiz timeouts.");
+    console.log("Verified maintenance releases expired answer reviews.");
     console.log("Verified maintenance reruns preserve completed attempt history.");
   } finally {
     await cleanup(

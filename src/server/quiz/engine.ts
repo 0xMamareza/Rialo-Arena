@@ -9,6 +9,7 @@ import { db } from "@/db";
 import * as databaseSchema from "@/db/schema";
 import { attemptQuestions, quizAttempts } from "@/db/schema";
 import {
+  ANSWER_REVIEW_DURATION_MS,
   ANSWER_OPTIONS,
   QUIZ_QUESTION_COUNT,
   type AnswerOption,
@@ -26,6 +27,7 @@ import {
   type DisplayChoiceIndex,
   type DisplayChoiceLabel,
   type PlayerQuizState,
+  type ReviewPlayerQuizState,
   type SubmitQuizAnswerInput,
 } from "./types";
 
@@ -70,6 +72,12 @@ type PlayerQuestionRecord = {
 
 type AnswerQuestionRecord = PlayerQuestionRecord & {
   correctOption: AnswerOption;
+};
+
+type ReviewQuestionRecord = AnswerQuestionRecord & {
+  answeredAt: Date | string | null;
+  selectedOption: AnswerOption | null;
+  isCorrect: boolean | null;
 };
 
 type PendingQuestionRecord = {
@@ -131,6 +139,10 @@ function assertOptionPermutation(
 
 function addQuestionWindow(activatedAt: Date) {
   return new Date(activatedAt.getTime() + QUESTION_TIME_LIMIT_MS);
+}
+
+function addReviewWindow(answeredAt: Date) {
+  return new Date(answeredAt.getTime() + ANSWER_REVIEW_DURATION_MS);
 }
 
 function parseDatabaseTimestamp(
@@ -308,6 +320,40 @@ async function getAnswerQuestion(
   return result.rows[0] ?? null;
 }
 
+async function getLatestAnsweredQuestion(
+  transaction: QuizTransaction,
+  attemptId: string,
+) {
+  const result = await transaction.execute<ReviewQuestionRecord>(
+    sql`
+      SELECT
+        attempt_questions.id AS "attemptQuestionId",
+        attempt_questions.position,
+        attempt_questions.option_order::text[] AS "optionOrder",
+        attempt_questions.activated_at::text AS "activatedAt",
+        attempt_questions.deadline_at::text AS "deadlineAt",
+        attempt_questions.answered_at::text AS "answeredAt",
+        attempt_questions.selected_option AS "selectedOption",
+        attempt_questions.is_correct AS "isCorrect",
+        questions.question_text AS "questionText",
+        questions.option_a AS "optionA",
+        questions.option_b AS "optionB",
+        questions.option_c AS "optionC",
+        questions.option_d AS "optionD",
+        questions.correct_option AS "correctOption"
+      FROM attempt_questions
+      INNER JOIN questions ON questions.id = attempt_questions.question_id
+      WHERE attempt_questions.attempt_id = ${attemptId}
+        AND attempt_questions.status = 'answered'
+      ORDER BY attempt_questions.position DESC
+      LIMIT 1
+      FOR UPDATE OF attempt_questions
+    `,
+  );
+
+  return result.rows[0] ?? null;
+}
+
 async function getNextPendingQuestion(
   transaction: QuizTransaction,
   attemptId: string,
@@ -478,6 +524,22 @@ async function settleExpiredQuestions(
   return attempt;
 }
 
+function buildPlayerOptions(question: PlayerQuestionRecord) {
+  assertOptionPermutation(question.optionOrder);
+  const optionText: Record<AnswerOption, string> = {
+    A: question.optionA,
+    B: question.optionB,
+    C: question.optionC,
+    D: question.optionD,
+  };
+
+  return question.optionOrder.map((canonicalOption, index) => ({
+    index: index as DisplayChoiceIndex,
+    label: DISPLAY_LABELS[index],
+    text: optionText[canonicalOption],
+  }));
+}
+
 function buildActiveState(
   attempt: AttemptRecord,
   serverNow: Date,
@@ -491,7 +553,6 @@ function buildActiveState(
     invalidState("Cannot build active state from non-active records.");
   }
 
-  assertOptionPermutation(question.optionOrder);
   const activatedAt = parseDatabaseTimestamp(
     question.activatedAt,
     "Active question activation time",
@@ -500,13 +561,6 @@ function buildActiveState(
     question.deadlineAt,
     "Active question deadline",
   );
-
-  const optionText: Record<AnswerOption, string> = {
-    A: question.optionA,
-    B: question.optionB,
-    C: question.optionC,
-    D: question.optionD,
-  };
 
   return {
     attemptId: attempt.id,
@@ -521,13 +575,67 @@ function buildActiveState(
       attemptQuestionId: question.attemptQuestionId,
       position: question.position,
       questionText: question.questionText,
-      options: question.optionOrder.map((canonicalOption, index) => ({
-        index: index as DisplayChoiceIndex,
-        label: DISPLAY_LABELS[index],
-        text: optionText[canonicalOption],
-      })),
+      options: buildPlayerOptions(question),
       activatedAt: activatedAt.toISOString(),
       deadlineAt: deadlineAt.toISOString(),
+    },
+  };
+}
+
+function buildReviewState(
+  attempt: AttemptRecord,
+  serverNow: Date,
+  question: ReviewQuestionRecord,
+): ReviewPlayerQuizState {
+  if (
+    attempt.status !== "active" ||
+    question.selectedOption === null ||
+    question.isCorrect === null
+  ) {
+    invalidState("Cannot build review state from incomplete answer records.");
+  }
+
+  assertOptionPermutation(question.optionOrder);
+  const answeredAt = parseDatabaseTimestamp(
+    question.answeredAt,
+    "Answered question receipt time",
+  );
+  const selectedChoiceIndex = question.optionOrder.indexOf(
+    question.selectedOption,
+  );
+  const correctChoiceIndex = question.optionOrder.indexOf(
+    question.correctOption,
+  );
+
+  if (
+    selectedChoiceIndex < 0 ||
+    selectedChoiceIndex > 3 ||
+    correctChoiceIndex < 0 ||
+    correctChoiceIndex > 3
+  ) {
+    invalidState("Answered choice mapping is inconsistent.");
+  }
+
+  return {
+    attemptId: attempt.id,
+    status: "review",
+    position: question.position,
+    questionCount: QUIZ_QUESTION_COUNT,
+    totalScore: attempt.totalScore,
+    correctCount: attempt.correctCount,
+    timeoutCount: attempt.timeoutCount,
+    serverNow: serverNow.toISOString(),
+    currentQuestion: {
+      attemptQuestionId: question.attemptQuestionId,
+      position: question.position,
+      questionText: question.questionText,
+      options: buildPlayerOptions(question),
+    },
+    review: {
+      selectedChoiceIndex: selectedChoiceIndex as DisplayChoiceIndex,
+      correctChoiceIndex: correctChoiceIndex as DisplayChoiceIndex,
+      wasCorrect: question.isCorrect,
+      reviewEndsAt: addReviewWindow(answeredAt).toISOString(),
     },
   };
 }
@@ -564,6 +672,76 @@ function buildCompletedState(
   };
 }
 
+async function settleReviewTransition(
+  transaction: QuizTransaction,
+  initialAttempt: AttemptRecord,
+  serverNow: Date,
+) {
+  if (initialAttempt.status !== "active") {
+    return { attempt: initialAttempt, reviewQuestion: null };
+  }
+
+  const activeQuestion = await getAnswerQuestion(transaction, initialAttempt.id);
+
+  if (activeQuestion) {
+    return { attempt: initialAttempt, reviewQuestion: null };
+  }
+
+  const reviewQuestion = await getLatestAnsweredQuestion(
+    transaction,
+    initialAttempt.id,
+  );
+
+  if (!reviewQuestion) {
+    invalidState("Active attempt has neither an active nor review question.");
+  }
+
+  const answeredAt = parseDatabaseTimestamp(
+    reviewQuestion.answeredAt,
+    "Answered question receipt time",
+  );
+  const reviewEndsAt = addReviewWindow(answeredAt);
+
+  if (serverNow.getTime() < reviewEndsAt.getTime()) {
+    return { attempt: initialAttempt, reviewQuestion };
+  }
+
+  const nextQuestion = await getNextPendingQuestion(
+    transaction,
+    initialAttempt.id,
+  );
+
+  if (!nextQuestion) {
+    const completedAttempt = await finalizeAttempt(
+      transaction,
+      initialAttempt.id,
+      reviewEndsAt,
+    );
+    return { attempt: completedAttempt, reviewQuestion: null };
+  }
+
+  const [activatedQuestion] = await transaction
+    .update(attemptQuestions)
+    .set({
+      status: "active",
+      activatedAt: reviewEndsAt,
+      deadlineAt: addQuestionWindow(reviewEndsAt),
+    })
+    .where(
+      and(
+        eq(attemptQuestions.id, nextQuestion.attemptQuestionId),
+        eq(attemptQuestions.status, "pending"),
+      ),
+    )
+    .returning({ id: attemptQuestions.id });
+
+  if (!activatedQuestion) {
+    invalidState("Next pending question could not be activated after review.");
+  }
+
+  return { attempt: initialAttempt, reviewQuestion: null };
+}
+
 async function buildSettledAttemptState(
   transaction: QuizTransaction,
   initialAttempt: AttemptRecord,
@@ -577,6 +755,21 @@ async function buildSettledAttemptState(
 
   if (attempt.status !== "active") {
     invalidState("Quiz attempt is not active or completed.");
+  }
+
+  const reviewTransition = await settleReviewTransition(
+    transaction,
+    attempt,
+    serverNow,
+  );
+  attempt = reviewTransition.attempt;
+
+  if (attempt.status === "completed") {
+    return buildCompletedState(attempt, serverNow);
+  }
+
+  if (reviewTransition.reviewQuestion) {
+    return buildReviewState(attempt, serverNow, reviewTransition.reviewQuestion);
   }
 
   attempt = await settleExpiredQuestions(transaction, attempt, serverNow);
@@ -736,7 +929,7 @@ export function submitQuizAnswer(
     validateChoiceIndex(input.choiceIndex);
 
     const result = await db.transaction(async (transaction) => {
-      let attempt = await lockOwnedAttempt(
+      const attempt = await lockOwnedAttempt(
         transaction,
         input.userId,
         input.attemptId,
@@ -754,9 +947,17 @@ export function submitQuizAnswer(
       }
 
       const serverNow = await getDatabaseTime(transaction);
-      attempt = await settleExpiredQuestions(transaction, attempt, serverNow);
+      const settledState = await buildSettledAttemptState(
+        transaction,
+        attempt,
+        serverNow,
+      );
 
-      if (attempt.status === "completed") {
+      if (
+        settledState.status !== "active" ||
+        settledState.currentQuestion.attemptQuestionId !==
+          input.attemptQuestionId
+      ) {
         return {
           error: new QuizEngineError(
             "STALE_QUESTION",
@@ -824,32 +1025,6 @@ export function submitQuizAnswer(
         } as const;
       }
 
-      const nextQuestion = await getNextPendingQuestion(transaction, attempt.id);
-
-      if (!nextQuestion) {
-        attempt = await finalizeAttempt(transaction, attempt.id, serverNow);
-        return { state: buildCompletedState(attempt, serverNow) } as const;
-      }
-
-      const [activatedQuestion] = await transaction
-        .update(attemptQuestions)
-        .set({
-          status: "active",
-          activatedAt: serverNow,
-          deadlineAt: addQuestionWindow(serverNow),
-        })
-        .where(
-          and(
-            eq(attemptQuestions.id, nextQuestion.attemptQuestionId),
-            eq(attemptQuestions.status, "pending"),
-          ),
-        )
-        .returning({ id: attemptQuestions.id });
-
-      if (!activatedQuestion) {
-        invalidState("Next pending question could not be activated.");
-      }
-
       const [updatedAttempt] = await transaction
         .update(quizAttempts)
         .set({
@@ -874,13 +1049,13 @@ export function submitQuizAnswer(
         invalidState("Attempt disappeared while applying the answer.");
       }
 
-      const playerQuestion = await getPlayerQuestion(
-        transaction,
-        updatedAttempt.id,
-      );
-
       return {
-        state: buildActiveState(updatedAttempt, serverNow, playerQuestion),
+        state: buildReviewState(updatedAttempt, serverNow, {
+          ...currentQuestion,
+          answeredAt: serverNow,
+          selectedOption,
+          isCorrect,
+        }),
       } as const;
     });
 

@@ -130,9 +130,62 @@ function assertSafeState(body: unknown, rawSessionTokens: string[]) {
       ["A", "B", "C", "D"],
     );
     assert.equal(Object.hasOwn(state, "questions"), false);
+    assert.equal(Object.hasOwn(state, "review"), false);
+    assert.equal(serialized.includes("correctChoiceIndex"), false);
+  } else if (state.status === "review") {
+    assert.deepEqual(
+      Object.keys(state).sort(),
+      [
+        "attemptId",
+        "correctCount",
+        "currentQuestion",
+        "position",
+        "questionCount",
+        "review",
+        "serverNow",
+        "status",
+        "timeoutCount",
+        "totalScore",
+      ].sort(),
+    );
+    assert.deepEqual(
+      Object.keys(state.currentQuestion).sort(),
+      ["options", "position", "questionText"].sort(),
+    );
+    assert.deepEqual(
+      Object.keys(state.review).sort(),
+      [
+        "correctChoiceIndex",
+        "reviewEndsAt",
+        "selectedChoiceIndex",
+        "wasCorrect",
+      ].sort(),
+    );
+    const remainingReviewMs =
+      new Date(state.review.reviewEndsAt).getTime() -
+      new Date(state.serverNow).getTime();
+    assert.ok(remainingReviewMs > 0 && remainingReviewMs <= 3_000);
   }
 
   return state;
+}
+
+async function expireCurrentReview(pool: Pool, attemptId: string) {
+  const result = await pool.query<{ id: string }>(
+    `UPDATE attempt_questions
+     SET answered_at = clock_timestamp() - interval '3100 milliseconds'
+     WHERE id = (
+       SELECT id
+       FROM attempt_questions
+       WHERE attempt_id = $1 AND status = 'answered'
+       ORDER BY position DESC
+       LIMIT 1
+     )
+     RETURNING id`,
+    [attemptId],
+  );
+
+  assert.ok(result.rows[0]?.id, "Review row was not available to expire");
 }
 
 async function cleanup(pool: Pool, identities: Identity[]) {
@@ -203,7 +256,7 @@ async function main() {
     const attemptRoute = await import(
       "../src/app/api/quiz/attempt/[attemptId]/route"
     );
-    const answerRoute = await import("../src/app/api/quiz/attempt/[attemptId]/answer/route");
+    const answerRoute = await import("../src/app/api/quiz/answer/[attemptId]/route");
 
     const owner = await identity.confirmProfile(`qa_${randomUUID().slice(0, 8)}`);
     const nonOwner = await identity.confirmProfile(`qb_${randomUUID().slice(0, 8)}`);
@@ -351,7 +404,7 @@ async function main() {
 
     const rejectedForeignAnswer = await readResponse(
       await answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           origin: "https://foreign.example",
           sessionToken: owner.rawSessionToken,
@@ -411,7 +464,7 @@ async function main() {
 
     const invalidChoice = await readResponse(
       await answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           etag: initialEtag,
@@ -424,7 +477,7 @@ async function main() {
 
     const missingPrecondition = await readResponse(
       await answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           body: { choiceIndex: 0 },
@@ -436,7 +489,7 @@ async function main() {
 
     const answer = await readResponse(
       await answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           etag: initialEtag,
@@ -446,11 +499,36 @@ async function main() {
       ),
     );
     assert.equal(answer.response.status, 200);
-    assertSafeState(answer.body, rawTokens);
+    const reviewState = assertSafeState(answer.body, rawTokens);
+    assert.equal(reviewState.status, "review");
+    if (reviewState.status !== "review") {
+      assert.fail("Accepted answer did not return review state");
+    }
+    assert.equal(
+      new Date(reviewState.review.reviewEndsAt).getTime() -
+        new Date(reviewState.serverNow).getTime(),
+      3_000,
+    );
+    const reviewEtag = answer.response.headers.get("etag");
+    assert.ok(reviewEtag);
+    assert.notEqual(reviewEtag, initialEtag);
+
+    const restoredReview = await readResponse(
+      await attemptRoute.GET(
+        request(`/api/quiz/attempt/${attemptId}`, {
+          sessionToken: owner.rawSessionToken,
+        }),
+        context,
+      ),
+    );
+    assert.equal(restoredReview.response.status, 200);
+    const restoredReviewState = assertSafeState(restoredReview.body, rawTokens);
+    assert.equal(restoredReviewState.status, "review");
+    assert.equal(restoredReview.response.headers.get("etag"), reviewEtag);
 
     const staleReplay = await readResponse(
       await answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           etag: initialEtag,
@@ -461,6 +539,8 @@ async function main() {
     );
     assert.equal(staleReplay.response.status, 409);
 
+    await expireCurrentReview(pool, attemptId);
+
     const currentFetch = await readResponse(
       await attemptRoute.GET(
         request(`/api/quiz/attempt/${attemptId}`, {
@@ -469,12 +549,22 @@ async function main() {
         context,
       ),
     );
+    const activeAfterReview = assertSafeState(currentFetch.body, rawTokens);
+    assert.equal(activeAfterReview.status, "active");
+    if (activeAfterReview.status !== "active") {
+      assert.fail("Expired review did not activate the next question");
+    }
+    assert.equal(
+      new Date(activeAfterReview.currentQuestion.deadlineAt).getTime() -
+        new Date(activeAfterReview.currentQuestion.activatedAt).getTime(),
+      20_000,
+    );
     const concurrentEtag = currentFetch.response.headers.get("etag");
     assert.ok(concurrentEtag);
 
     const concurrent = await Promise.all([
       answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           etag: concurrentEtag,
@@ -483,7 +573,7 @@ async function main() {
         context,
       ),
       answerRoute.POST(
-        request(`/api/quiz/attempt/${attemptId}/answer`, {
+        request(`/api/quiz/answer/${attemptId}`, {
           method: "POST",
           sessionToken: owner.rawSessionToken,
           etag: concurrentEtag,
@@ -496,7 +586,22 @@ async function main() {
     const accepted = concurrent.find((response) => response.status === 200);
     assert.ok(accepted);
     const acceptedState = assertSafeState(await accepted.json(), rawTokens);
-    assert.equal(acceptedState.status, "active");
+    assert.equal(acceptedState.status, "review");
+
+    await expireCurrentReview(pool, attemptId);
+    const afterConcurrentReview = await readResponse(
+      await attemptRoute.GET(
+        request(`/api/quiz/attempt/${attemptId}`, {
+          sessionToken: owner.rawSessionToken,
+        }),
+        context,
+      ),
+    );
+    assert.equal(afterConcurrentReview.response.status, 200);
+    assert.equal(
+      assertSafeState(afterConcurrentReview.body, rawTokens).status,
+      "active",
+    );
 
     await pool.query(
       `WITH authoritative_now AS (SELECT clock_timestamp() AS value)

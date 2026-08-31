@@ -131,6 +131,12 @@
   text-wrap: balance;
 }
 
+.entry h1 {
+  font-stretch: 84%;
+  letter-spacing: -0.03em;
+  line-height: 0.92;
+}
+
 .entry > p,
 .errorState > p {
   max-width: 39rem;
@@ -322,6 +328,7 @@
 
 .timer span { margin-top: 0.4rem; color: rgb(232 227 213 / 42%); font-size: 0.52rem; }
 .timer[data-low="true"] { background: conic-gradient(#e8e3d5 var(--timer-progress), rgb(232 227 213 / 10%) 0); box-shadow: 0 0 2.75rem rgb(232 227 213 / 12%); }
+.timer[data-review="true"] { box-shadow: 0 0 3rem rgb(169 221 211 / 14%); }
 
 .choices {
   display: grid;
@@ -352,6 +359,42 @@
 }
 
 .choices button:disabled { cursor: wait; opacity: 0.58; }
+
+.choices button[data-result] {
+  cursor: default;
+  opacity: 1;
+  transform: none;
+}
+
+.choices button[data-result="correct"] {
+  border-color: #a9ddd3;
+  background: rgb(169 221 211 / 16%);
+  box-shadow: inset 0 0 0 1px rgb(169 221 211 / 18%);
+}
+
+.choices button[data-result="correct"] > span {
+  border-color: #a9ddd3;
+  background: #a9ddd3;
+  color: #010101;
+}
+
+.choices button[data-result="correct"] i { color: #a9ddd3; }
+
+.choices button[data-result="wrong"] {
+  border-color: rgb(216 121 112 / 78%);
+  background: rgb(216 121 112 / 10%);
+}
+
+.choices button[data-result="wrong"] > span {
+  border-color: rgb(216 121 112 / 82%);
+  color: #d87970;
+}
+
+.choices button[data-result="wrong"] i { color: #d87970; }
+
+.choices button[data-result="subdued"] {
+  opacity: 0.38;
+}
 
 .choices button > span {
   display: grid;
@@ -551,6 +594,7 @@
   .entry, .errorState, .results, .loading, .play { min-height: calc(100svh - 4rem); }
   .entry, .errorState, .results { padding-block: 2.5rem; }
   .entry h1, .errorState h1, .results h1 { font-size: clamp(3.25rem, 18vw, 5rem); }
+  .entry h1 { font-stretch: 86%; letter-spacing: -0.02em; line-height: 0.94; }
   .play { grid-template-rows: auto auto auto auto auto; align-content: start; padding-block: 1.25rem 0; }
   .questionLayout { grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; min-height: auto; padding-block: 1.75rem; }
   .questionCopy h1 { font-size: clamp(1.85rem, 9vw, 3.1rem); line-height: 1; }

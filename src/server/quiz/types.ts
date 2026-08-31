@@ -40,6 +40,11 @@ export type PlayerCurrentQuestion = {
   deadlineAt: string;
 };
 
+export type PlayerReviewQuestion = Omit<
+  PlayerCurrentQuestion,
+  "activatedAt" | "deadlineAt"
+>;
+
 type PlayerQuizTotals = {
   attemptId: string;
   questionCount: number;
@@ -55,6 +60,18 @@ export type ActivePlayerQuizState = PlayerQuizTotals & {
   currentQuestion: PlayerCurrentQuestion;
 };
 
+export type ReviewPlayerQuizState = PlayerQuizTotals & {
+  status: "review";
+  position: number;
+  currentQuestion: PlayerReviewQuestion;
+  review: {
+    selectedChoiceIndex: DisplayChoiceIndex;
+    correctChoiceIndex: DisplayChoiceIndex;
+    wasCorrect: boolean;
+    reviewEndsAt: string;
+  };
+};
+
 export type CompletedPlayerQuizState = PlayerQuizTotals & {
   status: "completed";
   incorrectCount: number;
@@ -63,6 +80,7 @@ export type CompletedPlayerQuizState = PlayerQuizTotals & {
 
 export type PlayerQuizState =
   | ActivePlayerQuizState
+  | ReviewPlayerQuizState
   | CompletedPlayerQuizState;
 
 export type SubmitQuizAnswerInput = {

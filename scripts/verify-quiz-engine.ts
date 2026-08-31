@@ -9,9 +9,9 @@ import {
   QUESTION_TIME_LIMIT_MS,
 } from "../src/lib/quiz/scoring";
 import type {
-  ActivePlayerQuizState,
   PlayerQuizState,
   QuizEngineError,
+  ReviewPlayerQuizState,
 } from "../src/server/quiz/types";
 import { createToolingPool } from "./lib/database";
 
@@ -87,9 +87,33 @@ function assertSafePlayerState(value: PlayerQuizState) {
       false,
       "Player DTO exposed future questions",
     );
+    assert.equal(Object.hasOwn(value, "review"), false);
+  } else if (value.status === "review") {
+    assert.equal(value.currentQuestion.position, value.position);
+    assert.equal(value.currentQuestion.options.length, 4);
+    const remainingReviewMs =
+      new Date(value.review.reviewEndsAt).getTime() -
+      new Date(value.serverNow).getTime();
+    assert.ok(remainingReviewMs > 0 && remainingReviewMs <= 3_000);
   } else {
     assert.equal(Object.hasOwn(value, "currentQuestion"), false);
   }
+}
+
+async function finishReview(
+  engine: Engine,
+  pool: Pool,
+  userId: string,
+  state: ReviewPlayerQuizState,
+) {
+  await pool.query(
+    `UPDATE attempt_questions
+     SET answered_at = clock_timestamp() - interval '3100 milliseconds'
+     WHERE id = $1 AND status = 'answered'`,
+    [state.currentQuestion.attemptQuestionId],
+  );
+
+  return engine.getQuizState(userId, state.attemptId);
 }
 
 async function createTemporaryUser(
@@ -411,10 +435,45 @@ async function runIntegrationVerification(engine: Engine, pool: Pool) {
     });
 
     const state = fulfilled[0] as PromiseFulfilledResult<PlayerQuizState>;
-    assert.equal(state.value.status, "active");
+    assert.equal(state.value.status, "review");
     assertSafePlayerState(state.value);
+    if (state.value.status !== "review") {
+      assert.fail("Accepted answer did not enter review state");
+    }
+    assert.equal(state.value.review.wasCorrect, false);
+    assert.equal(state.value.review.selectedChoiceIndex, wrongChoiceIndex);
+    assert.equal(
+      new Date(state.value.review.reviewEndsAt).getTime() -
+        new Date(state.value.serverNow).getTime(),
+      3_000,
+    );
 
-    const firstCorrectState = state.value as ActivePlayerQuizState;
+    const restoredReview = await engine.getQuizState(
+      owner.id,
+      initialState.attemptId,
+    );
+    assert.equal(restoredReview.status, "review");
+    assertSafePlayerState(restoredReview);
+    if (restoredReview.status !== "review") {
+      assert.fail("Review state was not recoverable");
+    }
+    assert.equal(restoredReview.review.reviewEndsAt, state.value.review.reviewEndsAt);
+
+    const firstCorrectState = await finishReview(
+      engine,
+      pool,
+      owner.id,
+      restoredReview,
+    );
+    assert.equal(firstCorrectState.status, "active");
+    if (firstCorrectState.status !== "active") {
+      assert.fail("Review did not advance to an active question");
+    }
+    assert.equal(
+      new Date(firstCorrectState.currentQuestion.deadlineAt).getTime() -
+        new Date(firstCorrectState.currentQuestion.activatedAt).getTime(),
+      QUESTION_TIME_LIMIT_MS,
+    );
     const correctMapping = await getChoiceMapping(
       pool,
       firstCorrectState.currentQuestion.attemptQuestionId,
@@ -426,6 +485,20 @@ async function runIntegrationVerification(engine: Engine, pool: Pool) {
       choiceIndex: getCorrectChoiceIndex(correctMapping),
     });
     assertSafePlayerState(correctResult);
+    assert.equal(correctResult.status, "review");
+    if (correctResult.status !== "review") {
+      assert.fail("Correct answer did not enter review state");
+    }
+    assert.equal(correctResult.review.wasCorrect, true);
+    assert.equal(
+      new Date(correctResult.review.reviewEndsAt).getTime() -
+        new Date(correctResult.serverNow).getTime(),
+      3_000,
+    );
+    assert.equal(
+      correctResult.review.selectedChoiceIndex,
+      correctResult.review.correctChoiceIndex,
+    );
 
     const correctRowResult = await pool.query<{
       isCorrect: boolean;
@@ -439,9 +512,25 @@ async function runIntegrationVerification(engine: Engine, pool: Pool) {
     assert.ok((correctRowResult.rows[0]?.points ?? 0) >= 100);
     assert.ok((correctRowResult.rows[0]?.points ?? 0) <= 200);
 
-    let currentState = correctResult;
+    let currentState: PlayerQuizState = await finishReview(
+      engine,
+      pool,
+      owner.id,
+      correctResult,
+    );
 
-    while (currentState.status === "active") {
+    while (currentState.status !== "completed") {
+      if (currentState.status === "review") {
+        currentState = await finishReview(
+          engine,
+          pool,
+          owner.id,
+          currentState,
+        );
+        assertSafePlayerState(currentState);
+        continue;
+      }
+
       const mapping = await getChoiceMapping(
         pool,
         currentState.currentQuestion.attemptQuestionId,

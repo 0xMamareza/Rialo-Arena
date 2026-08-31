@@ -211,6 +211,28 @@
   border-top: 1px solid rgb(232 227 213 / 15%);
 }
 
+.avatarAttribution {
+  color: rgb(232 227 213 / 28%);
+  font-size: 0.5rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-decoration: none;
+  text-transform: none;
+}
+
+.avatarAttribution:hover,
+.avatarAttribution:focus-visible {
+  color: rgb(232 227 213 / 58%);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.avatarAttribution:focus-visible {
+  outline: 1px solid #a9ddd3;
+  outline-offset: 0.2rem;
+}
+
 @media (max-width: 900px) {
   .platform {
     min-height: 100svh;
@@ -298,6 +320,10 @@
   .productNav {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .avatarAttribution {
+    margin-left: auto;
   }
 }
 

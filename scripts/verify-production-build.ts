@@ -13,7 +13,7 @@ async function main() {
 
   for (const route of [
     "/api/quiz/attempt/[attemptId]/route",
-    "/api/quiz/attempt/[attemptId]/answer/route",
+    "/api/quiz/answer/[attemptId]/route",
   ]) {
     assert.ok(manifest[route], `Production route manifest is missing ${route}`);
   }

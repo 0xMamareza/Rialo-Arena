@@ -332,14 +332,6 @@ export function ProfilePanel({
           <Link className={styles.startQuizLink} href="/quiz">
             Start quiz <span aria-hidden="true">→</span>
           </Link>
-          <a
-            className={styles.attribution}
-            href="https://unavatar.io"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Avatars provided by Unavatar
-          </a>
         </div>
       ) : (
         <div className={styles.entryCta}>
@@ -467,15 +459,6 @@ export function ProfilePanel({
                   No, try again
                 </button>
               </div>
-
-              <a
-                className={styles.attribution}
-                href="https://unavatar.io"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Avatars provided by Unavatar
-              </a>
             </div>
           )}
         </div>
