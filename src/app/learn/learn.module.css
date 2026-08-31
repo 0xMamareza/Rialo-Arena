@@ -3525,6 +3525,16 @@
     left: 1rem;
   }
 
+  .chapterNav a {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+  }
+
+  .learnBrand {
+    min-height: 2.75rem;
+  }
+
   .activeChapterLink::before {
     width: calc(100% - 2rem) !important;
   }

@@ -306,17 +306,26 @@
 
 @media (max-width: 760px) {
   .header {
-    align-items: flex-start;
+    align-items: center;
   }
 
   .header nav {
-    display: grid;
-    gap: 0.05rem;
-    justify-items: end;
+    display: flex;
+    gap: clamp(0.55rem, 3vw, 0.9rem);
   }
 
   .header nav a {
-    padding-block: 0.2rem;
+    display: flex;
+    min-height: 2.75rem;
+    padding-block: 0;
+    align-items: center;
+    font-size: 0.54rem;
+  }
+
+  .header > a {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
   }
 
   .content {

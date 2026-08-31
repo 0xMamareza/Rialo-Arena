@@ -322,6 +322,12 @@
     justify-content: space-between;
   }
 
+  .productNav a {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+  }
+
   .avatarAttribution {
     margin-left: auto;
   }
