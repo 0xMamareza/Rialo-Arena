@@ -87,26 +87,49 @@ export default async function Home({
             </p>
           </div>
 
-          <div className={styles.challenge}>
-            <dl className={styles.facts}>
-              {challengeFacts.map((fact) => (
-                <div className={styles.fact} key={fact.label}>
-                  <dt>{fact.label}</dt>
-                  <dd>
-                    {fact.value}
-                    {fact.unit ? <small>{fact.unit}</small> : null}
-                  </dd>
-                </div>
-              ))}
-            </dl>
+          <div className={styles.heroRail}>
+            <aside className={styles.learnCta} aria-labelledby="learn-cta-title">
+              <div className={styles.learnSignal} aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </div>
+              <p className={styles.learnEyebrow}>Learn the system</p>
+              <h2 id="learn-cta-title">New to Rialo? Start with Learn</h2>
+              <p className={styles.learnDescription}>
+                Understand the architecture, primitives, and products behind
+                Rialo before you enter the Arena.
+              </p>
+              <div className={styles.learnActions}>
+                <Link href="/learn">
+                  Open Learn
+                  <span aria-hidden="true">↗</span>
+                </Link>
+                <span>Field manual. Cinematic walkthroughs. Official reading.</span>
+              </div>
+            </aside>
 
-            <ProfilePanel
-              initialProfile={initialProfile}
-              quizEntryRequested={query.quiz === "1"}
-              quizAttemptId={
-                typeof query.attempt === "string" ? query.attempt : null
-              }
-            />
+            <div className={styles.challenge}>
+              <dl className={styles.facts}>
+                {challengeFacts.map((fact) => (
+                  <div className={styles.fact} key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>
+                      {fact.value}
+                      {fact.unit ? <small>{fact.unit}</small> : null}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+
+              <ProfilePanel
+                initialProfile={initialProfile}
+                quizEntryRequested={query.quiz === "1"}
+                quizAttemptId={
+                  typeof query.attempt === "string" ? query.attempt : null
+                }
+              />
+            </div>
           </div>
         </section>
 

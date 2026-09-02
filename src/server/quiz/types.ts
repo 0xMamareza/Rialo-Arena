@@ -1,3 +1,5 @@
+import type { ArenaRankTier } from "@/server/leaderboard/rank-tiers";
+
 export const QUIZ_ENGINE_ERROR_CODES = [
   "USER_NOT_FOUND",
   "ATTEMPT_NOT_FOUND",
@@ -75,6 +77,7 @@ export type ReviewPlayerQuizState = PlayerQuizTotals & {
 export type CompletedPlayerQuizState = PlayerQuizTotals & {
   status: "completed";
   incorrectCount: number;
+  tier: ArenaRankTier;
   completedAt: string;
 };
 

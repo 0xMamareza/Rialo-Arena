@@ -20,6 +20,7 @@ import type {
   QuizApiPlayerState,
 } from "@/lib/quiz/api-types";
 
+import { ResultCardGenerator } from "./_components/result-card-generator";
 import styles from "./quiz.module.css";
 
 const DISPLAY_QUESTION_WINDOW_MS = 20_000;
@@ -77,6 +78,8 @@ function isQuizApiState(value: unknown): value is QuizApiPlayerState {
   if (candidate.status === "completed") {
     return (
       typeof candidate.incorrectCount === "number" &&
+      typeof candidate.tier === "string" &&
+      ARENA_TIERS.has(candidate.tier) &&
       typeof candidate.completedAt === "string"
     );
   }
@@ -913,6 +916,29 @@ export function QuizPlayer({
               </p>
             ) : null}
           </section>
+          {displayedPersonalStatsState.status === "ready" &&
+          displayedPersonalStatsState.stats.personalBest ? (
+            <div className={styles.cardGenerator}>
+              <ResultCardGenerator
+                data={{
+                  username: profile.username,
+                  profileImageUrl: profile.profileImageUrl,
+                  score: quizState.totalScore,
+                  personalBestScore:
+                    displayedPersonalStatsState.stats.personalBest.score,
+                  correctCount: quizState.correctCount,
+                  timeoutCount: quizState.timeoutCount,
+                  completedRuns:
+                    displayedPersonalStatsState.stats.completedAttemptsCount,
+                  globalRank: displayedPersonalStatsState.stats.globalRank,
+                  tier: quizState.tier,
+                  isPersonalBest:
+                    quizState.totalScore ===
+                    displayedPersonalStatsState.stats.personalBest.score,
+                }}
+              />
+            </div>
+          ) : null}
           <div className={styles.resultActions}>
             <button type="button" onClick={startAttempt} disabled={requestPending}>
               {requestPending ? "Preparing attempt" : "Play again"}

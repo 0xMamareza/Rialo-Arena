@@ -12,6 +12,7 @@ Copy `.env.example` to the ignored `.env.local` for local development. Never com
 - `DATABASE_DIRECT_URL`: required by migration, seed, and verification tooling when the application URL is pooled. It must bypass transaction pooling.
 - `RATE_LIMIT_HMAC_SECRET`: production-only secret with at least 32 bytes. Rotate deliberately because changing it creates new limiter-key identities.
 - `TRUSTED_PROXY_IP_HEADER`: must be exactly `x-real-ip` in production.
+- `NEXT_PUBLIC_SITE_URL`: canonical public origin used in share links. Production must set this to `https://rialoarena.xyz`; trailing slashes are normalized.
 
 Production startup fails if required configuration is missing, malformed, uses the placeholder limiter secret, or runs outside Node 24.x.
 

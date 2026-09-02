@@ -113,11 +113,17 @@
   grid-template-columns: minmax(0, 1.1fr) minmax(22rem, 0.9fr);
   gap: clamp(3rem, 8vw, 9rem);
   width: 100%;
-  padding-block: clamp(4rem, 11vh, 8rem);
+  padding-block: clamp(2.5rem, 7vh, 5.5rem);
 }
 
-.heroCopy {
+.heroCopy,
+.heroRail {
   align-self: end;
+}
+
+.heroRail {
+  display: grid;
+  gap: clamp(1.5rem, 3.5vh, 2.75rem);
 }
 
 .eyebrow {
@@ -152,6 +158,166 @@
   letter-spacing: -0.02em;
   line-height: 1.5;
   text-wrap: balance;
+}
+
+.learnCta {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  overflow: hidden;
+  padding: clamp(1.35rem, 2.2vw, 2rem);
+  border: 1px solid rgb(169 221 211 / 24%);
+  background:
+    linear-gradient(135deg, rgb(169 221 211 / 9%), transparent 52%),
+    rgb(1 1 1 / 68%);
+  box-shadow: inset 0 1px 0 rgb(232 227 213 / 6%);
+  isolation: isolate;
+}
+
+.learnCta::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgb(169 221 211 / 5%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(169 221 211 / 5%) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+  content: "";
+  mask-image: linear-gradient(105deg, transparent 18%, #000);
+}
+
+.learnCta::after {
+  position: absolute;
+  right: -4.5rem;
+  bottom: -6rem;
+  z-index: -1;
+  width: 12rem;
+  height: 12rem;
+  border: 1px solid rgb(169 221 211 / 18%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 1.75rem rgb(169 221 211 / 3%),
+    0 0 0 3.5rem rgb(169 221 211 / 2%);
+  content: "";
+}
+
+.learnEyebrow {
+  grid-column: 1;
+  margin: 0 0 0.9rem;
+  color: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.17em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.learnCta h2 {
+  grid-column: 1;
+  max-width: 18ch;
+  margin: 0;
+  color: #e8e3d5;
+  font-size: clamp(1.55rem, 2.2vw, 2.4rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-wrap: balance;
+}
+
+.learnDescription {
+  grid-column: 1;
+  max-width: 37rem;
+  margin: 1rem 0 0;
+  color: rgb(232 227 213 / 66%);
+  font-size: clamp(0.84rem, 1vw, 0.98rem);
+  letter-spacing: -0.015em;
+  line-height: 1.55;
+}
+
+.learnActions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 1rem 1.25rem;
+  margin-top: 1.4rem;
+}
+
+.learnActions a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #a9ddd3;
+  align-items: center;
+  gap: 1.5rem;
+  color: #010101;
+  background: #a9ddd3;
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.learnActions a:hover {
+  color: #e8e3d5;
+  background: rgb(169 221 211 / 8%);
+  transform: translateY(-2px);
+}
+
+.learnActions a:focus-visible {
+  outline: 2px solid #e8e3d5;
+  outline-offset: 0.25rem;
+}
+
+.learnActions > span {
+  max-width: 24rem;
+  color: rgb(232 227 213 / 38%);
+  font-family: "Arial Narrow", Arial, sans-serif;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.learnSignal {
+  grid-column: 2;
+  grid-row: 1 / span 3;
+  display: flex;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid rgb(169 221 211 / 20%);
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+}
+
+.learnSignal span {
+  position: absolute;
+  width: 0.3rem;
+  height: 0.3rem;
+  border-radius: 50%;
+  background: #a9ddd3;
+  box-shadow: 0 0 1rem rgb(169 221 211 / 60%);
+}
+
+.learnSignal span:nth-child(2),
+.learnSignal span:nth-child(3) {
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid rgb(169 221 211 / 38%);
+  background: transparent;
+  animation: learn-pulse 3.2s ease-out infinite;
+}
+
+.learnSignal span:nth-child(3) {
+  animation-delay: 1.6s;
 }
 
 .challenge {
@@ -245,6 +411,7 @@
   }
 
   .heroCopy,
+  .heroRail,
   .challenge {
     align-self: auto;
   }
@@ -255,6 +422,10 @@
 
   .description {
     margin-top: 2.5rem;
+  }
+
+  .learnCta {
+    max-width: 46rem;
   }
 }
 
@@ -274,6 +445,28 @@
   .hero {
     gap: 3rem;
     padding-block: 4.5rem;
+  }
+
+  .heroRail {
+    gap: 2.25rem;
+  }
+
+  .learnCta {
+    grid-template-columns: 1fr;
+    padding: 1.25rem;
+  }
+
+  .learnSignal {
+    display: none;
+  }
+
+  .learnActions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .learnActions a {
+    justify-content: space-between;
   }
 
   .title {
@@ -336,5 +529,30 @@
 @media (prefers-reduced-motion: reduce) {
   .platform {
     scroll-behavior: auto;
+  }
+
+  .learnSignal span:nth-child(2),
+  .learnSignal span:nth-child(3) {
+    animation: none;
+  }
+
+  .learnActions a {
+    transition: none;
+  }
+}
+
+@keyframes learn-pulse {
+  0% {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+
+  18% {
+    opacity: 0.7;
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
   }
 }

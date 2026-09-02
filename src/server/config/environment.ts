@@ -1,3 +1,5 @@
+import { resolvePublicSiteUrl } from "../../lib/config/public-site-url";
+
 const SUPPORTED_NODE_MAJOR = 24;
 const DEVELOPMENT_RATE_LIMIT_SECRET =
   "rialo-arena-development-only-rate-limit-hmac-key";
@@ -156,10 +158,21 @@ export function getTrustedProxyIpHeader(
   return configured;
 }
 
+export function getPublicSiteUrlEnvironment(
+  source: EnvironmentSource = process.env,
+) {
+  return resolvePublicSiteUrl({
+    configuredUrl: source.NEXT_PUBLIC_SITE_URL,
+    production: isProduction(source),
+  });
+}
+
 export function validateProductionEnvironment(
   source: EnvironmentSource = process.env,
   nodeVersion = process.versions.node,
 ) {
+  getPublicSiteUrlEnvironment(source);
+
   if (!isProduction(source)) {
     validateNodeRuntime(nodeVersion);
     return;

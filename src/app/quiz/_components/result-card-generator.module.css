@@ -1,0 +1,392 @@
+.generateButton {
+  display: inline-flex;
+  min-height: 3.25rem;
+  padding: 0.9rem 1.2rem;
+  border: 1px solid #a9ddd3;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  color: #010101;
+  background: #a9ddd3;
+  font: 800 0.7rem/1 "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.generateButton:hover {
+  color: #e8e3d5;
+  background: rgb(169 221 211 / 9%);
+  transform: translateY(-2px);
+}
+
+.generateButton:focus-visible,
+.dialog button:focus-visible,
+.dialog a:focus-visible {
+  outline: 2px solid #e8e3d5;
+  outline-offset: 0.25rem;
+}
+
+.dialog {
+  width: min(86rem, calc(100vw - 2rem));
+  max-width: none;
+  max-height: calc(100svh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 1px solid rgb(169 221 211 / 26%);
+  color: #e8e3d5;
+  background: #050706;
+  box-shadow: 0 2rem 7rem rgb(0 0 0 / 72%);
+}
+
+.dialog::backdrop {
+  background: rgb(1 1 1 / 82%);
+  backdrop-filter: blur(12px);
+}
+
+.dialogShell {
+  position: relative;
+  overflow: hidden auto;
+  max-height: calc(100svh - 2.25rem);
+  padding: clamp(1rem, 2.5vw, 2rem);
+  background:
+    radial-gradient(circle at 22% 38%, rgb(169 221 211 / 9%), transparent 32%),
+    linear-gradient(rgb(169 221 211 / 3%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(169 221 211 / 3%) 1px, transparent 1px),
+    #050706;
+  background-size: auto, 2rem 2rem, 2rem 2rem, auto;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.dialogHeader span,
+.readyPanel > span,
+.stageCount {
+  color: #a9ddd3;
+  font: 700 0.62rem/1.4 "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dialogHeader h2 {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.35rem, 2.4vw, 2.3rem);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.dialogHeader > button {
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid rgb(232 227 213 / 22%);
+  place-items: center;
+  color: #e8e3d5;
+  background: transparent;
+  font-size: 1.35rem;
+  cursor: pointer;
+}
+
+.generatorLayout {
+  display: grid;
+  grid-template-columns: minmax(32rem, 1.48fr) minmax(17rem, 0.52fr);
+  gap: clamp(1.25rem, 3vw, 3rem);
+  align-items: center;
+}
+
+.previewFrame {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  justify-self: center;
+  border: 1px solid rgb(169 221 211 / 22%);
+  background:
+    linear-gradient(135deg, rgb(169 221 211 / 8%), transparent 48%),
+    #010101;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 45%);
+}
+
+.previewFrame::before {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border: 1px solid rgb(232 227 213 / 8%);
+  content: "";
+  pointer-events: none;
+}
+
+.previewFrame canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  filter: blur(12px) saturate(0.5);
+  transform: scale(1.025);
+  transition:
+    opacity 500ms ease,
+    filter 700ms ease,
+    transform 700ms ease;
+}
+
+.previewFrame[data-stage="2"] canvas,
+.previewFrame[data-stage="3"] canvas,
+.previewFrame[data-ready="true"] canvas {
+  opacity: 1;
+}
+
+.previewFrame[data-ready="true"] canvas {
+  filter: none;
+  transform: none;
+}
+
+.scan {
+  position: absolute;
+  inset-inline: 0;
+  z-index: 3;
+  height: 1px;
+  background: #a9ddd3;
+  box-shadow: 0 0 1.5rem rgb(169 221 211 / 90%);
+  animation: card-scan 1.2s ease-in-out infinite;
+}
+
+.generatorPanel {
+  min-width: 0;
+}
+
+.stagePanel > strong,
+.errorPanel strong {
+  display: block;
+  margin-top: 1rem;
+  color: #e8e3d5;
+  font-size: clamp(1.7rem, 3.2vw, 3.8rem);
+  font-weight: 450;
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.stageTrack {
+  overflow: hidden;
+  height: 2px;
+  margin: 2rem 0;
+  background: rgb(232 227 213 / 12%);
+}
+
+.stageTrack span {
+  display: block;
+  height: 100%;
+  background: #a9ddd3;
+  box-shadow: 0 0 1rem rgb(169 221 211 / 50%);
+  transition: width 320ms ease;
+}
+
+.stagePanel ol {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stagePanel li {
+  display: grid;
+  grid-template-columns: 2.5rem 1fr;
+  min-height: 3rem;
+  border-bottom: 1px solid rgb(232 227 213 / 10%);
+  align-items: center;
+  color: rgb(232 227 213 / 28%);
+  font: 700 0.68rem/1.35 "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: color 180ms ease;
+}
+
+.stagePanel li[data-active="true"] {
+  color: #e8e3d5;
+}
+
+.stagePanel li[data-complete="true"] {
+  color: rgb(169 221 211 / 62%);
+}
+
+.stagePanel li span {
+  color: #a9ddd3;
+}
+
+.readyPanel {
+  max-width: 34rem;
+}
+
+.readyPanel p,
+.errorPanel p {
+  margin: 1rem 0 1.6rem;
+  color: rgb(232 227 213 / 58%);
+  font-size: clamp(0.88rem, 1.2vw, 1rem);
+  line-height: 1.65;
+}
+
+.cardActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.cardActions button,
+.cardActions a,
+.errorPanel button {
+  display: inline-flex;
+  min-height: 3.25rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgb(232 227 213 / 24%);
+  align-items: center;
+  justify-content: center;
+  color: #e8e3d5;
+  background: transparent;
+  font: 800 0.65rem/1 "Arial Narrow", Arial, sans-serif;
+  letter-spacing: 0.13em;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.cardActions > :first-child {
+  border-color: #a9ddd3;
+  color: #010101;
+  background: #a9ddd3;
+}
+
+.cardActions button:last-child {
+  grid-column: 1 / -1;
+}
+
+.cardActions button:hover,
+.cardActions a:hover,
+.errorPanel button:hover {
+  border-color: #a9ddd3;
+  color: #a9ddd3;
+}
+
+.cardActions > :first-child:hover {
+  color: #e8e3d5;
+  background: rgb(169 221 211 / 8%);
+}
+
+.errorPanel button {
+  border-color: #a9ddd3;
+}
+
+@media (max-width: 920px) {
+  .dialog {
+    width: calc(100vw - 1rem);
+    max-height: calc(100svh - 1rem);
+  }
+
+  .dialogShell {
+    max-height: calc(100svh - 1.25rem);
+    padding: 1rem;
+  }
+
+  .generatorLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .previewFrame {
+    width: 100%;
+  }
+
+  .stagePanel > strong {
+    font-size: clamp(1.65rem, 9vw, 2.75rem);
+  }
+
+  .stageTrack {
+    margin-block: 1.25rem;
+  }
+
+  .stagePanel li {
+    min-height: 2.6rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .dialogHeader {
+    gap: 1rem;
+  }
+
+  .dialogHeader h2 {
+    max-width: 14rem;
+  }
+
+  .generatorLayout {
+    gap: 1rem;
+  }
+
+  .stagePanel ol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stagePanel li {
+    grid-template-columns: 2rem 1fr;
+    padding-right: 0.5rem;
+    font-size: 0.57rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .cardActions {
+    grid-template-columns: 1fr;
+  }
+
+  .cardActions button:last-child {
+    grid-column: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generateButton,
+  .previewFrame canvas,
+  .stageTrack span,
+  .stagePanel li {
+    transition: none;
+  }
+
+  .generateButton:hover {
+    transform: none;
+  }
+
+  .scan {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+@keyframes card-scan {
+  0% {
+    top: 0;
+    opacity: 0;
+  }
+
+  18%,
+  82% {
+    opacity: 0.72;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}

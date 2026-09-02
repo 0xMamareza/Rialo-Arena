@@ -19,6 +19,7 @@ import {
   calculateQuestionPoints,
   QUESTION_TIME_LIMIT_MS,
 } from "@/lib/quiz/scoring";
+import { getArenaRankTier } from "@/server/leaderboard/rank-tiers";
 
 import {
   QuizEngineError,
@@ -667,6 +668,7 @@ function buildCompletedState(
     correctCount: attempt.correctCount,
     timeoutCount: attempt.timeoutCount,
     incorrectCount,
+    tier: getArenaRankTier(attempt.totalScore),
     completedAt: completedAt.toISOString(),
     serverNow: serverNow.toISOString(),
   };

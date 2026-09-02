@@ -1,3 +1,5 @@
+import type { ArenaRankTier } from "@/server/leaderboard/rank-tiers";
+
 export type QuizApiChoiceIndex = 0 | 1 | 2 | 3;
 export type QuizApiChoiceLabel = "A" | "B" | "C" | "D";
 
@@ -49,6 +51,7 @@ export type QuizApiReviewState = QuizApiTotals & {
 export type QuizApiCompletedState = QuizApiTotals & {
   status: "completed";
   incorrectCount: number;
+  tier: ArenaRankTier;
   completedAt: string;
 };
 

@@ -573,6 +573,16 @@
   line-height: 1.6;
 }
 
+.cardGenerator {
+  display: grid;
+  width: min(100%, 25rem);
+  margin-top: 1.25rem;
+}
+
+.cardGenerator > button {
+  width: 100%;
+}
+
 .resultActions { display: grid; width: min(100%, 25rem); justify-items: stretch; }
 .resultActions button { width: 100%; margin-top: 1.25rem; }
 .resultActions > a { justify-self: center; }

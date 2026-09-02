@@ -20,6 +20,7 @@ async function main() {
     DATABASE_TLS_MODE: "verify-full",
     RATE_LIMIT_HMAC_SECRET: "r".repeat(32),
     TRUSTED_PROXY_IP_HEADER: "x-real-ip",
+    NEXT_PUBLIC_SITE_URL: "https://rialoarena.xyz",
   };
 
   environment.validateProductionEnvironment(productionEnvironment, "24.0.0");
@@ -29,6 +30,7 @@ async function main() {
     "DATABASE_TLS_MODE",
     "RATE_LIMIT_HMAC_SECRET",
     "TRUSTED_PROXY_IP_HEADER",
+    "NEXT_PUBLIC_SITE_URL",
   ]) {
     const missing = { ...productionEnvironment, [requiredName]: undefined };
     assert.throws(() =>
@@ -46,6 +48,19 @@ async function main() {
   );
   assert.throws(() =>
     environment.validateProductionEnvironment(productionEnvironment, "22.0.0"),
+  );
+  assert.equal(
+    environment.getPublicSiteUrlEnvironment({
+      ...productionEnvironment,
+      NEXT_PUBLIC_SITE_URL: "https://rialoarena.xyz/",
+    }),
+    "https://rialoarena.xyz",
+  );
+  assert.throws(() =>
+    environment.getPublicSiteUrlEnvironment({
+      ...productionEnvironment,
+      NEXT_PUBLIC_SITE_URL: "https://rialoarena.xyz/share",
+    }),
   );
   assert.throws(() =>
     environment.getToolingDatabaseEnvironment(
