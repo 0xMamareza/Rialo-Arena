@@ -10,6 +10,9 @@ config({ path: resolve(process.cwd(), ".env.local"), quiet: true });
 async function main() {
   const environment = await import("../src/server/config/environment");
   const headersModule = await import("../src/server/security/headers");
+  const mutationOrigin = await import(
+    "../src/server/security/mutation-origin"
+  );
   const limiter = await import("../src/server/rate-limit/limiter");
   const clientIp = await import("../src/server/rate-limit/client-ip");
 
@@ -71,6 +74,57 @@ async function main() {
       "24.0.0",
     ),
   );
+
+  const mutationRequest = (
+    origin: string | null,
+    additionalHeaders: Record<string, string> = {},
+  ) => {
+    const headers = new Headers(additionalHeaders);
+
+    if (origin !== null) {
+      headers.set("origin", origin);
+    }
+
+    return new NextRequest(
+      "http://rialo-arena.internal:3000/api/quiz/start",
+      { method: "POST", headers },
+    );
+  };
+  const assertOriginAllowed = (origin: string) => {
+    assert.equal(
+      mutationOrigin.validateMutationOrigin(
+        mutationRequest(origin),
+        productionEnvironment,
+      ),
+      null,
+    );
+  };
+  const assertOriginRejected = (
+    origin: string | null,
+    additionalHeaders: Record<string, string> = {},
+  ) => {
+    const response = mutationOrigin.validateMutationOrigin(
+      mutationRequest(origin, additionalHeaders),
+      productionEnvironment,
+    );
+
+    assert.ok(response);
+    assert.equal(response.status, 403);
+  };
+
+  assertOriginAllowed("https://rialoarena.xyz");
+  assertOriginAllowed("https://RIALOARENA.XYZ:443/");
+  assertOriginRejected("https://www.rialoarena.xyz");
+  assertOriginRejected("https://evilrialoarena.xyz");
+  assertOriginRejected("https://rialoarena.xyz.evil.com");
+  assertOriginRejected("http://rialoarena.xyz");
+  assertOriginRejected("https://rialo-arena-production.up.railway.app");
+  assertOriginRejected("not-an-origin");
+  assertOriginRejected(null);
+  assertOriginRejected("https://evil.example", {
+    "x-forwarded-host": "rialoarena.xyz",
+    "x-forwarded-proto": "https",
+  });
 
   const spoofedIp = "203.0.113.10";
   const canonicalIp = "2001:db8::55";
@@ -173,6 +227,7 @@ async function main() {
   assert.equal(oversizedAnswer.status, 413);
 
   console.log("Verified production environment fail-closed validation.");
+  console.log("Verified exact canonical production mutation origin policy.");
   console.log("Verified trusted proxy extraction and spoofed-header rejection.");
   console.log("Verified secret-keyed HMAC rate-limit identifiers.");
   console.log("Verified security headers and disabled X-Powered-By.");
