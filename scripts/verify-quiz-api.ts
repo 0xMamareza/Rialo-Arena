@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHash, randomUUID } from "node:crypto";
 
 import { NextRequest } from "next/server";
 import type { Pool } from "pg";
@@ -20,6 +20,7 @@ const FORBIDDEN_KEYS = new Set([
   "futureQuestions",
   "rawSessionToken",
 ]);
+const QUIZ_CACHE_CONTROL = "private, no-store, no-transform";
 
 type Identity = Awaited<
   ReturnType<typeof import("../src/server/identity/session")["confirmProfile"]>
@@ -66,6 +67,10 @@ function request(
 
 async function readResponse(response: Response): Promise<RouteResponse> {
   return { response, body: await response.json() };
+}
+
+function assertQuizCachePolicy(response: Response) {
+  assert.equal(response.headers.get("cache-control"), QUIZ_CACHE_CONTROL);
 }
 
 function assertSafeState(body: unknown, rawSessionTokens: string[]) {
@@ -267,6 +272,7 @@ async function main() {
       await startRoute.POST(request("/api/quiz/start", { method: "POST" })),
     );
     assert.equal(unauthorizedStart.response.status, 401);
+    assertQuizCachePolicy(unauthorizedStart.response);
     const unauthorizedRecovery = await startRoute.GET(
       request("/api/quiz/start"),
     );
@@ -300,6 +306,7 @@ async function main() {
       }),
     );
     assert.equal(emptyRecovery.status, 204);
+    assertQuizCachePolicy(emptyRecovery);
 
     const start = await readResponse(
       await startRoute.POST(
@@ -310,10 +317,25 @@ async function main() {
       ),
     );
     assert.equal(start.response.status, 200);
+    assertQuizCachePolicy(start.response);
     const initialState = assertSafeState(start.body, rawTokens);
     assert.equal(initialState.status, "active");
     const initialEtag = start.response.headers.get("etag");
     assert.ok(initialEtag, "Start response did not include an ETag");
+    const activeQuestionResult = await pool.query<{ id: string }>(
+      `SELECT id
+       FROM attempt_questions
+       WHERE attempt_id = $1 AND status = 'active'`,
+      [initialState.attemptId],
+    );
+    const initialAttemptQuestionId = activeQuestionResult.rows[0]?.id;
+    assert.ok(initialAttemptQuestionId);
+    assert.equal(
+      initialEtag,
+      `"${createHash("sha256")
+        .update(initialAttemptQuestionId)
+        .digest("base64url")}"`,
+    );
 
     const repeatedStart = await readResponse(
       await startRoute.POST(
@@ -400,7 +422,7 @@ async function main() {
     );
     assert.equal(ownerFetch.response.status, 200);
     assertSafeState(ownerFetch.body, rawTokens);
-    assert.equal(ownerFetch.response.headers.get("cache-control"), "private, no-store");
+    assertQuizCachePolicy(ownerFetch.response);
 
     const rejectedForeignAnswer = await readResponse(
       await answerRoute.POST(
@@ -486,6 +508,7 @@ async function main() {
       ),
     );
     assert.equal(missingPrecondition.response.status, 428);
+    assertQuizCachePolicy(missingPrecondition.response);
 
     const answer = await readResponse(
       await answerRoute.POST(
@@ -499,6 +522,7 @@ async function main() {
       ),
     );
     assert.equal(answer.response.status, 200);
+    assertQuizCachePolicy(answer.response);
     const reviewState = assertSafeState(answer.body, rawTokens);
     assert.equal(reviewState.status, "review");
     if (reviewState.status !== "review") {
@@ -511,6 +535,12 @@ async function main() {
     );
     const reviewEtag = answer.response.headers.get("etag");
     assert.ok(reviewEtag);
+    assert.equal(
+      reviewEtag,
+      `"${createHash("sha256")
+        .update(`${initialAttemptQuestionId}:${reviewState.review.reviewEndsAt}`)
+        .digest("base64url")}"`,
+    );
     assert.notEqual(reviewEtag, initialEtag);
 
     const restoredReview = await readResponse(
@@ -538,6 +568,7 @@ async function main() {
       ),
     );
     assert.equal(staleReplay.response.status, 409);
+    assertQuizCachePolicy(staleReplay.response);
 
     await expireCurrentReview(pool, attemptId);
 

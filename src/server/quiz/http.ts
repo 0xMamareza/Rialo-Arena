@@ -35,7 +35,9 @@ type QuizApiErrorBody = {
   };
 };
 
-const JSON_HEADERS = { "Cache-Control": "private, no-store" } as const;
+const JSON_HEADERS = {
+  "Cache-Control": "private, no-store, no-transform",
+} as const;
 
 function errorResponse(
   code: QuizApiErrorCode,
