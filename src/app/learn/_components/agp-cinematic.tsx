@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -186,6 +187,18 @@ export function AgpCinematic() {
 
           return () => timeline.scrollTrigger?.kill();
         },
+      );
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-agp-world]",
+          phases: "[data-agp-phase]",
+          draw: "[data-agp-route-progress]",
+          reveal: "[data-agp-reveal], [data-agp-finish]",
+          travel: [
+            { element: '[data-agp-car="lead"]', path: "[data-agp-route]", start: 0.005, end: 0.99 },
+            { element: '[data-agp-car="chaser"]', path: "[data-agp-route]", end: 0.925 },
+          ],
+        }),
       );
     }, root);
 

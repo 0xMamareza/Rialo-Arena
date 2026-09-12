@@ -114,7 +114,7 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
     const nav = navRef.current;
     const activeItem = itemRefs.current.get(activeId);
 
-    if (!nav || !activeItem || !window.matchMedia("(max-width: 760px)").matches) {
+    if (!nav || !activeItem || !window.matchMedia("(max-width: 900px)").matches) {
       return;
     }
 

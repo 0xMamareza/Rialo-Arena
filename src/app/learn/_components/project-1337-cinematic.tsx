@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -136,6 +137,17 @@ export function Project1337Cinematic() {
         [1.92, 3.3, 4.78, 6.0].forEach((position, index) => timeline.set(panels[index + 1], { autoAlpha: 1 }, position).set(panels[index], { autoAlpha: 0 }, position).set(steps[index], { opacity: 0.24 }, position).set(steps[index + 1], { opacity: 1 }, position));
         return () => timeline.scrollTrigger?.kill();
       });
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-p1337-world]",
+          phases: "[data-p1337-phase]",
+          draw: "[data-p1337-process-line], [data-p1337-output-route], [data-p1337-sign-route], [data-p1337-publish-route]",
+          reveal: "[data-p1337-tick], [data-p1337-processor], [data-p1337-estimate], [data-p1337-signature], [data-p1337-destination]",
+          travel: [
+            { element: "[data-p1337-packet]", path: "[data-p1337-route]" },
+          ],
+        }),
+      );
     }, root);
     return () => { media.revert(); context.revert(); };
   }, []);

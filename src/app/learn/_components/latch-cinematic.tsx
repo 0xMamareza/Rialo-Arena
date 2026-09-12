@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const pipelinePhases = [
@@ -498,6 +499,18 @@ export function LatchCinematic() {
             mountTimeline.scrollTrigger?.kill();
           };
         },
+      );
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-latch-world]",
+          phases: "[data-latch-phase]",
+          draw: "[data-latch-entry-trace], [data-latch-trace], [data-latch-inject], [data-latch-response-route], [data-latch-mount-branch]",
+          reveal: "[data-latch-filter], [data-latch-secret], [data-latch-upstream], [data-latch-mount], [data-latch-audit]",
+          travel: [
+            { element: '[data-latch-packet="entry"]', path: "[data-latch-entry-trace]", end: 0.9 },
+            { element: '[data-latch-packet="allowed"]', path: "[data-latch-trace]" },
+          ],
+        }),
       );
     }, root);
 

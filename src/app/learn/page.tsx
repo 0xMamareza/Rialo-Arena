@@ -19,6 +19,7 @@ import {
   LearnNavigation,
   type LearnChapterNavItem,
 } from "./_components/learn-navigation";
+import { LearnMotionCoordinator } from "./_components/learn-motion-coordinator";
 import { RialoFieldBackground } from "./_components/rialo-field-background";
 import styles from "./learn.module.css";
 
@@ -673,6 +674,7 @@ export default function LearnPage() {
   return (
     <div className={`${styles.learnPage} ${learnDisplay.variable}`}>
       <RialoFieldBackground />
+      <LearnMotionCoordinator />
       <LearnNavigation chapters={chapters} />
 
       <main className={styles.learnMain}>

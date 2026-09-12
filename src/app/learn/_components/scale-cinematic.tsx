@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -99,6 +100,17 @@ export function ScaleCinematic() {
         [1.82, 3.08, 4.42, 5.72].forEach((position, index) => timeline.set(panels[index + 1], { autoAlpha: 1 }, position).set(panels[index], { autoAlpha: 0 }, position).set(steps[index], { opacity: 0.24 }, position).set(steps[index + 1], { opacity: 1 }, position));
         return () => timeline.scrollTrigger?.kill();
       });
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-scale-world]",
+          phases: "[data-scale-phase]",
+          draw: "[data-scale-route], [data-scale-deadline-route], [data-scale-payment-route], [data-scale-refund-route]",
+          reveal: "[data-scale-node], [data-scale-terms], [data-scale-a2a], [data-scale-verdict], [data-scale-outcome]",
+          travel: [
+            { element: "[data-scale-packet]", path: "[data-scale-route]" },
+          ],
+        }),
+      );
     }, root);
     return () => { media.revert(); context.revert(); };
   }, []);

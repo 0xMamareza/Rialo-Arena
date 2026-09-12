@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -236,6 +237,15 @@ export function ArchitectureMachine() {
 
         return () => timeline.scrollTrigger?.kill();
       });
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-architecture-world]",
+          phases: "[data-architecture-phase]",
+          draw: "[data-machine-route], [data-stream-line], [data-omni-branch]",
+          reveal: "[data-architecture-module], [data-machine-micro]",
+          horizontalCamera: true,
+        }),
+      );
     }, root);
     return () => { media.revert(); context.revert(); };
   }, []);

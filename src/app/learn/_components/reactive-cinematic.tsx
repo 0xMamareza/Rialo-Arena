@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -244,6 +245,19 @@ export function ReactiveCinematic() {
 
           return () => timeline.scrollTrigger?.kill();
         },
+      );
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-reactive-world]",
+          phases: "[data-reactive-phase]",
+          draw: "[data-reactive-route], [data-reactive-consensus-route], [data-reactive-execution-route]",
+          reveal: "[data-reactive-signal], [data-reactive-predicate], [data-reactive-validator], [data-reactive-trigger], [data-reactive-execution]",
+          travel: [
+            { element: '[data-reactive-packet="onchain"]', path: '[data-reactive-route="onchain"]' },
+            { element: '[data-reactive-packet="data"]', path: '[data-reactive-route="data"]' },
+            { element: '[data-reactive-packet="time"]', path: '[data-reactive-route="time"]' },
+          ],
+        }),
       );
     }, root);
 

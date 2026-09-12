@@ -1642,8 +1642,8 @@
     z-index: 2;
     order: 2;
     aspect-ratio: 16 / 9;
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1;
+    transform: none;
   }
 
   .reactiveSceneHeader,
@@ -1676,7 +1676,7 @@
     padding-right: 1.5rem;
     background: rgb(1 1 1 / 88%);
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
     scroll-snap-align: start;
   }
 
@@ -1695,13 +1695,6 @@
     opacity: 1 !important;
   }
 
-  .reactivePacket,
-  .sfsYieldPacket,
-  .sfsFlowParticle,
-  .reactiveTriggerFlash {
-    display: none;
-  }
-
   .reactiveSignal,
   .reactivePredicate,
   .reactiveValidator,
@@ -1713,7 +1706,7 @@
   .sfsService,
   .sfsReactiveNode {
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
   }
 
   .reactiveConsensusRoute,
@@ -1723,7 +1716,7 @@
   .sfsServiceBranch,
   .sfsReactiveBridge,
   .sfsRouterArc {
-    stroke-dashoffset: 0 !important;
+    stroke-dashoffset: 0;
   }
 }
 
@@ -2590,8 +2583,8 @@
     z-index: 2;
     order: 2;
     aspect-ratio: 16 / 9;
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1;
+    transform: none;
   }
 
   .latchSceneHeader {
@@ -2620,7 +2613,7 @@
     padding-right: 1.5rem;
     background: rgb(1 1 1 / 88%);
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
     scroll-snap-align: start;
   }
 
@@ -2645,29 +2638,23 @@
     opacity: 1 !important;
   }
 
-  .latchPacket,
-  .latchOutcome,
-  .latchRedaction {
-    display: none;
-  }
-
   .latchFilter,
   .latchSecretNode,
   .latchUpstreamNode,
   .latchMountService,
   .latchSharedAudit {
-    opacity: 1 !important;
+    opacity: 1;
   }
 
   .latchPinnedScene .latchFilter {
-    opacity: 1 !important;
+    opacity: 1;
     filter: none;
   }
 
   .latchMountBranch,
   .latchPipelineTrace,
   .latchInjectTrace {
-    stroke-dashoffset: 0 !important;
+    stroke-dashoffset: 0;
   }
 
   .latchMountScene {
@@ -3404,7 +3391,7 @@
 
   .agpWorld {
     inset: 0;
-    transform: none !important;
+    transform: none;
   }
 
   .agpRouteProgress {
@@ -3415,7 +3402,7 @@
   .agpOracleSignal,
   .agpGuessSignal,
   .agpFinish {
-    opacity: 1 !important;
+    opacity: 1;
     transform-box: fill-box;
   }
 
@@ -3446,7 +3433,7 @@
     position: relative;
     min-height: 13rem;
     padding-right: 1.5rem;
-    opacity: 1 !important;
+    opacity: 1;
     clip-path: none !important;
     scroll-snap-align: start;
   }
@@ -3465,7 +3452,7 @@
   }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .learnBar {
     grid-template-columns: 1fr auto;
     min-height: 4rem;
@@ -3629,13 +3616,14 @@
   .reactiveWorld,
   .sfsWorld {
     min-height: 19rem;
-    margin-inline: -14%;
+    margin-inline: 0;
     aspect-ratio: 5 / 4;
+    overflow: hidden;
   }
 
   .reactiveDiagram,
   .sfsDiagram {
-    transform: scale(1.18);
+    transform: scale(1.06);
   }
 
   .reactiveSceneHeader strong,
@@ -3681,12 +3669,13 @@
 
   .latchWorld {
     min-height: 18rem;
-    margin-inline: -12%;
+    margin-inline: 0;
     aspect-ratio: 5 / 4;
+    overflow: hidden;
   }
 
   .latchPipelineSvg {
-    transform: scale(1.2);
+    transform: scale(1.08);
   }
 
   .latchSceneHeader strong {
@@ -3720,8 +3709,8 @@
   }
 
   .latchMountSvg {
-    margin-inline: -8%;
-    width: 116%;
+    margin-inline: 0;
+    width: 100%;
   }
 
   .latchStaticRuns {
@@ -3771,7 +3760,7 @@
   .agpWorldViewport {
     aspect-ratio: 5 / 4;
     min-height: 22rem;
-    margin-inline: -10%;
+    margin-inline: 0;
   }
 
   .agpPhaseDeck {
@@ -4493,8 +4482,8 @@
   .scaleWorld {
     order: 2;
     aspect-ratio: 16 / 9;
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1;
+    transform: none;
   }
 
   .p1337SceneHeader,
@@ -4527,7 +4516,7 @@
     padding-right: 1.5rem;
     background: rgb(1 1 1 / 88%);
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
     scroll-snap-align: start;
   }
 
@@ -4542,7 +4531,7 @@
     min-height: 22rem;
     padding: 3rem 0;
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
   }
 
   .p1337Processor,
@@ -4565,14 +4554,9 @@
   .scaleDeadlineRoute,
   .scalePaymentRoute,
   .scaleRefundRoute {
-    stroke-dashoffset: 0 !important;
+    stroke-dashoffset: 0;
   }
 
-  .p1337Packet,
-  .p1337Pulse,
-  .scalePacket {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {
@@ -4589,7 +4573,8 @@
   .p1337World,
   .scaleWorld {
     min-height: 22rem;
-    margin-inline: -22%;
+    margin-inline: 0;
+    overflow: hidden;
   }
 
   .p1337PhaseDeck,
@@ -5122,8 +5107,8 @@
     width: 100%;
     min-height: 29rem;
     overflow-x: auto;
-    opacity: 1 !important;
-    transform: none !important;
+    opacity: 1;
+    transform: none;
     scrollbar-color: rgb(169 221 211 / 40%) transparent;
   }
 
@@ -5158,7 +5143,7 @@
     padding-right: 1.5rem;
     background: rgb(1 1 1 / 88%);
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
     scroll-snap-align: start;
   }
 
@@ -5171,7 +5156,7 @@
     min-height: 22rem;
     padding: 3rem 0;
     visibility: visible !important;
-    opacity: 1 !important;
+    opacity: 1;
   }
 
   .machineNode,
@@ -5194,7 +5179,7 @@
   .machineRoutes path,
   .omniBranches path,
   .streamBands path {
-    stroke-dashoffset: 0 !important;
+    stroke-dashoffset: 0;
   }
 
   .machineSignal {
@@ -5247,7 +5232,7 @@
   letter-spacing: 0.14em;
 }
 
-@media (max-width: 760px), (prefers-reduced-motion: reduce) {
+@media (max-width: 900px), (prefers-reduced-motion: reduce) {
   .reactivePhaseDeck,
   .sfsPhaseDeck,
   .latchPhaseDeck,
@@ -5271,5 +5256,20 @@
     padding: 2.25rem 0;
     border-bottom: 1px solid rgb(232 227 213 / 12%);
     scroll-snap-align: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reactivePacket,
+  .sfsYieldPacket,
+  .sfsFlowParticle,
+  .reactiveTriggerFlash,
+  .latchPacket,
+  .latchOutcome,
+  .latchRedaction,
+  .p1337Packet,
+  .p1337Pulse,
+  .scalePacket {
+    display: none !important;
   }
 }

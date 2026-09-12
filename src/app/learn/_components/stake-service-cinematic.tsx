@@ -6,6 +6,7 @@ import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import styles from "../learn.module.css";
+import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
 
 const phases = [
@@ -256,6 +257,17 @@ export function StakeServiceCinematic() {
 
           return () => timeline.scrollTrigger?.kill();
         },
+      );
+      media.add(mobileCinematicQuery, () =>
+        createMobileCinematic(root, {
+          world: "[data-sfs-world]",
+          phases: "[data-sfs-phase]",
+          draw: "[data-sfs-yield-route], [data-sfs-paymaster-route], [data-sfs-credit-route], [data-sfs-service-branch], [data-sfs-reactive-bridge], [data-sfs-router-arc]",
+          reveal: "[data-sfs-principal], [data-sfs-router], [data-sfs-paymaster], [data-sfs-credit-burst], [data-sfs-service], [data-sfs-reactive-node]",
+          travel: [
+            { element: "[data-sfs-yield-packet]", path: "[data-sfs-yield-route]" },
+          ],
+        }),
       );
     }, root);
 
