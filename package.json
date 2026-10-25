@@ -28,7 +28,8 @@
     "maintenance:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-rate-limit-maintenance.ts",
     "production:verify": "TMPDIR=/tmp NODE_OPTIONS=--conditions=react-server tsx scripts/verify-production-hardening.ts",
     "db:fresh:verify": "TMPDIR=/tmp tsx scripts/verify-fresh-database.ts",
-    "build:verify": "TMPDIR=/tmp tsx scripts/verify-production-build.ts"
+    "build:verify": "TMPDIR=/tmp tsx scripts/verify-production-build.ts",
+    "i18n:verify": "node --conditions=react-server --import tsx scripts/verify-i18n.ts && node --import tsx scripts/verify-i18n-catalogs.ts && node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/verify-learn-i18n.ts && node --import tsx scripts/verify-localized-arena-share.ts && node scripts/verify-localized-result-card.cjs && node scripts/verify-localized-quiz-presentation.cjs"
   },
   "dependencies": {
     "dotenv": "^17.4.2",

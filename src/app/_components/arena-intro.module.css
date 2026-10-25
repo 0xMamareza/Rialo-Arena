@@ -147,7 +147,8 @@
 
 .composition {
   position: relative;
-  z-index: 1;
+  /* Keep header controls above the full-screen entry hit target. */
+  z-index: 4;
   display: grid;
   grid-template-rows: auto 1fr;
   min-height: 100svh;
@@ -157,6 +158,7 @@
 }
 
 .identity {
+  position: relative;
   display: flex;
   justify-content: center;
   text-align: center;
@@ -165,6 +167,13 @@
 .introSymbol {
   width: clamp(1.4rem, 1.8vw, 1.9rem);
   height: auto;
+}
+
+.languageControl {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  pointer-events: auto;
 }
 
 .arenaSubtitle,
@@ -272,6 +281,11 @@
   box-shadow: inset 0 0 0 1px rgb(1 1 1 / 72%);
 }
 
+.intro:not([lang="en"]) :is(.supportingLine, .entryCue) {
+  letter-spacing: normal;
+  line-height: 1.6;
+}
+
 .entryCue {
   position: absolute;
   bottom: max(1.75rem, env(safe-area-inset-bottom));
@@ -281,10 +295,14 @@
   gap: 0.75rem;
   color: #e8e3d5;
   transform: translateX(-50%);
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  text-align: center;
+  white-space: normal;
 }
 
 .entryDot {
+  flex-shrink: 0;
   width: 0.58rem;
   height: 0.58rem;
   border: 1px solid #a9ddd3;

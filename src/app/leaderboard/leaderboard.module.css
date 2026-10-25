@@ -10,6 +10,20 @@
   color: #e8e3d5;
 }
 
+.page:not([lang="en"]) :is(h1, h2, p, a, span, small, strong) {
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+
+.page:not([lang="en"]) :is(.intro h1, .state h2) {
+  font-size: clamp(2.5rem, 7vw, 7rem);
+  line-height: 1.15;
+}
+
+.header nav { flex-wrap: wrap; justify-content: end; }
+.entry > * { min-width: 0; }
+.score { direction: ltr; flex-wrap: wrap; }
+
 .background {
   position: fixed;
   z-index: -1;
@@ -24,6 +38,7 @@
 
 .header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
@@ -33,6 +48,7 @@
 
 .header > a {
   display: block;
+  flex-shrink: 0;
   width: clamp(5.5rem, 7vw, 7.5rem);
 }
 
@@ -46,6 +62,15 @@
   display: flex;
   align-items: center;
   gap: clamp(0.85rem, 2vw, 1.75rem);
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem 1.5rem;
+  margin-inline-start: auto;
 }
 
 .header nav a,
@@ -393,7 +418,7 @@
     grid-column: 3;
     grid-row: 2;
     justify-self: end;
-    text-align: right;
+    text-align: end;
   }
 }
 

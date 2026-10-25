@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -97,6 +99,7 @@ export function ProfilePanel({
   quizEntryRequested = false,
   quizAttemptId = null,
 }: ProfilePanelProps) {
+  const { t, locale, direction } = useI18n();
   const router = useRouter();
   const [profile, setProfile] = useState(initialProfile);
   const [profileAvatarFailed, setProfileAvatarFailed] = useState(false);
@@ -291,7 +294,7 @@ export function ProfilePanel({
   };
 
   return (
-    <div className={styles.identityPanel}>
+    <div lang={locale} dir={direction} className={styles.identityPanel}>
       {profile ? (
         <div className={styles.readyState}>
           <div className={styles.readyProfile}>
@@ -300,20 +303,20 @@ export function ProfilePanel({
             ) : (
               <DirectAvatar
                 src={profile.profileImageUrl}
-                alt={`Public X avatar for @${profile.username}`}
+                alt={t("Public X avatar for @{username}", { username: profile.username })}
                 className={styles.readyAvatar}
                 onLoad={() => setProfileAvatarLoaded(true)}
                 onError={() => setProfileAvatarFailed(true)}
               />
             )}
             <div>
-              <span className={styles.status}>Profile ready</span>
-              <strong>@{profile.username}</strong>
+              <span className={styles.status}>{t("Profile ready")}</span>
+              <strong dir="ltr">@{profile.username}</strong>
             </div>
           </div>
           <div className={styles.profileActions}>
             <button className={styles.changeButton} type="button" onClick={openDialog}>
-              Change
+              {t("Change")}
             </button>
             <button
               className={styles.changeButton}
@@ -321,27 +324,26 @@ export function ProfilePanel({
               disabled={logoutPending}
               onClick={logout}
             >
-              {logoutPending ? "Signing out" : "Logout"}
+              {logoutPending ? t("Signing out") : t("Logout")}
             </button>
           </div>
           {logoutError ? (
             <p className={`${styles.error} ${styles.readyError}`} role="alert">
-              {logoutError}
+              {t(logoutError)}
             </p>
           ) : null}
           <Link className={styles.startQuizLink} href="/quiz">
-            Start quiz <span aria-hidden="true">→</span>
+            {t("Start quiz")} <span aria-hidden="true">→</span>
           </Link>
         </div>
       ) : (
         <div className={styles.entryCta}>
           <button className={styles.primaryButton} type="button" onClick={openDialog}>
-            Enter X username
+            {t("Enter X username")}
             <span aria-hidden="true">→</span>
           </button>
           <p>
-            Choose public profile metadata for your Arena identity. This does not
-            verify X account ownership.
+            {t("Choose public profile metadata for your Arena identity. This does not verify X account ownership.")}
           </p>
         </div>
       )}
@@ -358,7 +360,7 @@ export function ProfilePanel({
           <button
             className={styles.closeButton}
             type="button"
-            aria-label="Close profile setup"
+            aria-label={t("Close profile setup")}
             onClick={closeDialog}
           >
             ×
@@ -366,22 +368,22 @@ export function ProfilePanel({
 
           {step === "entry" ? (
             <form className={styles.form} onSubmit={findProfile}>
-              <span className={styles.stepMarker}>Profile setup / 01</span>
+              <span className={styles.stepMarker}>{t("Profile setup / {step}", { step: "01" })}</span>
               <h2 className={styles.headline} id={titleId}>
-                <span>Enter your</span>
-                <span>X username</span>
+                <span>{t("Enter your X username")}</span>
               </h2>
               <p id={descriptionId}>
-                We&apos;ll find your public profile so you can confirm it.
+                {t("We'll find your public profile so you can confirm it.")}
               </p>
               <label className={styles.inputLabel} htmlFor="x-username">
-                X username
+                {t("X username")}
               </label>
               <div className={styles.inputShell}>
                 <span aria-hidden="true">@</span>
                 <input
                   ref={inputRef}
                   id="x-username"
+                  dir="ltr"
                   name="username"
                   type="text"
                   value={usernameInput}
@@ -396,24 +398,22 @@ export function ProfilePanel({
               </div>
               {errorMessage ? (
                 <p className={styles.error} id={errorId} role="alert">
-                  {errorMessage}
+                  {t(errorMessage)}
                 </p>
               ) : null}
               <button className={styles.primaryButton} type="submit">
-                Find my profile
+                {t("Find my profile")}
                 <span aria-hidden="true">→</span>
               </button>
             </form>
           ) : (
             <div className={styles.confirmation}>
-              <span className={styles.stepMarker}>Profile setup / 02</span>
+              <span className={styles.stepMarker}>{t("Profile setup / {step}", { step: "02" })}</span>
               <h2 className={styles.headline} id={titleId}>
-                <span>Use this</span>
-                <span>profile?</span>
+                <span>{t("Use this profile?")}</span>
               </h2>
               <p id={descriptionId}>
-                Confirm the public metadata you want to display. This does not
-                verify ownership.
+                {t("Confirm the public metadata you want to display. This does not verify ownership.")}
               </p>
 
               {preview ? (
@@ -423,7 +423,7 @@ export function ProfilePanel({
                   ) : (
                     <DirectAvatar
                       src={preview.profileImageUrl}
-                      alt={`Public X avatar for @${preview.username}`}
+                      alt={t("Public X avatar for @{username}", { username: preview.username })}
                       className={styles.previewAvatar}
                       onLoad={() => setPreviewAvatarLoaded(true)}
                       onError={() => setPreviewAvatarFailed(true)}
@@ -432,11 +432,11 @@ export function ProfilePanel({
                 </div>
               ) : null}
 
-              {preview ? <strong className={styles.previewUsername}>@{preview.username}</strong> : null}
+              {preview ? <strong className={styles.previewUsername} dir="ltr">@{preview.username}</strong> : null}
 
               {errorMessage ? (
                 <p className={styles.error} id={errorId} role="alert">
-                  {errorMessage}
+                  {t(errorMessage)}
                 </p>
               ) : null}
 
@@ -447,7 +447,7 @@ export function ProfilePanel({
                   disabled={step === "submitting"}
                   onClick={confirmAccount}
                 >
-                  {step === "submitting" ? "Preparing profile…" : "Yes, continue"}
+                  {step === "submitting" ? t("Preparing profile…") : t("Yes, continue")}
                   <span aria-hidden="true">→</span>
                 </button>
                 <button
@@ -456,7 +456,7 @@ export function ProfilePanel({
                   disabled={step === "submitting"}
                   onClick={() => resetEntry(preview?.username ?? "")}
                 >
-                  No, try again
+                  {t("No, try again")}
                 </button>
               </div>
             </div>

@@ -1,3 +1,4 @@
+import { getI18n } from "@/lib/i18n/server";
 import type { ReactNode } from "react";
 
 import styles from "../learn.module.css";
@@ -25,12 +26,13 @@ type StudyNotesProps = {
   sourceType: string;
 };
 
-export function ChapterFacts({ facts, headingId }: ChapterFactsProps) {
+export async function ChapterFacts({ facts, headingId }: ChapterFactsProps) {
+  const { t } = await getI18n();
   return (
     <section className={styles.factSection} aria-labelledby={headingId}>
       <header className={styles.knowledgeHeader}>
-        <span>Key facts</span>
-        <h2 id={headingId}>Keep these in view.</h2>
+        <span>{t("Key facts")}</span>
+        <h2 id={headingId}>{t("Keep these in view.")}</h2>
       </header>
       <dl className={styles.factGrid}>
         {facts.map((fact, index) => (
@@ -45,18 +47,19 @@ export function ChapterFacts({ facts, headingId }: ChapterFactsProps) {
   );
 }
 
-export function StudyNotes({
+export async function StudyNotes({
   notes,
   headingId,
   sourceHref,
   sourceLabel,
   sourceType,
 }: StudyNotesProps) {
+  const { t } = await getI18n();
   return (
     <section className={styles.studyNotes} aria-labelledby={headingId}>
       <header className={styles.knowledgeHeader}>
-        <span>Study notes</span>
-        <h2 id={headingId}>Go one layer deeper.</h2>
+        <span>{t("Study notes")}</span>
+        <h2 id={headingId}>{t("Go one layer deeper.")}</h2>
       </header>
 
       <div className={styles.noteList}>
@@ -73,7 +76,7 @@ export function StudyNotes({
       </div>
 
       <div className={styles.readingCta}>
-        <p>Learn gives you the model. Official sources provide the deeper detail.</p>
+        <p>{t("Learn gives you the model. Official sources provide the deeper detail.")}</p>
         <a
           className={styles.primaryReading}
           href={sourceHref}

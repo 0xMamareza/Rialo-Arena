@@ -11,6 +11,25 @@
   color: #e8e3d5;
 }
 
+.quizPage:not([lang="en"]) :is(h1, h2, p, a, span, strong, dt, button, time) {
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+
+.quizPage:not([lang="en"]) :is(.entry h1, .errorState h1, .results h1, .questionCopy h1) {
+  line-height: 1.2;
+}
+
+.quizPage:not([lang="en"]) .personalBestGrid strong {
+  overflow: visible;
+  white-space: normal;
+}
+
+.runStatus { flex-wrap: wrap; }
+.personalBestHeading { flex-wrap: wrap; }
+.finalScore,
+.personalBestScore strong { direction: ltr; }
+
 .background {
   position: fixed;
   z-index: -2;
@@ -35,8 +54,8 @@
 }
 
 .header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 1rem;
   min-height: 3.5rem;
@@ -45,6 +64,7 @@
 
 .header > a {
   display: block;
+  flex-shrink: 0;
   width: clamp(5.5rem, 7vw, 7.5rem);
 }
 
@@ -75,7 +95,18 @@
   text-transform: uppercase;
 }
 
-.arenaLabel { color: rgb(232 227 213 / 42%); }
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem 1rem;
+  margin-inline-start: auto;
+  padding-block: 0.5rem;
+  min-width: 0;
+}
+
+.arenaLabel { color: rgb(232 227 213 / 42%); margin-inline: auto; }
 .eyebrow { color: #a9ddd3; }
 
 .profile {
@@ -257,7 +288,7 @@
   letter-spacing: -0.03em;
 }
 
-.runMeta > div:last-child { text-align: right; }
+.runMeta > div:last-child { text-align: end; }
 .runMeta > div:last-child strong { color: #a9ddd3; }
 
 .progress {
@@ -346,7 +377,7 @@
   border: 1px solid rgb(232 227 213 / 19%);
   background: rgb(1 1 1 / 58%);
   color: #e8e3d5;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
   backdrop-filter: blur(8px);
   transition: border-color 130ms ease, background-color 130ms ease, transform 130ms ease;
@@ -497,7 +528,7 @@
   margin-top: 1.25rem;
   border: 1px solid rgb(232 227 213 / 14%);
   background: rgb(1 1 1 / 45%);
-  text-align: left;
+  text-align: start;
   backdrop-filter: blur(8px);
 }
 
@@ -597,7 +628,7 @@
 
 @media (max-width: 760px) {
   .quizPage { padding: 0.8rem 1rem 1.25rem; }
-  .header { grid-template-columns: 1fr auto; min-height: 3.25rem; }
+  .header { min-height: 3.25rem; }
   .header > a { display: flex; width: 5.25rem; min-height: 2.75rem; align-items: center; }
   .arenaLabel { display: none; }
   .profile span { max-width: 8rem; }

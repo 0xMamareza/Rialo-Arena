@@ -1,10 +1,13 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { DiagramText } from "./diagram-text";
 import styles from "../learn.module.css";
 import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
@@ -43,8 +46,9 @@ const phases = [
 ] as const;
 
 function StakeServiceDiagram() {
+  const { t } = useI18n();
   return (
-    <svg className={styles.sfsDiagram} viewBox="0 0 1440 820" aria-hidden="true">
+    <svg direction="ltr" className={styles.sfsDiagram} viewBox="0 0 1440 820" role="img" aria-label={t("Diagram: staked principal routes future rewards into credits for network services and automation.")}>
       <defs>
         <filter id="sfs-glow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="10" />
@@ -66,15 +70,15 @@ function StakeServiceDiagram() {
         <circle className={styles.sfsReservoirOuter} r="86" />
         <circle className={styles.sfsReservoirInner} r="61" />
         <path d="M-38 8C-18-16 19-16 39 8M-29 25C-11 9 12 9 30 25" />
-        <text y="-10" textAnchor="middle">STAKED</text>
-        <text className={styles.sfsNodeTitle} y="12" textAnchor="middle">PRINCIPAL</text>
-        <text y="116" textAnchor="middle">REMAINS STAKED</text>
+        <DiagramText maxWidth={150} y="-10" textAnchor="middle">{t("STAKED")}</DiagramText>
+        <DiagramText maxWidth={150} className={styles.sfsNodeTitle} y="12" textAnchor="middle">{t("PRINCIPAL")}</DiagramText>
+        <DiagramText maxWidth={150} y="116" textAnchor="middle">{t("REMAINS STAKED")}</DiagramText>
       </g>
 
       <path className={styles.sfsYieldRoute} data-sfs-yield-route d="M318 386C405 386 411 304 497 304" />
       <path className={styles.sfsReturnRoute} d="M318 386C405 386 411 468 497 468" />
-      <text className={styles.sfsRouteLabel} x="392" y="322">SELECTED YIELD</text>
-      <text className={styles.sfsRouteLabel} x="390" y="485">REMAINDER / STANDARD PATH</text>
+      <DiagramText maxWidth={240} className={styles.sfsRouteLabel} x="392" y="322">{t("SELECTED YIELD")}</DiagramText>
+      <DiagramText maxWidth={240} className={styles.sfsRouteLabel} x="390" y="485">{t("REMAINDER / STANDARD PATH")}</DiagramText>
 
       <g className={styles.sfsYieldPacket} data-sfs-yield-packet>
         <circle r="8" />
@@ -86,9 +90,9 @@ function StakeServiceDiagram() {
         <circle cx="95" cy="97" r="54" />
         <path className={styles.sfsRouterArc} data-sfs-router-arc d="M63 123A43 43 0 1 1 132 119" />
         <path d="M95 97L126 74" />
-        <text x="95" y="31" textAnchor="middle">ROUTING FRACTION</text>
-        <text className={styles.sfsRouterValue} data-sfs-router-value x="95" y="104" textAnchor="middle">ROUTED</text>
-        <text x="95" y="190" textAnchor="middle">FUTURE REWARDS ONLY</text>
+        <DiagramText maxWidth={170} x="95" y="31" textAnchor="middle">{t("ROUTING FRACTION")}</DiagramText>
+        <DiagramText maxWidth={170} className={styles.sfsRouterValue} data-sfs-router-value x="95" y="104" textAnchor="middle">{t("ROUTED")}</DiagramText>
+        <DiagramText maxWidth={170} x="95" y="190" textAnchor="middle">{t("FUTURE REWARDS ONLY")}</DiagramText>
       </g>
 
       <path className={styles.sfsPaymasterRoute} data-sfs-paymaster-route d="M687 347C750 347 763 386 816 386" />
@@ -98,14 +102,14 @@ function StakeServiceDiagram() {
         <circle cx="115" cy="101" r="31" />
         <path d="M99 101H131M115 85V117" />
         <text x="115" y="35" textAnchor="middle">SERVICEPAYMASTER</text>
-        <text className={styles.sfsNodeTitle} x="115" y="175" textAnchor="middle">MINT CREDITS 1:1</text>
+        <DiagramText maxWidth={205} className={styles.sfsNodeTitle} x="115" y="175" textAnchor="middle">{t("MINT CREDITS 1:1")}</DiagramText>
       </g>
 
       <g className={styles.sfsCreditBurst} data-sfs-credit-burst transform="translate(1075 386)">
         <circle r="42" />
         <circle r="25" />
-        <text y="4" textAnchor="middle">CREDITS</text>
-        <text y="69" textAnchor="middle">SERVICE-BOUND</text>
+        <DiagramText maxWidth={150} y="4" textAnchor="middle">{t("CREDITS")}</DiagramText>
+        <DiagramText maxWidth={150} y="69" textAnchor="middle">{t("SERVICE-BOUND")}</DiagramText>
       </g>
       <path className={styles.sfsCreditRoute} data-sfs-credit-route d="M1046 386H1075" />
 
@@ -117,8 +121,8 @@ function StakeServiceDiagram() {
         <g className={styles.sfsService} data-sfs-service={service} key={service} transform={`translate(1260 ${210 + index * 132})`}>
           <rect width="134" height="88" rx="3" />
           <circle cx="24" cy="44" r="8" />
-          <text x="43" y="48">{service === "scheduled" ? "SCHEDULED" : service.toUpperCase()}</text>
-          {service === "scheduled" ? <text x="43" y="62">EXECUTION</text> : null}
+          <DiagramText maxWidth={80} x="43" y="48">{t(service === "scheduled" ? "SCHEDULED" : service === "gas" ? "GAS" : "STORAGE")}</DiagramText>
+          {service === "scheduled" ? <DiagramText maxWidth={80} x="43" y="62">{t("EXECUTION")}</DiagramText> : null}
         </g>
       ))}
 
@@ -126,8 +130,8 @@ function StakeServiceDiagram() {
       <g className={styles.sfsReactiveNode} data-sfs-reactive-node transform="translate(610 620)">
         <rect width="260" height="64" rx="32" />
         <circle cx="31" cy="32" r="8" />
-        <text x="55" y="29">REACTIVE TRANSACTIONS</text>
-        <text x="55" y="45">CONTINUOUSLY FUNDED</text>
+        <DiagramText maxWidth={220} x="55" y="29">{t("REACTIVE TRANSACTIONS")}</DiagramText>
+        <DiagramText maxWidth={220} x="55" y="45">{t("CONTINUOUSLY FUNDED")}</DiagramText>
       </g>
 
       {[0, 1, 2, 3].map((index) => (
@@ -140,6 +144,7 @@ function StakeServiceDiagram() {
 }
 
 export function StakeServiceCinematic() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -174,7 +179,7 @@ export function StakeServiceCinematic() {
           gsap.set("[data-sfs-content]", { autoAlpha: 0 });
           gsap.set("[data-sfs-release]", { autoAlpha: 0, yPercent: 5 });
           gsap.set("[data-sfs-world]", { xPercent: 3, yPercent: 2, scale: 0.95, opacity: 0.72 });
-          gsap.set("[data-sfs-router-value]", { textContent: "SELECT" });
+          gsap.set("[data-sfs-router-value]", { textContent: t("SELECT") });
 
           const timeline = gsap.timeline({
             defaults: { ease: "none" },
@@ -210,7 +215,7 @@ export function StakeServiceCinematic() {
             )
             .to("[data-sfs-router]", { opacity: 1, duration: 0.36 }, 2.25)
             .to("[data-sfs-router-arc]", { strokeDashoffset: 0, duration: 0.65 }, 2.32)
-            .set("[data-sfs-router-value]", { textContent: "ROUTED" }, 2.72)
+            .set("[data-sfs-router-value]", { textContent: t("ROUTED") }, 2.72)
             .set("[data-sfs-yield-packet]", { autoAlpha: 0 }, 2.9)
             .to("[data-sfs-paymaster-route]", { strokeDashoffset: 0, duration: 0.78 }, 3.25)
             .to("[data-sfs-paymaster]", { opacity: 1, duration: 0.38 }, 3.72)
@@ -275,7 +280,7 @@ export function StakeServiceCinematic() {
       media.revert();
       context.revert();
     };
-  }, []);
+  }, [t]);
 
   return (
     <section ref={rootRef} className={styles.sfsCinematic} aria-labelledby="sfs-title">
@@ -292,40 +297,40 @@ export function StakeServiceCinematic() {
 
           <div className={styles.sfsContentLayer}>
             <header className={styles.sfsIntro} data-sfs-intro>
-              <span className={styles.chapterMarker}>Chapter 04 / Stake-for-Service</span>
-              <span className={styles.systemType}>Economic mechanism</span>
-              <p className={styles.chapterThesis}>Yield into utility</p>
-              <h2 id="sfs-title">Keep the stake. Route the rewards.</h2>
-              <p>Future yield becomes a renewable budget for network services.</p>
+              <span className={styles.chapterMarker}>{t("Chapter 04 / Stake-for-Service")}</span>
+              <span className={styles.systemType}>{t("Economic mechanism")}</span>
+              <p className={styles.chapterThesis}>{t("Yield into utility")}</p>
+              <h2 id="sfs-title">{t("Keep the stake. Route the rewards.")}</h2>
+              <p>{t("Future yield becomes a renewable budget for network services.")}</p>
             </header>
 
             <div className={styles.sfsSceneContent} data-sfs-content>
               <header className={styles.sfsSceneHeader}>
-                <span>Stake-for-Service / Capital flow</span>
-                <strong>Principal stays. Utility flows.</strong>
+                <span>{t("Stake-for-Service / Capital flow")}</span>
+                <strong>{t("Principal stays. Utility flows.")}</strong>
               </header>
 
               <div className={styles.sfsPhaseDeck}>
                 {phases.map((phase, index) => (
                   <article className={styles.sfsPhase} data-sfs-phase key={phase.code}>
-                    <span>{phase.eyebrow}</span>
-                    <h3>{phase.title}</h3>
-                    <p>{phase.body}</p>
+                    <span>{t(phase.eyebrow)}</span>
+                    <h3>{t(phase.title)}</h3>
+                    <p>{t(phase.body)}</p>
                     <small>{String(index + 1).padStart(2, "0")} / 05</small>
                   </article>
                 ))}
               </div>
 
-              <ol className={styles.sfsPhaseRail} aria-label="Stake-for-Service phases">
+              <ol className={styles.sfsPhaseRail} aria-label={t("Stake-for-Service phases")}>
                 {phases.map((phase) => (
-                  <li data-sfs-step key={phase.code}>{phase.code}</li>
+                  <li data-sfs-step key={phase.code}>{t(phase.code)}</li>
                 ))}
               </ol>
             </div>
 
             <div className={styles.sfsRelease} data-sfs-release>
-              <span>Stake-for-Service + Reactive Transactions</span>
-              <p>Automation can fund its next execution.</p>
+              <span>{t("Stake-for-Service + Reactive Transactions")}</span>
+              <p>{t("Automation can fund its next execution.")}</p>
             </div>
           </div>
         </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import Image from "next/image";
 import {
   useCallback,
@@ -12,6 +14,7 @@ import {
 
 import styles from "./arena-intro.module.css";
 import { Grainient } from "./grainient";
+import { LanguageSelector } from "./language-selector";
 
 const WORD = "RIALO";
 const RESTING_WIDTH = 28;
@@ -57,6 +60,7 @@ export function ArenaIntro({
   children,
   fontVariableClassName,
 }: ArenaIntroProps) {
+  const { t, locale, direction } = useI18n();
   const [phase, setPhase] = useState<IntroPhase>("open");
   const [pressureEnabled, setPressureEnabled] = useState(false);
   const [motionEnabled, setMotionEnabled] = useState(false);
@@ -399,6 +403,8 @@ export function ArenaIntro({
         <section
           ref={introRef}
           className={styles.intro}
+          lang={locale}
+          dir={direction}
           data-phase={phase}
           aria-labelledby="arena-intro-title"
           onPointerMove={handlePointerMove}
@@ -472,6 +478,9 @@ export function ArenaIntro({
                 className={styles.introSymbol}
                 priority
               />
+              <div className={styles.languageControl}>
+                <LanguageSelector />
+              </div>
             </header>
 
             <div className={styles.wordCluster}>
@@ -485,6 +494,7 @@ export function ArenaIntro({
               <div
                 ref={wordRef}
                 className={styles.pressureWord}
+                dir="ltr"
                 aria-hidden="true"
               >
                 {Array.from(WORD).map((letter, index) => (
@@ -509,8 +519,7 @@ export function ArenaIntro({
               </div>
               <p className={styles.arenaSubtitle}>Arena</p>
               <p className={styles.supportingLine}>
-                15 questions <span>·</span> 20 seconds each <span>·</span> up
-                to 3,000 points
+                {t("15 questions · 20 seconds each · up to 3,000 points")}
               </p>
             </div>
           </div>
@@ -519,11 +528,11 @@ export function ArenaIntro({
             className={styles.enterButton}
             type="button"
             onClick={enterArena}
-            aria-label="Enter Rialo Arena"
+            aria-label={t("Enter Rialo Arena")}
           >
             <span className={styles.entryCue}>
               <span className={styles.entryDot} aria-hidden="true" />
-              Enter the Arena
+              {t("Enter the Arena")}
             </span>
           </button>
         </section>

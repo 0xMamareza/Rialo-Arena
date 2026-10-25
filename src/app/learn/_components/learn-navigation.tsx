@@ -1,5 +1,8 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+import { LanguageSelector } from "@/app/_components/language-selector";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -18,6 +21,7 @@ type LearnNavigationProps = {
 };
 
 export function LearnNavigation({ chapters }: LearnNavigationProps) {
+  const { t } = useI18n();
   const firstAvailable = chapters.find((chapter) => chapter.available);
   const [activeId, setActiveId] = useState(firstAvailable?.id ?? "");
   const progressRef = useRef<HTMLSpanElement>(null);
@@ -132,7 +136,7 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
   return (
     <>
       <header className={styles.learnBar}>
-        <Link className={styles.learnBrand} href="/" aria-label="Back to Rialo Arena">
+        <Link className={styles.learnBrand} href="/" aria-label={t("Back to Rialo Arena")}>
           <Image
             src="/brand/rialo/rialo-lockup-off-white.svg"
             alt="Rialo"
@@ -140,26 +144,28 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
             height={182}
             priority
           />
-          <span>Field manual</span>
+          <span>{t("Field manual")}</span>
         </Link>
 
         <div className={styles.chapterReadout} aria-live="polite">
-          <span>Chapter</span>
+          <span>{t("Chapter")}</span>
           <strong>{activeChapter?.number ?? "01"}</strong>
           <i>/</i>
           <span>{String(chapters.length).padStart(2, "0")}</span>
         </div>
 
-        <Link className={styles.arenaReturn} href="/">
-          Arena <span aria-hidden="true">↗</span>
-        </Link>
+        <div className={styles.headerActions}>
+          <LanguageSelector />
+          <Link className={styles.arenaReturn} href="/">{t("Arena")}<span aria-hidden="true">↗</span>
+          </Link>
+        </div>
 
         <div className={styles.pageProgress} aria-hidden="true">
           <span ref={progressRef} className={styles.pageProgressFill} />
         </div>
       </header>
 
-      <nav ref={navRef} className={styles.chapterNav} aria-label="Learn chapters">
+      <nav dir="ltr" ref={navRef} className={styles.chapterNav} aria-label={t("Learn chapters")}>
         <ol>
           {chapters.map((chapter) => (
             <li
@@ -178,6 +184,7 @@ export function LearnNavigation({ chapters }: LearnNavigationProps) {
               <span className={styles.navNumber}>{chapter.number}</span>
               {chapter.available ? (
                 <a
+                  dir="auto"
                   href={`#${chapter.id}`}
                   aria-current={chapter.id === activeId ? "location" : undefined}
                 >

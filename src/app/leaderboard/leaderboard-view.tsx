@@ -1,5 +1,8 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+import { LanguageSelector } from "@/app/_components/language-selector";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -69,6 +72,7 @@ function readRetryAfter(response: Response) {
 }
 
 export function LeaderboardView({ className }: LeaderboardViewProps) {
+  const { t, locale, direction } = useI18n();
   const [requestVersion, setRequestVersion] = useState(0);
   const [loadState, setLoadState] = useState<LoadState>({ status: "loading" });
 
@@ -124,11 +128,11 @@ export function LeaderboardView({ className }: LeaderboardViewProps) {
   }, [requestVersion]);
 
   return (
-    <main className={`${styles.page} ${className}`}>
+    <main lang={locale} dir={direction} className={`${styles.page} ${className}`}>
       <div className={styles.background} aria-hidden="true" />
 
       <header className={styles.header}>
-        <Link href="/" aria-label="Return to Rialo Arena">
+        <Link href="/" aria-label={t("Return to Rialo Arena")}>
           <Image
             src="/brand/rialo/rialo-lockup-off-white.svg"
             alt="Rialo"
@@ -137,26 +141,29 @@ export function LeaderboardView({ className }: LeaderboardViewProps) {
             priority
           />
         </Link>
-        <nav aria-label="Product navigation">
-          <Link href="/">Arena</Link>
-          <Link href="/learn">Learn</Link>
-          <Link href="/quiz">Start quiz</Link>
-        </nav>
+        <div className={styles.headerActions}>
+          <nav aria-label={t("Product navigation")}>
+            <Link href="/">Arena</Link>
+            <Link href="/learn">{t("Learn")}</Link>
+            <Link href="/quiz">{t("Start quiz")}</Link>
+          </nav>
+          <LanguageSelector />
+        </div>
       </header>
 
       <section className={styles.content} aria-labelledby="leaderboard-title">
         <div className={styles.intro}>
           <div>
-            <span className={styles.eyebrow}>Global standings</span>
-            <h1 id="leaderboard-title">Leaderboard</h1>
+            <span className={styles.eyebrow}>{t("Global standings")}</span>
+            <h1 id="leaderboard-title">{t("Leaderboard")}</h1>
           </div>
-          <p>Each player is represented by their best completed Arena run.</p>
+          <p>{t("Each player is represented by their best completed Arena run.")}</p>
         </div>
 
         <div className={styles.disclosure}>
-          <span>Profiles are unverified.</span>
+          <span>{t("Profiles are unverified.")}</span>
           <span>
-            Arena tiers are progression labels, not official Rialo status.
+            {t("Arena tiers are progression labels, not official Rialo status.")}
           </span>
         </div>
 
@@ -168,50 +175,50 @@ export function LeaderboardView({ className }: LeaderboardViewProps) {
           {loadState.status === "loading" ? (
             <div className={styles.state}>
               <span className={styles.loadingMark} aria-hidden="true" />
-              <p>Loading the top 50</p>
+              <p>{t("Loading the top 50")}</p>
             </div>
           ) : null}
 
           {loadState.status === "error" ? (
             <div className={styles.state} role="alert">
-              <span className={styles.stateCode}>Connection state</span>
-              <h2>Standings unavailable.</h2>
-              <p>{loadState.message}</p>
+              <span className={styles.stateCode}>{t("Connection state")}</span>
+              <h2>{t("Standings unavailable.")}</h2>
+              <p>{t(loadState.message)}</p>
               {loadState.retryAfterSeconds ? (
-                <small>Try again in {loadState.retryAfterSeconds} seconds.</small>
+                <small>{t("Try again in {seconds} seconds.", { seconds: loadState.retryAfterSeconds.toLocaleString(locale) })}</small>
               ) : null}
               <button
                 type="button"
                 onClick={() => setRequestVersion((version) => version + 1)}
               >
-                Retry
+                {t("Retry")}
               </button>
             </div>
           ) : null}
 
           {loadState.status === "ready" && loadState.entries.length === 0 ? (
             <div className={styles.state}>
-              <span className={styles.stateCode}>No completed runs</span>
-              <h2>The board is open.</h2>
-              <p>Complete an Arena run to establish the first score.</p>
-              <Link href="/quiz">Start quiz</Link>
+              <span className={styles.stateCode}>{t("No completed runs")}</span>
+              <h2>{t("The board is open.")}</h2>
+              <p>{t("Complete an Arena run to establish the first score.")}</p>
+              <Link href="/quiz">{t("Start quiz")}</Link>
             </div>
           ) : null}
 
           {loadState.status === "ready" && loadState.entries.length > 0 ? (
             <>
               <div className={styles.columns} aria-hidden="true">
-                <span>Rank</span>
-                <span>Player</span>
-                <span>Score</span>
-                <span>Tier</span>
-                <span>Run</span>
+                <span>{t("Rank")}</span>
+                <span>{t("Player")}</span>
+                <span>{t("Score")}</span>
+                <span>{t("Tier")}</span>
+                <span>{t("Run")}</span>
               </div>
               <ol className={styles.entries}>
                 {loadState.entries.map((entry) => (
                   <li className={styles.entry} key={entry.rank}>
                     <span className={styles.rank}>
-                      {String(entry.rank).padStart(2, "0")}
+                      {entry.rank.toLocaleString(locale, { minimumIntegerDigits: 2, useGrouping: false })}
                     </span>
                     <div className={styles.identity}>
                       <span className={styles.avatar}>
@@ -232,16 +239,16 @@ export function LeaderboardView({ className }: LeaderboardViewProps) {
                           }}
                         />
                       </span>
-                      <strong>@{entry.xUsername}</strong>
+                      <strong dir="ltr">@{entry.xUsername}</strong>
                     </div>
                     <div className={styles.score}>
-                      <strong>{entry.score.toLocaleString("en-US")}</strong>
-                      <span>/ 3,000</span>
+                      <strong>{entry.score.toLocaleString(locale)}</strong>
+                      <span>/ {(3000).toLocaleString(locale)}</span>
                     </div>
-                    <span className={styles.tier}>{entry.tier}</span>
+                    <span className={styles.tier}>{t(entry.tier)}</span>
                     <div className={styles.runStats}>
-                      <span>{entry.correctCount} correct</span>
-                      <span>{entry.timeoutCount} timeout</span>
+                      <span>{t("{count} correct", { count: entry.correctCount.toLocaleString(locale) })}</span>
+                      <span>{t("{count} timeout", { count: entry.timeoutCount.toLocaleString(locale) })}</span>
                     </div>
                   </li>
                 ))}

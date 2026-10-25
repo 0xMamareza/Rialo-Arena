@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getI18n } from "@/lib/i18n/server";
 import localFont from "next/font/local";
 
 import { LeaderboardView } from "./leaderboard-view";
@@ -12,10 +13,10 @@ const arenaPressure = localFont({
   fallback: ["Arial Narrow", "Arial", "sans-serif"],
 });
 
-export const metadata: Metadata = {
-  title: "Leaderboard | Rialo Arena",
-  description: "See the top completed runs in Rialo Arena.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("Leaderboard | Rialo Arena"), description: t("See the top completed runs in Rialo Arena.") };
+}
 
 export default function LeaderboardPage() {
   return <LeaderboardView className={arenaPressure.variable} />;

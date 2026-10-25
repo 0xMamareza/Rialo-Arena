@@ -1,10 +1,13 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { DiagramText } from "./diagram-text";
 import styles from "../learn.module.css";
 import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
@@ -43,8 +46,9 @@ const phases = [
 ] as const;
 
 function ReactiveDiagram() {
+  const { t } = useI18n();
   return (
-    <svg className={styles.reactiveDiagram} viewBox="0 0 1440 820" aria-hidden="true">
+    <svg direction="ltr" className={styles.reactiveDiagram} viewBox="0 0 1440 820" role="img" aria-label={t("Diagram: signals become a condition, validator agreement, and automatic execution.")}>
       <defs>
         <filter id="reactive-glow" x="-60%" y="-60%" width="220%" height="220%">
           <feGaussianBlur stdDeviation="8" />
@@ -64,21 +68,21 @@ function ReactiveDiagram() {
       <g className={styles.reactiveSignal} data-reactive-signal="onchain" transform="translate(238 238)">
         <circle r="49" />
         <path d="M-18-10H18M-18 0H10M-18 10H15" />
-        <text y="72" textAnchor="middle">ONCHAIN</text>
-        <text y="88" textAnchor="middle">STATE + EVENTS</text>
+        <DiagramText maxWidth={210} y="72" textAnchor="middle">{t("ONCHAIN")}</DiagramText>
+        <DiagramText maxWidth={210} y="88" textAnchor="middle">{t("STATE + EVENTS")}</DiagramText>
       </g>
       <g className={styles.reactiveSignal} data-reactive-signal="data" transform="translate(182 410)">
         <circle r="49" />
         <path d="M-21 8C-10-15 12-15 23 8M-13 8C-6-4 6-4 13 8M0 8V19" />
-        <text y="72" textAnchor="middle">OFFCHAIN / DATA</text>
-        <text y="88" textAnchor="middle">VALIDATOR ATTESTED</text>
+        <DiagramText maxWidth={210} y="72" textAnchor="middle">{t("OFFCHAIN / DATA")}</DiagramText>
+        <DiagramText maxWidth={210} y="88" textAnchor="middle">{t("VALIDATOR ATTESTED")}</DiagramText>
       </g>
       <g className={styles.reactiveSignal} data-reactive-signal="time" transform="translate(238 582)">
         <circle r="49" />
         <circle r="20" />
         <path d="M0-20V0L14 10" />
-        <text y="72" textAnchor="middle">TIME</text>
-        <text y="88" textAnchor="middle">HEIGHT + TIMESTAMP</text>
+        <DiagramText maxWidth={210} y="72" textAnchor="middle">{t("TIME")}</DiagramText>
+        <DiagramText maxWidth={210} y="88" textAnchor="middle">{t("HEIGHT + TIMESTAMP")}</DiagramText>
       </g>
 
       <path className={styles.reactiveSignalRoute} data-reactive-route="onchain" d="M287 238C420 238 405 344 548 390" />
@@ -94,26 +98,26 @@ function ReactiveDiagram() {
 
       <g className={styles.reactivePredicate} data-reactive-predicate transform="translate(548 325)">
         <rect width="206" height="170" rx="4" />
-        <text x="103" y="30" textAnchor="middle">PREDICATE</text>
+        <DiagramText maxWidth={180} x="103" y="30" textAnchor="middle">{t("PREDICATE")}</DiagramText>
         <path d="M35 62H171M35 96H171M35 130H171" />
         <circle cx="58" cy="62" r="6" />
         <circle cx="58" cy="96" r="6" />
         <circle cx="58" cy="130" r="6" />
-        <text className={styles.reactivePredicateValue} data-reactive-predicate-value x="128" y="101" textAnchor="middle">TRUE</text>
+        <DiagramText maxWidth={180} className={styles.reactivePredicateValue} data-reactive-predicate-value x="128" y="101" textAnchor="middle">{t("TRUE")}</DiagramText>
       </g>
 
       <path className={styles.reactiveConsensusRoute} data-reactive-consensus-route d="M754 410H940" />
       <g className={styles.reactiveValidators} data-reactive-validators transform="translate(790 282)">
         <rect width="180" height="256" rx="90" />
-        <text x="90" y="32" textAnchor="middle">VALIDATOR EVALUATION</text>
+        <DiagramText maxWidth={165} x="90" y="32" textAnchor="middle">{t("VALIDATOR EVALUATION")}</DiagramText>
         {[72, 112, 152, 192].map((y, index) => (
           <g className={styles.reactiveValidator} data-reactive-validator key={y} transform={`translate(40 ${y})`}>
             <circle r="12" />
             <path d="M-5 0L-1 4L7-5" />
-            <text x="28" y="4">NODE {String(index + 1).padStart(2, "0")}</text>
+            <DiagramText maxWidth={115} x="28" y="4">{t("NODE {number}", { number: String(index + 1).padStart(2, "0") })}</DiagramText>
           </g>
         ))}
-        <text className={styles.reactiveAgreement} data-reactive-agreement x="90" y="232" textAnchor="middle">DETERMINISTIC / TRUE</text>
+        <DiagramText maxWidth={165} className={styles.reactiveAgreement} data-reactive-agreement x="90" y="232" textAnchor="middle">{t("DETERMINISTIC / TRUE")}</DiagramText>
       </g>
 
       <path className={styles.reactiveExecutionRoute} data-reactive-execution-route d="M970 410H1192" />
@@ -122,18 +126,18 @@ function ReactiveDiagram() {
         <circle className={styles.reactiveTriggerRing} r="57" />
         <circle className={styles.reactiveTriggerCore} r="12" />
         <path d="M-3-19L-14 2H-3L-8 22L15-7H4L10-19Z" />
-        <text y="84" textAnchor="middle">TRIGGER</text>
+        <DiagramText maxWidth={150} y="84" textAnchor="middle">{t("TRIGGER")}</DiagramText>
       </g>
 
       <g className={styles.reactiveExecution} data-reactive-execution transform="translate(1192 330)">
         <rect width="170" height="160" rx="4" />
         <path d="M35 52H135M35 80H106M35 108H124" />
         <circle cx="137" cy="108" r="8" />
-        <text x="85" y="139" textAnchor="middle">EXECUTION</text>
+        <DiagramText maxWidth={180} x="85" y="139" textAnchor="middle">{t("EXECUTION")}</DiagramText>
       </g>
 
       <g className={styles.reactiveBlockRail}>
-        <text x="548" y="660">BLOCK EXECUTION</text>
+        <DiagramText maxWidth={150} x="548" y="660">{t("BLOCK EXECUTION")}</DiagramText>
         <path d="M548 680H1362" />
         {[650, 824, 998, 1172, 1346].map((x, index) => (
           <g key={x} transform={`translate(${x} 680)`}>
@@ -147,6 +151,7 @@ function ReactiveDiagram() {
 }
 
 export function ReactiveCinematic() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -179,7 +184,7 @@ export function ReactiveCinematic() {
           gsap.set("[data-reactive-release]", { autoAlpha: 0, yPercent: 5 });
           gsap.set("[data-reactive-trigger-flash]", { opacity: 0 });
           gsap.set("[data-reactive-world]", { xPercent: 4, scale: 0.95, opacity: 0.72 });
-          gsap.set("[data-reactive-predicate-value]", { textContent: "WAIT" });
+          gsap.set("[data-reactive-predicate-value]", { textContent: t("WAIT") });
 
           const timeline = gsap.timeline({
             defaults: { ease: "none" },
@@ -220,7 +225,7 @@ export function ReactiveCinematic() {
 
           timeline
             .to("[data-reactive-predicate]", { opacity: 1, duration: 0.35 }, 2.35)
-            .set("[data-reactive-predicate-value]", { textContent: "TRUE" }, 2.62)
+            .set("[data-reactive-predicate-value]", { textContent: t("TRUE") }, 2.62)
             .to("[data-reactive-consensus-route]", { strokeDashoffset: 0, duration: 1.05 }, 3.05)
             .to(validators, { opacity: 1, duration: 0.28, stagger: 0.18 }, 3.25)
             .to("[data-reactive-agreement]", { opacity: 1, duration: 0.35 }, 4.05)
@@ -265,7 +270,7 @@ export function ReactiveCinematic() {
       media.revert();
       context.revert();
     };
-  }, []);
+  }, [t]);
 
   return (
     <section ref={rootRef} className={styles.reactiveCinematic} aria-labelledby="reactive-title">
@@ -283,40 +288,40 @@ export function ReactiveCinematic() {
 
           <div className={styles.reactiveContentLayer}>
             <header className={styles.reactiveIntro} data-reactive-intro>
-              <span className={styles.chapterMarker}>Chapter 03 / Reactive transactions</span>
-              <span className={styles.systemType}>Protocol primitive</span>
-              <p className={styles.chapterThesis}>Native blockchain automation</p>
-              <h2 id="reactive-title">The chain knows when to act.</h2>
-              <p>Define the condition once. Validators carry the workflow forward.</p>
+              <span className={styles.chapterMarker}>{t("Chapter 03 / Reactive transactions")}</span>
+              <span className={styles.systemType}>{t("Protocol primitive")}</span>
+              <p className={styles.chapterThesis}>{t("Native blockchain automation")}</p>
+              <h2 id="reactive-title">{t("The chain knows when to act.")}</h2>
+              <p>{t("Define the condition once. Validators carry the workflow forward.")}</p>
             </header>
 
             <div className={styles.reactiveSceneContent} data-reactive-content>
               <header className={styles.reactiveSceneHeader}>
-                <span>Reactive / Condition system</span>
-                <strong>No keeper in the loop.</strong>
+                <span>{t("Reactive / Condition system")}</span>
+                <strong>{t("No keeper in the loop.")}</strong>
               </header>
 
               <div className={styles.reactivePhaseDeck}>
                 {phases.map((phase, index) => (
                   <article className={styles.reactivePhase} data-reactive-phase key={phase.code}>
-                    <span>{phase.eyebrow}</span>
-                    <h3>{phase.title}</h3>
-                    <p>{phase.body}</p>
+                    <span>{t(phase.eyebrow)}</span>
+                    <h3>{t(phase.title)}</h3>
+                    <p>{t(phase.body)}</p>
                     <small>{String(index + 1).padStart(2, "0")} / 05</small>
                   </article>
                 ))}
               </div>
 
-              <ol className={styles.reactivePhaseRail} aria-label="Reactive transaction phases">
+              <ol className={styles.reactivePhaseRail} aria-label={t("Reactive transaction phases")}>
                 {phases.map((phase) => (
-                  <li data-reactive-step key={phase.code}>{phase.code}</li>
+                  <li data-reactive-step key={phase.code}>{t(phase.code)}</li>
                 ))}
               </ol>
             </div>
 
             <div className={styles.reactiveRelease} data-reactive-release>
-              <span>Condition / Agreed / Executed</span>
-              <p>The waiting is native. The action is automatic.</p>
+              <span>{t("Condition / Agreed / Executed")}</span>
+              <p>{t("The waiting is native. The action is automatic.")}</p>
             </div>
           </div>
         </div>

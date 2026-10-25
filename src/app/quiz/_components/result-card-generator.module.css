@@ -18,6 +18,15 @@
     transform 160ms ease;
 }
 
+.dialog:not([lang="en"]) :is(h2, p, span, strong, li, button, a) {
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+  line-height: 1.4;
+}
+
+.dialogHeader > button { flex-shrink: 0; }
+.cardActions > * { min-width: 0; }
+
 .generateButton:hover {
   color: #e8e3d5;
   background: rgb(169 221 211 / 9%);
@@ -341,7 +350,7 @@
 
   .stagePanel li {
     grid-template-columns: 2rem 1fr;
-    padding-right: 0.5rem;
+    padding-inline-end: 0.5rem;
     font-size: 0.57rem;
   }
 }

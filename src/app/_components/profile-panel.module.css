@@ -4,6 +4,18 @@
   padding-top: clamp(1.5rem, 3vh, 2.25rem);
 }
 
+.identityPanel:not([lang="en"]) :is(h2, p, span, label, button, a) {
+  letter-spacing: normal;
+  overflow-wrap: anywhere;
+}
+
+.identityPanel:not([lang="en"]) .headline {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.2;
+}
+
+.inputShell { direction: ltr; }
+
 .entryCta {
   display: grid;
   gap: 0.9rem;
@@ -255,7 +267,7 @@
   position: absolute;
   z-index: 1;
   top: 0.85rem;
-  right: 0.85rem;
+  inset-inline-end: 0.85rem;
   display: grid;
   width: 2.75rem;
   height: 2.75rem;

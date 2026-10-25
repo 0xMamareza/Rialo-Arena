@@ -1,10 +1,13 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { DiagramText } from "./diagram-text";
 import styles from "../learn.module.css";
 import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
@@ -42,22 +45,24 @@ const moduleNodes = [
 ] as const;
 
 function MachineNode({ id, label, x, y, detail }: { id: string; label: string; x: number; y: number; detail: string }) {
+  const { t } = useI18n();
   return (
     <g className={styles.machineNode} data-architecture-module={id} transform={`translate(${x} ${y})`}>
       <rect className={styles.machineNodeHalo} x="-102" y="-70" width="204" height="140" rx="70" />
       <rect className={styles.machineNodeBody} x="-88" y="-56" width="176" height="112" rx="4" />
       <circle className={styles.machineNodePort} cx="-88" r="5" />
       <circle className={styles.machineNodePort} cx="88" r="5" />
-      <text className={styles.machineNodeLabel} y="-5" textAnchor="middle">{label}</text>
-      <text className={styles.machineNodeDetail} y="17" textAnchor="middle">{detail}</text>
+      <DiagramText maxWidth={150} className={styles.machineNodeLabel} y="-5" textAnchor="middle">{t(String(label))}</DiagramText>
+      <DiagramText maxWidth={150} className={styles.machineNodeDetail} y="17" textAnchor="middle">{t(detail)}</DiagramText>
       <path className={styles.machineNodeMeter} d="M-52 36H52" />
     </g>
   );
 }
 
 function ArchitectureTopology() {
+  const { t } = useI18n();
   return (
-    <svg className={styles.architectureMachineSvg} viewBox="0 0 2360 820" aria-hidden="true">
+    <svg direction="ltr" className={styles.architectureMachineSvg} viewBox="0 0 2360 820" role="img" aria-label={t("Diagram: external services connect to Rialo execution, privacy, accounts, interoperability, and consensus.")}>
       <defs>
         <filter id="machine-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="10" /></filter>
         <linearGradient id="machine-route" x1="0" x2="1"><stop stopColor="#a9ddd3" stopOpacity=".08" /><stop offset=".48" stopColor="#a9ddd3" /><stop offset="1" stopColor="#e8e3d5" stopOpacity=".58" /></linearGradient>
@@ -88,7 +93,7 @@ function ArchitectureTopology() {
 
       <g className={styles.edgeTraffic} data-machine-micro="edge">
         <circle data-edge-packet="out" r="7" /><circle data-edge-packet="in" r="5" />
-        <text x="510" y="228" textAnchor="middle">REQUEST / RESPONSE</text>
+        <DiagramText maxWidth={230} x="510" y="228" textAnchor="middle">{t("REQUEST / RESPONSE")}</DiagramText>
       </g>
 
       <g className={styles.workflowSteps} data-machine-micro="workflow">
@@ -99,17 +104,17 @@ function ArchitectureTopology() {
 
       <g className={styles.streamBands} data-machine-micro="stream">
         {[0, 1, 2].map((line) => <path data-stream-line key={line} d={`M938 ${520 + line * 42}C972 ${488 + line * 54} 1024 ${558 + line * 22} 1062 ${520 + line * 42}`} />)}
-        <text x="1000" y="656" textAnchor="middle">CONTINUOUS LIVE FEED</text>
+        <DiagramText maxWidth={240} x="1000" y="656" textAnchor="middle">{t("CONTINUOUS LIVE FEED")}</DiagramText>
       </g>
 
       <g className={styles.executionEngine} data-machine-micro="execution">
         <path d="M1098 320H1222" />
-        {["EVENT", "CONDITION", "HYBRID"].map((label, index) => <g data-execution-pulse key={label} transform={`translate(${1104 + index * 56} 320)`}><circle r="8" /><text y="27" textAnchor="middle">{label}</text></g>)}
+        {["EVENT", "CONDITION", "HYBRID"].map((label, index) => <g data-execution-pulse key={label} transform={`translate(${1104 + index * 56} 320)`}><circle r="8" /><DiagramText maxWidth={50} y="27" textAnchor="middle">{t(String(label))}</DiagramText></g>)}
       </g>
 
       <g className={styles.vmInstructions} data-machine-micro="vm">
         {[0, 1, 2, 3, 4].map((line) => <rect data-vm-instruction key={line} x={1102 + line * 24} y="520" width="14" height={18 + line * 7} rx="2" />)}
-        <text x="1160" y="585" textAnchor="middle">RISC-V INSTRUCTION FLOW</text>
+        <DiagramText maxWidth={220} x="1160" y="585" textAnchor="middle">{t("RISC-V INSTRUCTION FLOW")}</DiagramText>
       </g>
 
       <g className={styles.rexChamber} data-machine-micro="rex" transform="translate(1460 190)">
@@ -117,28 +122,28 @@ function ArchitectureTopology() {
       </g>
 
       <g className={styles.cruisePath} data-machine-micro="cruise" transform="translate(1460 450)">
-        <path d="M-54 84C-28 48 30 48 56 84" /><circle data-cruise-packet cx="-54" cy="84" r="7" /><text y="108" textAnchor="middle">GAS / 0</text>
+        <path d="M-54 84C-28 48 30 48 56 84" /><circle data-cruise-packet cx="-54" cy="84" r="7" /><DiagramText maxWidth={120} y="108" textAnchor="middle">{t("GAS / 0")}</DiagramText>
       </g>
 
       <g className={styles.omniBranches} data-machine-micro="omni">
         <path data-omni-branch d="M1760 190C1844 124 1884 110 1930 110" /><path data-omni-branch d="M1760 190H1930" /><path data-omni-branch d="M1760 190C1844 256 1884 270 1930 270" />
-        {[[1930,110,"NET A"],[1930,190,"NET B"],[1930,270,"NET C"]].map(([x,y,label]) => <g data-omni-network key={String(label)} transform={`translate(${x} ${y})`}><circle r="22" /><text y="4" textAnchor="middle">{label}</text></g>)}
+        {[[1930,110,"NET A"],[1930,190,"NET B"],[1930,270,"NET C"]].map(([x,y,label]) => <g data-omni-network key={String(label)} transform={`translate(${x} ${y})`}><circle r="22" /><DiagramText maxWidth={38} y="4" textAnchor="middle">{t(String(label))}</DiagramText></g>)}
       </g>
 
       <g className={styles.interopFlow} data-machine-micro="interop">
         <path d="M1842 472H1982" /><path d="M1982 504H1842" />
         <circle data-interop-packet="out" cx="1842" cy="472" r="7" />
         <circle data-interop-packet="in" cx="1982" cy="504" r="7" />
-        <text x="1912" y="536" textAnchor="middle">VALUE / MESSAGE</text>
+        <DiagramText maxWidth={200} x="1912" y="536" textAnchor="middle">{t("VALUE / MESSAGE")}</DiagramText>
       </g>
 
       <g className={styles.ipcLayers} data-machine-micro="ipc">
-        {[["IDENTITY", 1648], ["PRIVACY", 1760], ["COMPLIANCE", 1872]].map(([label,x]) => <g data-ipc-layer key={String(label)} transform={`translate(${x} 720)`}><rect x="-45" y="-21" width="90" height="42" rx="21" /><text y="4" textAnchor="middle">{label}</text></g>)}
+        {[["IDENTITY", 1648], ["PRIVACY", 1760], ["COMPLIANCE", 1872]].map(([label,x]) => <g data-ipc-layer key={String(label)} transform={`translate(${x} 720)`}><rect x="-45" y="-21" width="90" height="42" rx="21" /><DiagramText maxWidth={84} y="4" textAnchor="middle">{t(String(label))}</DiagramText></g>)}
       </g>
 
       <g className={styles.consensusValidators} data-machine-micro="consensus">
         {[[2020,260],[2110,230],[2200,260],[2020,520],[2110,550],[2200,520]].map(([x,y], index) => <g data-validator key={`${x}-${y}`} transform={`translate(${x} ${y})`}><circle r="17" /><text y="4" textAnchor="middle">V{index + 1}</text></g>)}
-        <rect data-consensus-block x="2051" y="462" width="118" height="46" rx="3" /><text x="2110" y="490" textAnchor="middle">ORDERED BLOCK</text>
+        <rect data-consensus-block x="2051" y="462" width="118" height="46" rx="3" /><DiagramText maxWidth={100} x="2110" y="490" textAnchor="middle">{t("ORDERED BLOCK")}</DiagramText>
       </g>
 
       <g className={styles.machineSignal} data-machine-signal><circle r="7" /><circle className={styles.machineSignalGlow} r="24" /></g>
@@ -155,6 +160,7 @@ const cameraStates = [
 ] as const;
 
 export function ArchitectureMachine() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -258,18 +264,18 @@ export function ArchitectureMachine() {
           <div className={styles.architectureMachineWorld} data-architecture-world><ArchitectureTopology /></div>
           <div className={styles.architectureMachineContent}>
             <header className={styles.architectureMachineIntro} data-architecture-intro>
-              <span className={styles.chapterMarker}>Chapter 02 / Architecture</span>
-              <span className={styles.systemType}>Core architecture</span>
-              <p className={styles.chapterThesis}>One living system</p>
-              <h2 id="architecture-title">Enter the Rialo machine.</h2>
-              <p>Follow a signal from the external world to shared consensus.</p>
+              <span className={styles.chapterMarker}>{t("Chapter 02 / Architecture")}</span>
+              <span className={styles.systemType}>{t("Core architecture")}</span>
+              <p className={styles.chapterThesis}>{t("One living system")}</p>
+              <h2 id="architecture-title">{t("Enter the Rialo machine.")}</h2>
+              <p>{t("Follow a signal from the external world to shared consensus.")}</p>
             </header>
             <div className={styles.architectureMachineScene} data-architecture-content>
-              <header className={styles.architectureMachineHeader}><span>Architecture / Connected topology</span><strong>Every capability compounds.</strong></header>
-              <div className={styles.architectureMachinePhases}>{phases.map((phase, index) => <article className={styles.architectureMachinePhase} data-architecture-phase key={phase.code}><span>{phase.eyebrow}</span><h3>{phase.title}</h3><p>{phase.body}</p><small>{String(index + 1).padStart(2, "0")} / {phases.length}</small></article>)}</div>
-              <ol className={styles.architectureMachineRail} aria-label="Architecture machine phases">{phases.map((phase) => <li data-architecture-step key={phase.code}><i /><span>{phase.code}</span></li>)}</ol>
+              <header className={styles.architectureMachineHeader}><span>{t("Architecture / Connected topology")}</span><strong>{t("Every capability compounds.")}</strong></header>
+              <div className={styles.architectureMachinePhases}>{phases.map((phase, index) => <article className={styles.architectureMachinePhase} data-architecture-phase key={phase.code}><span>{t(phase.eyebrow)}</span><h3>{t(phase.title)}</h3><p>{t(phase.body)}</p><small>{String(index + 1).padStart(2, "0")} / {phases.length}</small></article>)}</div>
+              <ol className={styles.architectureMachineRail} aria-label={t("Architecture machine phases")}>{phases.map((phase) => <li data-architecture-step key={phase.code}><i /><span>{t(phase.code)}</span></li>)}</ol>
             </div>
-            <div className={styles.architectureMachineRelease} data-architecture-release><span>World / Execution / Agreement</span><p>One machine. Shared guarantees.</p></div>
+            <div className={styles.architectureMachineRelease} data-architecture-release><span>{t("World / Execution / Agreement")}</span><p>{t("One machine. Shared guarantees.")}</p></div>
           </div>
         </div>
       </div>

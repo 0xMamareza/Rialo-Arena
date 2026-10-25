@@ -1,5 +1,8 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+import { LanguageSelector } from "@/app/_components/language-selector";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -167,8 +170,9 @@ async function parseQuizResponse(response: Response) {
   return { state: body, etag };
 }
 
-function formatQuestionPosition(position: number, count: number) {
-  return `${String(position).padStart(2, "0")} / ${String(count).padStart(2, "0")}`;
+function formatQuestionPosition(position: number, count: number, locale: string) {
+  const format = new Intl.NumberFormat(locale, { minimumIntegerDigits: 2, useGrouping: false });
+  return `${format.format(position)} / ${format.format(count)}`;
 }
 
 const ARENA_TIERS = new Set([
@@ -219,6 +223,7 @@ export function QuizPlayer({
   initialAttemptId,
   profile,
 }: QuizPlayerProps) {
+  const { t, locale, direction } = useI18n();
   const router = useRouter();
   const [screen, setScreen] = useState<QuizScreen>("loading");
   const [quizState, setQuizState] = useState<QuizApiPlayerState | null>(null);
@@ -660,7 +665,7 @@ export function QuizPlayer({
       : ({ status: "loading" } as const);
 
   return (
-    <main className={`${styles.quizPage} ${className}`}>
+    <main lang={locale} dir={direction} className={`${styles.quizPage} ${className}`}>
       <div className={styles.background} aria-hidden="true">
         <Image
           src="/arena/rialo-arena-background.png"
@@ -672,7 +677,7 @@ export function QuizPlayer({
       </div>
 
       <header className={styles.header}>
-        <Link href="/" aria-label="Return to Rialo Arena">
+        <Link href="/" aria-label={t("Return to Rialo Arena")}>
           <Image
             src="/brand/rialo/rialo-lockup-off-white.svg"
             alt="Rialo"
@@ -681,57 +686,59 @@ export function QuizPlayer({
             priority
           />
         </Link>
-        <span className={styles.arenaLabel}>Arena / Live run</span>
-        <div className={styles.profile}>
-          {/* Browser-direct avatar matches the existing identity flow. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={profile.profileImageUrl}
-            alt=""
-            width="36"
-            height="36"
-            referrerPolicy="no-referrer"
-            onError={(event) => {
-              event.currentTarget.src = RIALO_AVATAR_FALLBACK_PATH;
-            }}
-          />
-          <span>@{profile.username}</span>
+        <span className={styles.arenaLabel}>{t("Arena / Live run")}</span>
+        <div className={styles.headerActions}>
+          <LanguageSelector />
+          <div className={styles.profile}>
+            {/* Browser-direct avatar matches the existing identity flow. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={profile.profileImageUrl}
+              alt=""
+              width="36"
+              height="36"
+              referrerPolicy="no-referrer"
+              onError={(event) => {
+                event.currentTarget.src = RIALO_AVATAR_FALLBACK_PATH;
+              }}
+            />
+            <span dir="ltr">@{profile.username}</span>
+          </div>
         </div>
       </header>
 
       {screen === "ready" ? (
         <section className={styles.entry} aria-labelledby="quiz-entry-title">
-          <span className={styles.eyebrow}>Authenticated challenge</span>
-          <h1 id="quiz-entry-title">Enter when focused.</h1>
+          <span className={styles.eyebrow}>{t("Authenticated challenge")}</span>
+          <h1 id="quiz-entry-title">{t("Enter when focused.")}</h1>
           <p>
-            Fifteen random questions. Twenty seconds each. Once a question is
-            active, the server clock keeps moving.
+            {t("Fifteen random questions. Twenty seconds each. Once a question is active, the server clock keeps moving.")}
           </p>
-          {errorMessage ? <p className={styles.error} role="alert">{errorMessage}</p> : null}
+          {errorMessage ? <p className={styles.error} role="alert">{t(errorMessage)}</p> : null}
           <button type="button" onClick={startAttempt} disabled={requestPending}>
-            {requestPending ? "Preparing attempt" : "Start quiz"}
+            {requestPending ? t("Preparing attempt") : t("Start quiz")}
             <span aria-hidden="true">→</span>
           </button>
-          <Link href="/">Return to Arena</Link>
+          <Link href="/">{t("Return to Arena")}</Link>
         </section>
       ) : null}
 
       {screen === "loading" ? (
         <section className={styles.loading} aria-live="polite" aria-busy="true">
           <span className={styles.loadingMark} />
-          <p>Synchronizing with the Arena</p>
+          <p>{t("Synchronizing with the Arena")}</p>
         </section>
       ) : null}
 
       {screen === "error" ? (
         <section className={styles.errorState} role="alert">
-          <span className={styles.eyebrow}>Connection state</span>
-          <h1>Run paused.</h1>
-          <p>{errorMessage ?? "The Arena could not restore this attempt."}</p>
+          <span className={styles.eyebrow}>{t("Connection state")}</span>
+          <h1>{t("Run paused.")}</h1>
+          <p>{t(errorMessage ?? "The Arena could not restore this attempt.")}</p>
           <button type="button" onClick={retrySynchronization} disabled={requestPending}>
-            Retry synchronization
+            {t("Retry synchronization")}
           </button>
-          <Link href="/">Return to Arena</Link>
+          <Link href="/">{t("Return to Arena")}</Link>
         </section>
       ) : null}
 
@@ -739,16 +746,16 @@ export function QuizPlayer({
         <section className={styles.play} aria-labelledby="current-question">
           <div className={styles.runMeta}>
             <div>
-              <span>Question</span>
-              <strong>{formatQuestionPosition(questionState.position, questionState.questionCount)}</strong>
+              <span>{t("Question")}</span>
+              <strong dir="ltr">{formatQuestionPosition(questionState.position, questionState.questionCount, locale)}</strong>
             </div>
             <div>
-              <span>Current score</span>
-              <strong>{questionState.totalScore.toLocaleString("en-US")}</strong>
+              <span>{t("Current score")}</span>
+              <strong>{questionState.totalScore.toLocaleString(locale)}</strong>
             </div>
           </div>
 
-          <div className={styles.progress} aria-label={`${questionState.position} of ${questionState.questionCount} questions`}>
+          <div className={styles.progress} aria-label={t("{position} of {count} questions", { position: questionState.position.toLocaleString(locale), count: questionState.questionCount.toLocaleString(locale) })}>
             {Array.from({ length: questionState.questionCount }, (_, index) => (
               <span
                 key={index}
@@ -768,11 +775,11 @@ export function QuizPlayer({
               <span className={styles.eyebrow}>
                 {isReview
                   ? questionState.review.wasCorrect
-                    ? "Correct answer"
-                    : "Answer review"
-                  : "Choose one answer"}
+                    ? t("Correct answer")
+                    : t("Answer review")
+                  : t("Choose one answer")}
               </span>
-              <h1 id="current-question">{questionState.currentQuestion.questionText}</h1>
+              <h1 id="current-question">{t(questionState.currentQuestion.questionText)}</h1>
             </div>
 
             <div
@@ -782,8 +789,8 @@ export function QuizPlayer({
               data-review={isReview || undefined}
             >
               <div>
-                <time>{String(secondsRemaining).padStart(2, "0")}</time>
-                <span>{isReview ? "review" : "seconds"}</span>
+                <time>{secondsRemaining.toLocaleString(locale, { minimumIntegerDigits: 2, useGrouping: false })}</time>
+                <span>{isReview ? t("review") : t("seconds")}</span>
               </div>
             </div>
           </div>
@@ -812,7 +819,7 @@ export function QuizPlayer({
                 onClick={() => void submitChoice(option.index)}
               >
                 <span>{option.label}</span>
-                <strong>{option.text}</strong>
+                <strong>{t(option.text)}</strong>
                 <i aria-hidden="true">
                   {result === "correct" ? "✓" : result === "wrong" ? "×" : "↗"}
                 </i>
@@ -824,15 +831,15 @@ export function QuizPlayer({
           <div className={styles.runStatus} aria-live="polite">
             <span>
               {requestPending
-                ? "Server check in progress"
+                ? t("Server check in progress")
                 : isReview
-                  ? "Authoritative answer review"
-                  : "Server time is authoritative"}
+                  ? t("Authoritative answer review")
+                  : t("Server time is authoritative")}
             </span>
-            {notice ? <p>{notice}</p> : null}
+            {notice ? <p>{t(notice)}</p> : null}
             {errorMessage ? (
               <button type="button" onClick={retrySynchronization} disabled={requestPending}>
-                Synchronize state
+                {t("Synchronize state")}
               </button>
             ) : null}
           </div>
@@ -841,17 +848,17 @@ export function QuizPlayer({
 
       {screen === "completed" && quizState?.status === "completed" ? (
         <section className={styles.results} aria-labelledby="results-title">
-          <span className={styles.eyebrow}>Attempt completed</span>
-          <h1 id="results-title">Run recorded.</h1>
-          <span className={styles.currentRunLabel}>Current run</span>
+          <span className={styles.eyebrow}>{t("Attempt completed")}</span>
+          <h1 id="results-title">{t("Run recorded.")}</h1>
+          <span className={styles.currentRunLabel}>{t("Current run")}</span>
           <div className={styles.finalScore}>
-            <strong>{quizState.totalScore.toLocaleString("en-US")}</strong>
-            <span>/ {MAXIMUM_SCORE.toLocaleString("en-US")}</span>
+            <strong>{quizState.totalScore.toLocaleString(locale)}</strong>
+            <span>/ {MAXIMUM_SCORE.toLocaleString(locale)}</span>
           </div>
           <dl className={styles.runBreakdown}>
-            <div><dt>Correct</dt><dd>{quizState.correctCount}</dd></div>
-            <div><dt>Timed out</dt><dd>{quizState.timeoutCount}</dd></div>
-            <div><dt>Completed</dt><dd>15 / 15</dd></div>
+            <div><dt>{t("Correct")}</dt><dd>{quizState.correctCount.toLocaleString(locale)}</dd></div>
+            <div><dt>{t("Timed out")}</dt><dd>{quizState.timeoutCount.toLocaleString(locale)}</dd></div>
+            <div><dt>{t("Completed")}</dt><dd dir="ltr">{(15).toLocaleString(locale)} / {(15).toLocaleString(locale)}</dd></div>
           </dl>
           <section
             className={styles.personalBest}
@@ -859,18 +866,17 @@ export function QuizPlayer({
             aria-live="polite"
           >
             <div className={styles.personalBestHeading}>
-              <span id="personal-best-title">All-time Personal Best</span>
-              <span>Server ranked</span>
+              <span id="personal-best-title">{t("All-time Personal Best")}</span>
+              <span>{t("Server ranked")}</span>
             </div>
 
             {displayedPersonalStatsState.status === "loading" ? (
-              <p className={styles.personalBestStatus}>Loading your record...</p>
+              <p className={styles.personalBestStatus}>{t("Loading your record...")}</p>
             ) : null}
 
             {displayedPersonalStatsState.status === "error" ? (
               <p className={styles.personalBestStatus} role="status">
-                Personal Best is temporarily unavailable. Your run is still
-                recorded.
+                {t("Personal Best is temporarily unavailable. Your run is still recorded.")}
               </p>
             ) : null}
 
@@ -878,32 +884,32 @@ export function QuizPlayer({
             displayedPersonalStatsState.stats.personalBest ? (
               <div className={styles.personalBestGrid}>
                 <div className={styles.personalBestScore}>
-                  <span>Best score</span>
+                  <span>{t("Best score")}</span>
                   <strong>
                     {displayedPersonalStatsState.stats.personalBest.score.toLocaleString(
-                      "en-US",
+                      locale,
                     )}
-                    <small> / 3,000</small>
+                    <small> / {(3000).toLocaleString(locale)}</small>
                   </strong>
                 </div>
                 <div>
-                  <span>Arena tier</span>
+                  <span>{t("Arena tier")}</span>
                   <strong>
-                    {displayedPersonalStatsState.stats.tier ?? "Unranked"}
+                    {t(displayedPersonalStatsState.stats.tier ?? "Unranked")}
                   </strong>
                 </div>
                 <div>
-                  <span>Global rank</span>
+                  <span>{t("Global rank")}</span>
                   <strong>
                     {displayedPersonalStatsState.stats.globalRank
-                      ? `#${displayedPersonalStatsState.stats.globalRank}`
-                      : "Unranked"}
+                      ? `#${displayedPersonalStatsState.stats.globalRank.toLocaleString(locale)}`
+                      : t("Unranked")}
                   </strong>
                 </div>
                 <div>
-                  <span>Completed runs</span>
+                  <span>{t("Completed runs")}</span>
                   <strong>
-                    {displayedPersonalStatsState.stats.completedAttemptsCount}
+                    {displayedPersonalStatsState.stats.completedAttemptsCount.toLocaleString(locale)}
                   </strong>
                 </div>
               </div>
@@ -912,7 +918,7 @@ export function QuizPlayer({
             {displayedPersonalStatsState.status === "ready" &&
             !displayedPersonalStatsState.stats.personalBest ? (
               <p className={styles.personalBestStatus}>
-                No completed Personal Best is available yet.
+                {t("No completed Personal Best is available yet.")}
               </p>
             ) : null}
           </section>
@@ -941,11 +947,11 @@ export function QuizPlayer({
           ) : null}
           <div className={styles.resultActions}>
             <button type="button" onClick={startAttempt} disabled={requestPending}>
-              {requestPending ? "Preparing attempt" : "Play again"}
+              {requestPending ? t("Preparing attempt") : t("Play again")}
               <span aria-hidden="true">→</span>
             </button>
-            <Link href="/leaderboard">View Leaderboard</Link>
-            <Link href="/">Return to Arena</Link>
+            <Link href="/leaderboard">{t("View Leaderboard")}</Link>
+            <Link href="/">{t("Return to Arena")}</Link>
           </div>
         </section>
       ) : null}

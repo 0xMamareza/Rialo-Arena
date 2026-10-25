@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import { useI18n } from "@/app/_components/language-provider";
+
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 
 import { getPublicSiteUrl } from "@/lib/config/public-site-url";
 import type { PersonalBestStats } from "@/lib/leaderboard/api-types";
@@ -113,6 +115,8 @@ export type ResultCardData = {
 type ResultCardGeneratorProps = {
   data: ResultCardData;
 };
+
+type CardI18n = Pick<ReturnType<typeof useI18n>, "locale" | "t" | "direction">;
 
 type GeneratorMode = "idle" | "generating" | "ready" | "error";
 
@@ -457,6 +461,27 @@ function fitText(
   return size;
 }
 
+// Measure complete strings so Arabic shaping and Unicode fallback stay intact.
+function drawText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  width: number,
+  size: number,
+  direction: "ltr" | "rtl" = "ltr",
+  serif = false,
+) {
+  context.save();
+  context.direction = direction;
+  context.textAlign = direction === "rtl" ? "right" : "left";
+  context.letterSpacing = "0px";
+  fitText(context, text, width, size, Math.min(size, 12),
+    serif ? '500 {size}px Georgia, "Times New Roman", serif' : '600 {size}px Arial, sans-serif');
+  context.fillText(text, direction === "rtl" ? x + width : x, y, width);
+  context.restore();
+}
+
 function drawStatBox(
   context: CanvasRenderingContext2D,
   tier: ArenaTier,
@@ -468,6 +493,8 @@ function drawStatBox(
   label: string,
   value: string,
   large = false,
+  direction: "ltr" | "rtl" = "ltr",
+  valueDirection: "ltr" | "rtl" = "ltr",
 ) {
   const { gold } = TIER_STYLE[tier];
   const compact = width < 200;
@@ -484,16 +511,19 @@ function drawStatBox(
   const textX = compact ? x + 72 : x + 102;
   drawStatIcon(context, icon, iconX, y + height / 2, iconSize);
   context.fillStyle = "rgba(169, 221, 211, 0.78)";
-  context.font = `700 ${compact ? 14 : 17}px "Arial Narrow", Arial, sans-serif`;
-  context.letterSpacing = compact ? "2px" : "3px";
-  context.fillText(label, textX, y + (large ? 34 : 31));
+  const textWidth = width - (textX - x) - 12;
+  drawText(context, label, textX, y + (large ? 34 : 31), textWidth, compact ? 14 : 17, direction);
   context.fillStyle = "#e6d4b5";
-  context.font = `${compact ? 28 : large ? 42 : 31}px Georgia, "Times New Roman", serif`;
-  context.letterSpacing = "0px";
-  context.fillText(value, textX, y + (large ? 78 : 70), width - (textX - x) - 12);
+  drawText(context, value, textX, y + (large ? 78 : 70), textWidth, compact ? 28 : large ? 42 : 31, valueDirection, true);
 }
 
-export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCardData) {
+export async function renderResultCard(
+  canvas: HTMLCanvasElement,
+  data: ResultCardData,
+  { t, locale, direction }: CardI18n,
+) {
+  canvas.lang = locale;
+  if (typeof document !== "undefined") await document.fonts.ready;
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Card rendering is unavailable.");
   const style = TIER_STYLE[data.tier];
@@ -536,7 +566,7 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
   context.fillStyle = "#d4ab70";
   context.font = '500 27px Georgia, "Times New Roman", serif';
   context.letterSpacing = "2px";
-  context.fillText(`ARENA TIER ${TIER_NUMBER[data.tier]}`, 1_548, 72);
+  drawText(context, t("ARENA TIER {tier}", { tier: TIER_NUMBER[data.tier] }), 1_332, 72, 216, 27, direction, true);
   context.strokeStyle = style.gold;
   context.globalAlpha = 0.72;
   context.lineWidth = 1.5;
@@ -561,31 +591,17 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
   context.fillStyle = "rgba(169, 221, 211, 0.8)";
   context.font = '700 17px "Arial Narrow", Arial, sans-serif';
   context.letterSpacing = "4px";
-  context.fillText("CURRENT RUN", 776, 120);
+  drawText(context, t("CURRENT RUN"), 776, 120, 360, 17, direction);
 
-  const tierText = data.tier.toUpperCase();
-  fitText(
-    context,
-    tierText,
-    770,
-    86,
-    68,
-    '500 {size}px Georgia, "Times New Roman", serif',
-  );
+  const tierText = locale === "en" ? t(data.tier).toUpperCase() : t(data.tier);
   context.fillStyle = style.accent;
-  context.letterSpacing = "3px";
-  context.fillText(tierText, 756, 220);
+  drawText(context, tierText, 756, 220, 790, 86, direction, true);
 
-  const scoreText = data.score.toLocaleString("en-US");
-  context.font = '500 126px Georgia, "Times New Roman", serif';
-  context.letterSpacing = "-3px";
-  const scoreWidth = context.measureText(scoreText).width;
+  const scoreText = data.score.toLocaleString(locale);
   context.fillStyle = style.accent;
-  context.fillText(scoreText, 752, 350);
+  drawText(context, scoreText, 752, 350, 440, 126, "ltr", true);
   context.fillStyle = "#d9bd93";
-  context.font = '500 45px Georgia, "Times New Roman", serif';
-  context.letterSpacing = "1px";
-  context.fillText("/ 3,000", Math.min(1_315, 778 + scoreWidth), 342);
+  drawText(context, "/ " + (3000).toLocaleString(locale), 1_200, 342, 100, 40, "ltr", true);
 
   if (data.isPersonalBest) {
     roundedRect(context, 1_310, 304, 232, 46, 23);
@@ -595,7 +611,7 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     context.font = '800 14px "Arial Narrow", Arial, sans-serif';
     context.letterSpacing = "3px";
     context.textAlign = "center";
-    context.fillText("PERSONAL BEST", 1_426, 333);
+    drawText(context, t("PERSONAL BEST"), 1_322, 333, 208, 14, direction);
     context.textAlign = "left";
   }
 
@@ -612,19 +628,10 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
   context.fillStyle = "rgba(169, 221, 211, 0.76)";
   context.font = '700 17px "Arial Narrow", Arial, sans-serif';
   context.letterSpacing = "4px";
-  context.fillText("ARENA IDENTITY", 918, 459);
+  drawText(context, t("ARENA IDENTITY"), 918, 459, 612, 17, direction);
   const username = `@${data.username}`;
-  fitText(
-    context,
-    username,
-    612,
-    46,
-    30,
-    '500 {size}px Georgia, "Times New Roman", serif',
-  );
   context.fillStyle = "#e6d4b5";
-  context.letterSpacing = "0px";
-  context.fillText(username, 918, 515);
+  drawText(context, username, 918, 515, 612, 46, "ltr", true);
 
   drawStatBox(
     context,
@@ -634,9 +641,10 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     390,
     104,
     "target",
-    "CORRECT",
-    `${data.correctCount} / 15`,
+    t("CORRECT"),
+    `${data.correctCount.toLocaleString(locale)} / ${(15).toLocaleString(locale)}`,
     true,
+    direction,
   );
   drawStatBox(
     context,
@@ -646,9 +654,10 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     400,
     104,
     "clock",
-    "TIMEOUTS",
-    String(data.timeoutCount),
+    t("TIMEOUTS"),
+    data.timeoutCount.toLocaleString(locale),
     true,
+    direction,
   );
   drawStatBox(
     context,
@@ -658,8 +667,10 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     328,
     102,
     "crown",
-    "PERSONAL BEST",
-    `${data.personalBestScore.toLocaleString("en-US")} / 3,000`,
+    t("PERSONAL BEST"),
+    `${data.personalBestScore.toLocaleString(locale)} / ${(3000).toLocaleString(locale)}`,
+    false,
+    direction,
   );
   drawStatBox(
     context,
@@ -669,8 +680,11 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     300,
     102,
     "globe",
-    "GLOBAL PB RANK",
-    data.globalRank ? `#${data.globalRank}` : "UNRANKED",
+    t("GLOBAL PB RANK"),
+    data.globalRank ? `#${data.globalRank.toLocaleString(locale)}` : t("UNRANKED"),
+    false,
+    direction,
+    data.globalRank ? "ltr" : direction,
   );
   drawStatBox(
     context,
@@ -680,8 +694,10 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
     150,
     102,
     "flag",
-    "RUNS",
-    String(data.completedRuns),
+    t("RUNS"),
+    data.completedRuns.toLocaleString(locale),
+    false,
+    direction,
   );
 
   let symbol: ImageBitmap | null = null;
@@ -710,7 +726,7 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
   context.fillStyle = "#c49a63";
   context.font = '700 16px "Arial Narrow", Arial, sans-serif';
   context.letterSpacing = "5px";
-  context.fillText("RIALO ARENA RESULT", 158, 849);
+  drawText(context, t("RIALO ARENA RESULT"), 158, 849, 900, 16, direction);
 
   context.save();
   context.strokeStyle = "rgba(169, 221, 211, 0.28)";
@@ -735,10 +751,12 @@ export async function renderResultCard(canvas: HTMLCanvasElement, data: ResultCa
 }
 
 export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
+  const { t, locale, direction } = useI18n();
   const titleId = useId();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const generationRef = useRef(0);
+  const cardLocaleRef = useRef(locale);
   const downloadUrlRef = useRef<string | null>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [mode, setMode] = useState<GeneratorMode>("idle");
@@ -770,8 +788,10 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
       arenaUrl: getPublicSiteUrl(browserOrigin),
       score: data.score,
       tier: data.tier,
+      locale,
+      t,
     });
-  }, [browserOrigin, data.score, data.tier]);
+  }, [browserOrigin, data.score, data.tier, locale, t]);
 
   const closeGenerator = () => {
     generationRef.current += 1;
@@ -780,13 +800,15 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
     setStageIndex(0);
   };
 
-  const generateCard = async () => {
+  const generateCard = useCallback(async () => {
     const generation = generationRef.current + 1;
     generationRef.current = generation;
+    cardLocaleRef.current = locale;
     setBrowserOrigin(window.location.origin);
     setIsOpen(true);
     setMode("generating");
     setStageIndex(0);
+    setDownloadUrl(null);
     try {
       for (let index = 0; index < GENERATION_STAGES.length; index += 1) {
         if (generationRef.current !== generation) return;
@@ -794,8 +816,14 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
         if (index === 2) {
           const canvas = canvasRef.current;
           if (!canvas) throw new Error("Card preview is unavailable.");
-          await renderResultCard(canvas, data);
-          const blob = await createCardBlob(canvas);
+          // Render offscreen so a superseded locale cannot overwrite the preview.
+          const rendered = document.createElement("canvas");
+          rendered.width = CARD_WIDTH;
+          rendered.height = CARD_HEIGHT;
+          await renderResultCard(rendered, data, { t, locale, direction });
+          const blob = await createCardBlob(rendered);
+          if (generationRef.current !== generation) return;
+          canvas.getContext("2d")?.drawImage(rendered, 0, 0);
           if (downloadUrlRef.current) URL.revokeObjectURL(downloadUrlRef.current);
           downloadUrlRef.current = URL.createObjectURL(blob);
           setDownloadUrl(downloadUrlRef.current);
@@ -806,16 +834,24 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
     } catch {
       if (generationRef.current === generation) setMode("error");
     }
-  };
+  }, [data, direction, locale, reducedMotion, t]);
+
+  useEffect(() => {
+    if (!isOpen || cardLocaleRef.current === locale) return;
+    const task = window.setTimeout(() => void generateCard(), 0);
+    return () => window.clearTimeout(task);
+  }, [generateCard, isOpen, locale]);
 
   return (
     <>
       <button className={styles.generateButton} type="button" onClick={generateCard}>
-        Generate card
+        {t("Generate card")}
         <span aria-hidden="true">✦</span>
       </button>
       <dialog
         className={styles.dialog}
+        lang={locale}
+        dir={direction}
         ref={dialogRef}
         aria-labelledby={titleId}
         onCancel={(event) => {
@@ -827,12 +863,12 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
         <div className={styles.dialogShell}>
           <header className={styles.dialogHeader}>
             <div>
-              <span>Rialo Arena result</span>
+              <span>{t("Rialo Arena result")}</span>
               <h2 id={titleId}>
-                {mode === "ready" ? "Your card is ready." : "Generate your card."}
+                {mode === "ready" ? t("Your card is ready.") : t("Generate your card.")}
               </h2>
             </div>
-            <button type="button" onClick={closeGenerator} aria-label="Close card generator">×</button>
+            <button type="button" onClick={closeGenerator} aria-label={t("Close card generator")}>×</button>
           </header>
           <div className={styles.generatorLayout}>
             <div className={styles.previewFrame} data-ready={mode === "ready"} data-stage={stageIndex}>
@@ -841,7 +877,7 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
                 width={CARD_WIDTH}
                 height={CARD_HEIGHT}
                 role="img"
-                aria-label={`${data.tier} Rialo Arena record card for ${data.username}, score ${data.score} out of 3000`}
+                aria-label={t("{tier} Rialo Arena record card for {username}, score {score} out of {maximum}", { tier: t(data.tier), username: data.username, score: data.score.toLocaleString(locale), maximum: (3000).toLocaleString(locale, { useGrouping: false }) })}
               />
               {mode === "generating" ? <div className={styles.scan} aria-hidden="true" /> : null}
             </div>
@@ -849,7 +885,7 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
               {mode === "generating" ? (
                 <div className={styles.stagePanel} aria-live="polite" aria-busy="true">
                   <span className={styles.stageCount}>0{stageIndex + 1} / 04</span>
-                  <strong>{GENERATION_STAGES[stageIndex]}</strong>
+                  <strong>{t(GENERATION_STAGES[stageIndex])}</strong>
                   <div className={styles.stageTrack} aria-hidden="true">
                     <span style={{ width: `${((stageIndex + 1) / 4) * 100}%` }} />
                   </div>
@@ -857,7 +893,7 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
                     {GENERATION_STAGES.map((stage, index) => (
                       <li key={stage} data-active={index === stageIndex} data-complete={index < stageIndex}>
                         <span>0{index + 1}</span>
-                        {stage}
+                        {t(stage)}
                       </li>
                     ))}
                   </ol>
@@ -865,27 +901,27 @@ export function ResultCardGenerator({ data }: ResultCardGeneratorProps) {
               ) : null}
               {mode === "ready" ? (
                 <div className={styles.readyPanel}>
-                  <span>{data.tier} / Arena tier {TIER_NUMBER[data.tier]}</span>
+                  <span>{t("{tier} / Arena tier {number}", { tier: t(data.tier), number: TIER_NUMBER[data.tier] })}</span>
                   <p>
-                    Download the card, then attach it to your post on X. The share action opens a prefilled post and never uploads the image for you.
+                    {t("Download the card, then attach it to your post on X. The share action opens a prefilled post and never uploads the image for you.")}
                   </p>
                   <div className={styles.cardActions}>
                     <a
                       href={downloadUrl ?? undefined}
                       download={`rialo-arena-${data.tier.toLowerCase()}-${data.username}.png`}
                     >
-                      Download card
+                      {t("Download card")}
                     </a>
-                    <a href={shareUrl} target="_blank" rel="noopener noreferrer">Share to X</a>
-                    <button type="button" onClick={closeGenerator}>Back to results</button>
+                    <a href={shareUrl} target="_blank" rel="noopener noreferrer">{t("Share to X")}</a>
+                    <button type="button" onClick={closeGenerator}>{t("Back to results")}</button>
                   </div>
                 </div>
               ) : null}
               {mode === "error" ? (
                 <div className={styles.errorPanel} role="alert">
-                  <strong>Card rendering paused.</strong>
-                  <p>Your result is safe. Try generating the card again.</p>
-                  <button type="button" onClick={generateCard}>Try again</button>
+                  <strong>{t("Card rendering paused.")}</strong>
+                  <p>{t("Your result is safe. Try generating the card again.")}</p>
+                  <button type="button" onClick={generateCard}>{t("Try again")}</button>
                 </div>
               ) : null}
             </div>

@@ -1,10 +1,13 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { DiagramText } from "./diagram-text";
 import styles from "../learn.module.css";
 import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
@@ -45,8 +48,9 @@ const pipelinePhases = [
 const filterLabels = ["METHOD", "ENDPOINT", "IDENTITY", "RATE LIMIT", "SPEND LIMIT"] as const;
 
 function PipelineDiagram() {
+  const { t } = useI18n();
   return (
-    <svg className={styles.latchPipelineSvg} viewBox="0 0 1440 820" aria-hidden="true">
+    <svg direction="ltr" className={styles.latchPipelineSvg} viewBox="0 0 1440 820" role="img" aria-label={t("Diagram: a scoped token crosses ordered request filters before credential injection, upstream access, and response filtering.")}>
       <defs>
         <filter id="latch-glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="9" />
@@ -83,19 +87,19 @@ function PipelineDiagram() {
         <rect width="112" height="120" rx="2" />
         <circle cx="56" cy="42" r="15" />
         <path d="M31 89C36 68 76 68 81 89" />
-        <text x="56" y="108" textAnchor="middle">AGENT</text>
+        <DiagramText maxWidth={95} x="56" y="108" textAnchor="middle">{t("AGENT")}</DiagramText>
       </g>
 
       <g className={styles.latchTokenNode} transform="translate(213 344)">
         <rect width="142" height="96" rx="48" />
         <circle cx="24" cy="48" r="5" />
-        <text x="45" y="43">SCOPED TOKEN</text>
+        <DiagramText maxWidth={88} x="45" y="43">{t("SCOPED TOKEN")}</DiagramText>
         <text className={styles.latchTokenValue} x="45" y="63">lat_7F2A...</text>
       </g>
 
       <g className={styles.latchPolicyBoundary}>
         <path d="M382 272V510" />
-        <text x="397" y="294">ORDERED POLICY PIPELINE</text>
+        <DiagramText maxWidth={340} x="397" y="294">{t("ORDERED POLICY PIPELINE")}</DiagramText>
       </g>
 
       {filterLabels.map((label, index) => {
@@ -112,7 +116,7 @@ function PipelineDiagram() {
             <path d="M18 34H88M18 42H72" />
             <circle cx="53" cy="67" r="12" />
             <path d="M47 67L51 71L60 62" />
-            <text x="53" y="101" textAnchor="middle">{label}</text>
+            <DiagramText maxWidth={95} x="53" y="101" textAnchor="middle">{t(String(label))}</DiagramText>
           </g>
         );
       })}
@@ -122,8 +126,8 @@ function PipelineDiagram() {
         <path className={styles.latchVaultDoor} data-latch-vault-door d="M18 18H98V100H18Z" />
         <circle cx="58" cy="59" r="13" />
         <path d="M58 72V84" />
-        <text x="58" y="124" textAnchor="middle">SECRET</text>
-        <text x="58" y="137" textAnchor="middle">WRITE ONLY</text>
+        <DiagramText maxWidth={100} x="58" y="124" textAnchor="middle">{t("SECRET")}</DiagramText>
+        <DiagramText maxWidth={100} x="58" y="137" textAnchor="middle">{t("WRITE ONLY")}</DiagramText>
       </g>
 
       <path className={styles.latchInjectTrace} data-latch-inject d="M1070 392H1086" />
@@ -131,7 +135,7 @@ function PipelineDiagram() {
       <g className={styles.latchUpstreamNode} data-latch-upstream transform="translate(1240 332)">
         <rect width="126" height="120" rx="3" />
         <path d="M28 43H98M28 60H86M28 77H76" />
-        <text x="63" y="103" textAnchor="middle">UPSTREAM</text>
+        <DiagramText maxWidth={110} x="63" y="103" textAnchor="middle">{t("UPSTREAM")}</DiagramText>
       </g>
 
       <g className={styles.latchPacket} data-latch-packet="allowed">
@@ -157,22 +161,22 @@ function PipelineDiagram() {
 
       <g className={styles.latchOutcome} data-latch-outcome="allowed" transform="translate(1239 284)">
         <rect width="127" height="31" rx="15.5" />
-        <text x="63.5" y="20" textAnchor="middle">200 / FORWARDED</text>
+        <DiagramText maxWidth={120} x="63.5" y="20" textAnchor="middle">{t("200 / FORWARDED")}</DiagramText>
       </g>
       <g className={styles.latchOutcome} data-latch-outcome="403" transform="translate(540 470)">
         <path d="M0 0H142V50H48L32 65V50H0Z" />
-        <text x="71" y="22" textAnchor="middle">403 / DENIED</text>
-        <text x="71" y="37" textAnchor="middle">ENDPOINT</text>
+        <DiagramText maxWidth={120} x="71" y="22" textAnchor="middle">{t("403 / DENIED")}</DiagramText>
+        <DiagramText maxWidth={120} x="71" y="37" textAnchor="middle">{t("ENDPOINT")}</DiagramText>
       </g>
       <g className={styles.latchOutcome} data-latch-outcome="429" transform="translate(800 470)">
         <path d="M0 0H152V50H104L120 65V50H0Z" />
-        <text x="76" y="22" textAnchor="middle">429 / RETRY AFTER</text>
-        <text x="76" y="37" textAnchor="middle">RATE LIMIT</text>
+        <DiagramText maxWidth={120} x="76" y="22" textAnchor="middle">{t("429 / RETRY AFTER")}</DiagramText>
+        <DiagramText maxWidth={120} x="76" y="37" textAnchor="middle">{t("RATE LIMIT")}</DiagramText>
       </g>
 
       <g className={styles.latchRedaction} data-latch-redaction transform="translate(798 574)">
         <rect width="250" height="78" rx="3" />
-        <text x="18" y="23">RESPONSE FILTER</text>
+        <DiagramText maxWidth={210} x="18" y="23">{t("RESPONSE FILTER")}</DiagramText>
         <text x="18" y="45">email</text>
         <rect x="76" y="35" width="150" height="13" rx="2" />
         <text x="18" y="64">ssn</text>
@@ -180,19 +184,20 @@ function PipelineDiagram() {
       </g>
 
       <g className={styles.latchAuditTrace} transform="translate(420 704)">
-        <text x="0" y="0">AUDIT TRACE</text>
+        <DiagramText maxWidth={320} x="0" y="0">{t("AUDIT TRACE")}</DiagramText>
         <path d="M92-4H944" />
         <circle cx="230" cy="-4" r="3" />
         <circle cx="480" cy="-4" r="3" />
         <circle cx="730" cy="-4" r="3" />
-        <text x="944" y="0" textAnchor="end">ALLOW + DENY + FILTER REASON</text>
+        <DiagramText maxWidth={320} x="944" y="0" textAnchor="end">{t("ALLOW + DENY + FILTER REASON")}</DiagramText>
       </g>
-      <text className={styles.latchResponseLabel} x="1176" y="581">RETURNING RESPONSE</text>
+      <DiagramText maxWidth={220} className={styles.latchResponseLabel} x="1176" y="581">{t("RETURNING RESPONSE")}</DiagramText>
     </svg>
   );
 }
 
 function MultiMountDiagram() {
+  const { t } = useI18n();
   const services = [
     { name: "MODEL", path: "/openai", y: 178 },
     { name: "PAYMENTS", path: "/stripe", y: 354 },
@@ -200,7 +205,7 @@ function MultiMountDiagram() {
   ] as const;
 
   return (
-    <svg className={styles.latchMountSvg} viewBox="0 0 1040 700" aria-hidden="true">
+    <svg direction="ltr" className={styles.latchMountSvg} viewBox="0 0 1040 700" role="img" aria-label={t("Diagram: one token branches into separate service mounts, each with its own secret and policy, sharing one audit trail.")}>
       <defs>
         <linearGradient id="latch-branch-gradient" x1="0" x2="1">
           <stop offset="0" stopColor="#a9ddd3" />
@@ -211,7 +216,7 @@ function MultiMountDiagram() {
       <g className={styles.latchMountToken}>
         <circle cx="126" cy="354" r="76" />
         <circle cx="126" cy="354" r="53" />
-        <text x="126" y="346" textAnchor="middle">ONE TOKEN</text>
+        <DiagramText maxWidth={130} x="126" y="346" textAnchor="middle">{t("ONE TOKEN")}</DiagramText>
         <text x="126" y="369" textAnchor="middle">lat_...</text>
       </g>
 
@@ -225,7 +230,7 @@ function MultiMountDiagram() {
           <g transform={`translate(424 ${service.y - 56})`}>
             <rect className={styles.latchMountPipeline} width="250" height="112" rx="3" />
             <text x="18" y="25">{service.path}</text>
-            <text className={styles.latchMountServiceName} x="18" y="52">{service.name}</text>
+            <DiagramText maxWidth={210} className={styles.latchMountServiceName} x="18" y="52">{t(service.name)}</DiagramText>
             <path d="M18 77H62M74 77H118M130 77H174M186 77H230" />
             <circle cx="62" cy="77" r="3" />
             <circle cx="118" cy="77" r="3" />
@@ -235,26 +240,27 @@ function MultiMountDiagram() {
             <rect width="106" height="80" rx="3" />
             <path d="M31 36V27C31 15 75 15 75 27V36" />
             <rect x="25" y="36" width="56" height="29" rx="2" />
-            <text x="53" y="76" textAnchor="middle">SECRET {index + 1}</text>
+            <DiagramText maxWidth={90} x="53" y="76" textAnchor="middle">{t("SECRET {number}", { number: index + 1 })}</DiagramText>
           </g>
           <g className={styles.latchMountUpstream} transform={`translate(840 ${service.y - 40})`}>
             <rect width="142" height="80" rx="3" />
             <path d="M20 27H122M20 40H106M20 53H88" />
-            <text x="71" y="71" textAnchor="middle">UPSTREAM {index + 1}</text>
+            <DiagramText maxWidth={125} x="71" y="71" textAnchor="middle">{t("UPSTREAM {number}", { number: index + 1 })}</DiagramText>
           </g>
         </g>
       ))}
 
       <g className={styles.latchSharedAudit} data-latch-audit>
         <path d="M424 632H982" />
-        <text x="424" y="661">ONE AUDIT TRAIL</text>
-        <text x="982" y="661" textAnchor="end">MOUNT + DECISION + FILTER TRACE</text>
+        <DiagramText maxWidth={320} x="424" y="661">{t("ONE AUDIT TRAIL")}</DiagramText>
+        <DiagramText maxWidth={320} x="982" y="661" textAnchor="end">{t("MOUNT + DECISION + FILTER TRACE")}</DiagramText>
       </g>
     </svg>
   );
 }
 
 export function LatchCinematic() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -537,44 +543,40 @@ export function LatchCinematic() {
 
           <div className={styles.latchContentLayer}>
             <header className={styles.latchIntro} data-latch-intro>
-              <span className={styles.chapterMarker}>Chapter 07 / Latch</span>
-              <span className={styles.systemType}>Security product</span>
-              <p className={styles.chapterThesis}>Programmable authority</p>
-              <h2 id="latch-title">The key never crosses the line.</h2>
-              <p>
-                Scoped authority enters. Hardware identity can bind the caller,
-                while attested policy can protect encrypted requests. The real
-                credential never leaves Latch.
-              </p>
+              <span className={styles.chapterMarker}>{t("Chapter 07 / Latch")}</span>
+              <span className={styles.systemType}>{t("Security product")}</span>
+              <p className={styles.chapterThesis}>{t("Programmable authority")}</p>
+              <h2 id="latch-title">{t("The key never crosses the line.")}</h2>
+              <p>{t("Scoped authority enters. Hardware identity can bind the caller, while attested policy can protect encrypted requests. The real credential never leaves Latch.")}</p>
             </header>
 
             <div className={styles.latchSceneContent} data-latch-scene-content>
               <header className={styles.latchSceneHeader}>
-                <span>Latch / Request control</span>
-                <strong>First deny wins.</strong>
+                <span>{t("Latch / Request control")}</span>
+                <strong>{t("First deny wins.")}</strong>
               </header>
 
               <div className={styles.latchPhaseDeck}>
                 {pipelinePhases.map((phase, index) => (
                   <article className={styles.latchPhase} data-latch-phase key={phase.code}>
-                    <span>{phase.eyebrow}</span>
-                    <h3>{phase.title}</h3>
-                    <p>{phase.body}</p>
+                    <span>{t(phase.eyebrow)}</span>
+                    <h3>{t(phase.title)}</h3>
+                    <p>{t(phase.body)}</p>
                     <small>{String(index + 1).padStart(2, "0")} / 05</small>
                   </article>
                 ))}
               </div>
 
-              <ol className={styles.latchPhaseRail} aria-label="Latch request phases">
+              <ol className={styles.latchPhaseRail} aria-label={t("Latch request phases")}>
                 {pipelinePhases.map((phase) => (
-                  <li data-latch-step={phase.code.toLowerCase()} key={phase.code}>{phase.code}</li>
+                  <li data-latch-step={phase.code.toLowerCase()} key={phase.code}>{phase.code === "403" || phase.code === "429" ? phase.code : t(phase.code)}</li>
                 ))}
               </ol>
             </div>
 
             <div className={styles.latchRelease} data-latch-release>
-              <span>Every decision leaves a trace.</span>
-              <p>Authority stays bounded. The credential stays hidden.</p>
+              <span>{t("Every decision leaves a trace.")}</span>
+              <p>{t("Authority stays bounded. The credential stays hidden.")}</p>
             </div>
           </div>
         </div>
@@ -583,24 +585,19 @@ export function LatchCinematic() {
       <section className={styles.latchMountScene} data-latch-mount-scene aria-labelledby="latch-mount-title">
         <RialoFieldBackground intensity="stage" />
         <header className={styles.latchMountCopy}>
-          <span>Scene 02 / Multi-mount</span>
-          <h3 id="latch-mount-title">One token. Separate authority.</h3>
-          <p>
-            A mount routes each path to its own upstream, Secret, and policy
-            pipeline while every decision joins one audit trail.
-          </p>
-          <small>
-            Child Latches can inherit policy and narrow authority further.
-          </small>
+          <span>{t("Scene 02 / Multi-mount")}</span>
+          <h3 id="latch-mount-title">{t("One token. Separate authority.")}</h3>
+          <p>{t("A mount routes each path to its own upstream, Secret, and policy pipeline while every decision joins one audit trail.")}</p>
+          <small>{t("Child Latches can inherit policy and narrow authority further.")}</small>
         </header>
         <MultiMountDiagram />
       </section>
 
-      <div className={styles.latchStaticRuns} aria-label="Latch policy outcomes">
-        <div><span>200</span><p>Allowed requests pass every request filter before Secret injection and forwarding.</p></div>
-        <div><span>403</span><p>A policy denial stops at its first failing filter and never reaches upstream.</p></div>
-        <div><span>429</span><p>A rate limit denial returns Retry-After without using the real credential.</p></div>
-        <div><span>RETURN</span><p>A response filter can block or redact data after upstream replies.</p></div>
+      <div className={styles.latchStaticRuns} aria-label={t("Latch policy outcomes")}>
+        <div><span>200</span><p>{t("Allowed requests pass every request filter before Secret injection and forwarding.")}</p></div>
+        <div><span>403</span><p>{t("A policy denial stops at its first failing filter and never reaches upstream.")}</p></div>
+        <div><span>429</span><p>{t("A rate limit denial returns Retry-After without using the real credential.")}</p></div>
+        <div><span>{t("RETURN")}</span><p>{t("A response filter can block or redact data after upstream replies.")}</p></div>
       </div>
     </section>
   );

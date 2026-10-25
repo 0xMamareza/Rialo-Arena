@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getI18n } from "@/lib/i18n/server";
 import localFont from "next/font/local";
 import { redirect } from "next/navigation";
 
@@ -15,10 +16,10 @@ const arenaPressure = localFont({
   fallback: ["Arial Narrow", "Arial", "sans-serif"],
 });
 
-export const metadata: Metadata = {
-  title: "Play | Rialo Arena",
-  description: "Take the 15-question Rialo Arena knowledge challenge.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getI18n();
+  return { title: t("Play | Rialo Arena"), description: t("Take the 15-question Rialo Arena knowledge challenge.") };
+}
 
 export default async function QuizPage({
   searchParams,

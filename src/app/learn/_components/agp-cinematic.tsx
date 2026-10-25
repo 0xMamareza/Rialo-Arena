@@ -1,10 +1,13 @@
 "use client";
 
+import { useI18n } from "@/app/_components/language-provider";
+
 import { useLayoutEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { MotionPathPlugin } from "gsap/MotionPathPlugin";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
+import { DiagramText } from "./diagram-text";
 import styles from "../learn.module.css";
 import { createMobileCinematic, mobileCinematicQuery } from "./mobile-cinematic";
 import { RialoFieldBackground } from "./rialo-field-background";
@@ -68,6 +71,7 @@ function RaceCar({ variant, dataName }: RaceCarProps) {
 }
 
 export function AgpCinematic() {
+  const { t } = useI18n();
   const rootRef = useRef<HTMLElement>(null);
 
   useLayoutEffect(() => {
@@ -215,7 +219,7 @@ export function AgpCinematic() {
           <RialoFieldBackground intensity="stage" />
           <div className={styles.agpWorldViewport}>
             <div className={styles.agpWorld} data-agp-world>
-              <svg className={styles.agpCircuit} viewBox="0 0 1200 720" role="presentation" aria-hidden="true">
+              <svg direction="ltr" className={styles.agpCircuit} viewBox="0 0 1200 720" role="img" aria-label={t("Diagram: agents race through hidden checkpoints by asking questions and committing guesses.")}>
               <defs>
                 <filter id="agp-track-glow" x="-30%" y="-30%" width="160%" height="160%">
                   <feGaussianBlur stdDeviation="8" />
@@ -243,28 +247,28 @@ export function AgpCinematic() {
               <path data-agp-route d="M118 548C40 430 134 315 290 350C422 380 400 520 556 518C710 516 769 404 713 311C659 221 489 268 483 165C477 69 668 74 803 124C939 175 1064 134 1084 69" fill="none" stroke="transparent" />
 
               <g className={styles.agpCheckpoint} data-agp-reveal="checkpoint-1" transform="translate(288 350)">
-                <circle r="35" /><circle r="7" /><text x="0" y="-49" textAnchor="middle">CP 01</text>
+                <circle r="35" /><circle r="7" /><DiagramText maxWidth={90} x="0" y="-49" textAnchor="middle">{t("CP 01")}</DiagramText>
               </g>
               <g className={styles.agpCheckpoint} data-agp-reveal="checkpoint-2" transform="translate(704 302)">
-                <circle r="35" /><circle r="7" /><text x="0" y="-49" textAnchor="middle">CP 02</text>
+                <circle r="35" /><circle r="7" /><DiagramText maxWidth={90} x="0" y="-49" textAnchor="middle">{t("CP 02")}</DiagramText>
               </g>
               <g className={styles.agpCheckpoint} data-agp-reveal="checkpoint-3" transform="translate(490 155)">
-                <circle r="35" /><circle r="7" /><text x="0" y="-49" textAnchor="middle">CP 03</text>
+                <circle r="35" /><circle r="7" /><DiagramText maxWidth={90} x="0" y="-49" textAnchor="middle">{t("CP 03")}</DiagramText>
               </g>
 
               <g className={styles.agpOracleSignal} data-agp-reveal="yes" transform="translate(390 414)">
-                <path d="M0 0H122V42H39L24 58V42H0Z" /><text x="61" y="26" textAnchor="middle">ORACLE / YES</text>
+                <path d="M0 0H122V42H39L24 58V42H0Z" /><DiagramText maxWidth={110} x="61" y="26" textAnchor="middle">{t("ORACLE / YES")}</DiagramText>
               </g>
               <g className={styles.agpOracleSignal} data-agp-reveal="no" transform="translate(700 201)">
-                <path d="M0 0H116V42H76L92 58V42H0Z" /><text x="58" y="26" textAnchor="middle">ORACLE / NO</text>
+                <path d="M0 0H116V42H76L92 58V42H0Z" /><DiagramText maxWidth={110} x="58" y="26" textAnchor="middle">{t("ORACLE / NO")}</DiagramText>
               </g>
               <g className={styles.agpGuessSignal} data-agp-reveal="guess" transform="translate(610 112)">
-                <circle r="49" /><circle r="34" /><text y="4" textAnchor="middle">GUESS</text>
+                <circle r="49" /><circle r="34" /><DiagramText maxWidth={60} y="4" textAnchor="middle">{t("GUESS")}</DiagramText>
               </g>
 
               <g className={styles.agpFinish} data-agp-finish transform="translate(1050 32) rotate(19)">
                 <rect width="16" height="100" fill="url(#agp-finish-pattern)" />
-                <text x="8" y="-13" textAnchor="middle">FIN</text>
+                <DiagramText maxWidth={70} x="8" y="-13" textAnchor="middle">{t("FIN")}</DiagramText>
               </g>
               <circle className={styles.agpFinishGlow} data-agp-finish-glow cx="1084" cy="69" r="150" />
 
@@ -278,45 +282,42 @@ export function AgpCinematic() {
           <div className={styles.agpContentLayer} data-agp-content-layer>
             <div className={styles.agpSceneIntro} data-agp-scene-intro>
               <div className={styles.agpApproachCopy}>
-                <span>Chapter 08 / Field test</span>
-                <span className={styles.systemType}>Applied agent demonstration</span>
-                <p>Reasoning enters the circuit.</p>
-                <small>
-                  Hidden checkpoints turn every question into distance, cost,
-                  and commitment.
-                </small>
+                <span>{t("Chapter 08 / Field test")}</span>
+                <span className={styles.systemType}>{t("Applied agent demonstration")}</span>
+                <p>{t("Reasoning enters the circuit.")}</p>
+                <small>{t("Hidden checkpoints turn every question into distance, cost, and commitment.")}</small>
               </div>
             </div>
 
             <div className={styles.agpRaceContent} data-agp-race-content>
               <header className={styles.agpSceneHeader}>
-                <span className={styles.chapterMarker}>Chapter 08 / AGP</span>
+                <span className={styles.chapterMarker}>{t("Chapter 08 / AGP")}</span>
                 <p className={styles.chapterThesis}>Agent Grand Prix</p>
-                <h2 id="agp-title">21 Questions meets F1 for AI agents.</h2>
+                <h2 id="agp-title">{t("21 Questions meets F1 for AI agents.")}</h2>
               </header>
 
               <div className={styles.agpPhaseDeck}>
                 {phases.map((phase, index) => (
                   <article className={styles.agpPhase} data-agp-phase key={phase.code}>
-                    <span>{phase.eyebrow}</span>
-                    <h3>{phase.title}</h3>
-                    <p>{phase.body}</p>
+                    <span>{t(phase.eyebrow)}</span>
+                    <h3>{t(phase.title)}</h3>
+                    <p>{t(phase.body)}</p>
                     <small>{String(index + 1).padStart(2, "0")} / 05</small>
                   </article>
                 ))}
               </div>
 
-              <ol className={styles.agpPhaseRail} aria-label="AGP race phases">
+              <ol className={styles.agpPhaseRail} aria-label={t("AGP race phases")}>
                 {phases.map((phase) => (
-                  <li data-agp-step key={phase.code}>{phase.code}</li>
+                  <li data-agp-step key={phase.code}>{t(phase.code)}</li>
                 ))}
               </ol>
             </div>
 
             <div className={styles.agpSceneRelease} data-agp-scene-release>
               <div className={styles.agpReleaseCopy}>
-                <span>Finish / Signal resolved</span>
-                <p>The race makes efficient reasoning visible.</p>
+                <span>{t("Finish / Signal resolved")}</span>
+                <p>{t("The race makes efficient reasoning visible.")}</p>
                 <small>MCP / Sigil / OpenRouter / Latch</small>
               </div>
             </div>

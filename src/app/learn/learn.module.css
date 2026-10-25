@@ -94,8 +94,9 @@
   right: 0;
   left: 0;
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
+  gap: 1rem;
   min-height: 4.5rem;
   padding-inline: clamp(1rem, 2.5vw, 2.5rem);
   border-bottom: 1px solid rgb(232 227 213 / 14%);
@@ -169,6 +170,14 @@
   justify-self: end;
   color: #e8e3d5;
   text-decoration: none;
+}
+
+.headerActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1rem;
+  min-width: 0;
 }
 
 .arenaReturn span {
@@ -3454,7 +3463,8 @@
 
 @media (max-width: 900px) {
   .learnBar {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: auto auto minmax(0, 1fr);
+    gap: 0.5rem;
     min-height: 4rem;
   }
 
@@ -3469,6 +3479,19 @@
 
   .chapterReadout {
     justify-self: end;
+  }
+
+  .chapterReadout > span:first-child {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .headerActions :global(select) {
+    max-width: min(8rem, 40vw);
   }
 
   .chapterNav {
@@ -5271,5 +5294,91 @@
   .p1337Pulse,
   .scalePacket {
     display: none !important;
+  }
+}
+
+/* Preserve the topology and scroll-coordinate system; only annotations change direction. */
+.learnPage svg {
+  direction: ltr;
+}
+
+.learnPage svg text {
+  unicode-bidi: plaintext;
+}
+
+.learnPage :is(h1, h2, h3, p, a, dt, dd, summary, strong, small) {
+  overflow-wrap: anywhere;
+}
+
+.chapterTransition strong,
+.rialoCore span,
+.fieldNode {
+  white-space: normal;
+}
+
+.systemType,
+.agpApproachCopy > .systemType {
+  max-width: 100%;
+  line-height: 1.4;
+}
+
+.fieldNode {
+  max-width: 34%;
+}
+
+.chapterNav a,
+.primaryReading strong,
+.noteList summary strong {
+  min-width: 0;
+}
+
+/* The English display font's tracking/case rules must not break joined or wide scripts. */
+:global(html:not([lang="en"])) .learnPage :is(h1, h2, h3, p, span, strong, small, a, dt, dd, summary, text) {
+  font-family: inherit;
+  font-variation-settings: normal;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+:global(html:not([lang="en"])) .learnPage :is(h1, h2, h3) {
+  max-width: 100%;
+  line-height: 1.2;
+}
+
+:global(html:not([lang="en"])) .chapterCopy :is(h1, h2) {
+  font-size: clamp(2.5rem, 4.7vw, 5.5rem);
+}
+
+@media (min-width: 1101px) and (prefers-reduced-motion: no-preference) {
+  /* Grid-overlaid panels still animate independently, but the longest translation
+     now contributes real height instead of spilling out of an English-sized box. */
+  .reactivePhaseDeck,
+  .sfsPhaseDeck,
+  .latchPhaseDeck,
+  .agpPhaseDeck,
+  .p1337PhaseDeck,
+  .scalePhaseDeck,
+  .architectureMachinePhases {
+    display: grid;
+  }
+
+  .reactivePhase,
+  .sfsPhase,
+  .latchPhase,
+  .agpPhase,
+  .p1337Phase,
+  .scalePhase,
+  .architectureMachinePhase {
+    position: relative;
+    inset: auto;
+    grid-area: 1 / 1;
+    max-height: 44svh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    padding-inline-end: 0.4rem;
+  }
+
+  :global(html:not([lang="en"])) .learnPage :is(.reactivePhase, .sfsPhase, .latchPhase, .agpPhase, .p1337Phase, .scalePhase, .architectureMachinePhase) h3 {
+    font-size: clamp(1.4rem, 1.8vw, 2.2rem);
   }
 }
